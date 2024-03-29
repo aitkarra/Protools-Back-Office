@@ -4,16 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.campaign.CampaignDto;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.campaign.MetadataValue;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.surveyunit.SurveyUnitResponseDto;
+import fr.insee.protools.backend.dto.rem.REMSurveyUnitDto;
+import fr.insee.protools.backend.repository.IUniteEnquetee;
+import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
 import fr.insee.protools.backend.service.exception.JsonParsingBPMNError;
 import fr.insee.protools.backend.service.nomenclature.NomenclatureService;
+import fr.insee.protools.backend.service.platine.questionnaire.PlatineQuestionnaireService;
 import fr.insee.protools.backend.service.platine.utils.PlatineHelper;
 import fr.insee.protools.backend.service.questionnaire_model.QuestionnaireModelService;
-import fr.insee.protools.backend.dto.rem.REMSurveyUnitDto;
 import fr.insee.protools.backend.service.sabiane.SabianeIdHelper;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -328,5 +330,27 @@ public class QuestionnaireHelper {
             results.addAll(DelegateContextVerifier.computeMissingChildrenMessages(requiredPartition,partitionNode,QuestionnaireHelper.class));
         }
         return results;
+    }
+
+    public static void createSUTaskPlatineAsync(DelegateExecution execution, ContextService protoolsContext, IUniteEnquetee iUniteEnquetee) {
+        JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
+
+        Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, Long.class);
+        JsonNode remSUNode = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_SURVEY_UNIT, JsonNode.class);
+        JsonNode currentPartitionNode = getCurrentPartitionNode(contextRootNode, currentPartitionId);
+
+        //Create the DTO object
+        SurveyUnitResponseDto dto = QuestionnaireHelper.computeDtoPlatine(remSUNode, currentPartitionNode);
+
+        log.info("ProcessInstanceId={} - mode={} - currentPartitionId={} - remSU.id={}",
+                execution.getProcessInstanceId(), "platine Async", currentPartitionId, dto.getId());
+
+        //Call service
+//        service.postSurveyUnit(dto, contextRootNode.path(CTX_CAMPAGNE_ID).asText());
+
+        log.info("SAVE to MongoDB - DelegateExecution");
+        iUniteEnquetee.addNewUniteEnquetee(dto);
+
+        log.debug("ProcessInstanceId={}  end", execution.getProcessInstanceId());
     }
 }

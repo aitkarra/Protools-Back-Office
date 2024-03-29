@@ -2,7 +2,7 @@
 < {%
     client.global.set("host", "https://api-orchestration-protocole-enquete.developpement.insee.fr/");
     client.global.set("host", "https://api-orchestration-protocole-enquete.developpement2.insee.fr/");
-    client.global.set("host", "http://localhost:8080/");
+    client.global.set("host", "http://localhost:8082/");
 %}
 POST https://auth.insee.test/auth/realms/{{realm}}/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
@@ -27,7 +27,8 @@ Content-Type: multipart/form-data; boundary=WebAppBoundary
 --WebAppBoundary
 Content-Disposition: form-data; name="file"; filename="testDeploy.bpmn20.xml"
 
-< ./bpmnAndContext/creation_context_and_su_platine/noCTX_getREMAvecSousProcess_noUELimit.bpmn20.xml
+#< ./bpmnAndContext/creation_context_and_su_platine/noCTX_getREMAvecSousProcess_noUELimit.bpmn20.xml
+< ../../tmp/poc-platine-questionnaire.bpmn
 
 --WebAppBoundary--
 

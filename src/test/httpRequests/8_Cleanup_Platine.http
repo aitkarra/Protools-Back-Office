@@ -11,14 +11,14 @@ grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_sec
   client.global.set("auth_token", response.body.access_token);
   client.log("TOKEN = "+client.global.get("auth_token"));
   client.log("RESPONSE = "+client.global);
-  client.global.set("CAMPAGNE_ID", "AAB2023A00");
-  client.global.set("PARTITION_ID1", "AAB2023A0042");
-    client.global.set("PARTITION_ID2", "AAB2023A0043");
-    client.global.set("SU_ID1", "3287903");
-    client.global.set("SU_ID2", "3287902");
-    client.global.set("SU_ID3", "3043280");
-    client.global.set("SU_ID4", "3043281");
-    client.global.set("SOURCE_ID", "AAB");
+  client.global.set("CAMPAGNE_ID", "BBC2023A00");
+  client.global.set("PARTITION_ID1", "BBC2023A0085");
+    client.global.set("PARTITION_ID2", "BBC2023A0085");
+    // client.global.set("SU_ID1", "3287903");
+    // client.global.set("SU_ID2", "3287902");
+    // client.global.set("SU_ID3", "3043280");
+    // client.global.set("SU_ID4", "3043281");
+    client.global.set("SOURCE_ID", "BBC");
 %}
 
 ### suppression campagne dans platine questionnaire (et des SU rattachées)
@@ -27,43 +27,43 @@ accept: */*
 Authorization: Bearer {{auth_token}}
 
 
-### suppression campagne dans platine pilotage (part0)
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr//api/campaigns/{{CAMPAGNE_ID}}
-accept: */*
-Authorization: Bearer {{auth_token}}
-
-### suppression campagne dans platine pilotage (part1) ID1
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/partitionings/{{PARTITION_ID1}}
-accept: */*
-Authorization: Bearer {{auth_token}}
-
-### suppression campagne dans platine pilotage (part1) ID2
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/partitionings/{{PARTITION_ID2}}
-accept: */*
-Authorization: Bearer {{auth_token}}
-
-### suppression campagne dans platine pilotage (part2)
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/sources/{{SOURCE_ID}}
-accept: */*
-Authorization: Bearer {{auth_token}}
-
-
-### Suppression SU dans platine pilotage SÜ1
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID1}}
-accept: */*
-Authorization: Bearer {{auth_token}}
-
-### Suppression SU dans platine pilotage SU2
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID2}}
-accept: */*
-Authorization: Bearer {{auth_token}}
-
-### Suppression SU dans platine pilotage SU3
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID3}}
-accept: */*
-Authorization: Bearer {{auth_token}}
-
-### Suppression SU dans platine pilotage SU3
-DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID4}}
-accept: */*
-Authorization: Bearer {{auth_token}}
+#### suppression campagne dans platine pilotage (part0)
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr//api/campaigns/{{CAMPAGNE_ID}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
+#
+#### suppression campagne dans platine pilotage (part1) ID1
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/partitionings/{{PARTITION_ID1}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
+#
+#### suppression campagne dans platine pilotage (part1) ID2
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/partitionings/{{PARTITION_ID2}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
+#
+#### suppression campagne dans platine pilotage (part2)
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/sources/{{SOURCE_ID}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
+#
+#
+#### Suppression SU dans platine pilotage SÜ1
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID1}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
+#
+#### Suppression SU dans platine pilotage SU2
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID2}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
+#
+#### Suppression SU dans platine pilotage SU3
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID3}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
+#
+#### Suppression SU dans platine pilotage SU3
+#DELETE https://api-pilotage-enquetes.developpement2.insee.fr/api/survey-units/{{SU_ID4}}
+#accept: */*
+#Authorization: Bearer {{auth_token}}
