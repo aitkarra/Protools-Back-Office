@@ -7,4 +7,4 @@ EXPOSE 8080
 RUN adduser starter
 USER starter
 
-CMD ["java", "-jar","/usr/local/app.jar"]
+CMD ["java", "-jar","/usr/local/app.jar", "-Dspring.profiles.active=dev"]
