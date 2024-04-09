@@ -1,5 +1,10 @@
 package fr.insee.protools.backend.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mongodb.BasicDBObject;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.surveyunit.SurveyUnitResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +12,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.ClassUtils;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Repository
@@ -21,6 +34,11 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 	public List<SurveyUnitResponseDto> getAllUniteEnquetee() {
 		return mongoTemplate.findAll(SurveyUnitResponseDto.class);
 	}
+	private static final ObjectMapper objectMapper =
+			new ObjectMapper()
+					.configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+					.configure(FAIL_ON_MISSING_CREATOR_PROPERTIES, true);
+
 
 	@Override
 	public SurveyUnitResponseDto getUniteEnqueteeById(String UniteEnqueteeId) {
@@ -30,10 +48,33 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 	}
 
 	@Override
-	public SurveyUnitResponseDto addNewUniteEnquetee(SurveyUnitResponseDto ue) {
-		mongoTemplate.save(ue);
-		// Now, user object will contain the ID as well
-		return ue;
+	public JsonNode addNewUniteEnquetee(JsonNode ue) {
+        //JSonNode jackson
+        //mongoTemplate.save(objectMapper.valueToTree(ue), "MaCollectionDeFarid");
+
+        //JSonNode
+//        mongoTemplate.save(ue, "SurveyUnitJSonNode");
+		//String
+        //            mongoTemplate.save(objectMapper.writeValueAsString(ue), "SurveyUnitString");
+        // Now, user object will contain the ID as well
+
+		String correlationID = UUID.randomUUID().toString();
+//		((ObjectNode) ue).put("correlationID", correlationID);
+//		((ObjectNode) ue).put("inProgress", false);
+//		((ObjectNode) ue).put("done", false);
+
+		BasicDBObject dbObject = new BasicDBObject();
+        HashMap<String, Object> keyValuePairs = null;
+        //            keyValuePairs = new ObjectMapper().readValue(ue.traverse(), HashMap.class);
+        keyValuePairs = new HashMap<>();
+        keyValuePairs.put("payload", ue);
+        keyValuePairs.put("correlationID", correlationID);
+        keyValuePairs.put("inProgress", false);
+        keyValuePairs.put("done", false);
+		dbObject.putAll(keyValuePairs);
+        mongoTemplate.save(dbObject, "commandes");
+
+        return ue;
 	}
 
 	@Override

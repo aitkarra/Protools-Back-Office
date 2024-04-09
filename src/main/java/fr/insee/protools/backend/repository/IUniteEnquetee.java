@@ -1,5 +1,6 @@
 package fr.insee.protools.backend.repository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.surveyunit.SurveyUnitResponseDto;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,7 +11,7 @@ public interface IUniteEnquetee {
 	SurveyUnitResponseDto getUniteEnqueteeById(String userId);
 
 	@Transactional
-	SurveyUnitResponseDto addNewUniteEnquetee(SurveyUnitResponseDto ue);
+	JsonNode addNewUniteEnquetee(JsonNode ue);
 //	@Query("{ 'replyTo': 0 }")
 //	@Query(value = "{ 'replyTo' : 1 }", fields = "{ 'replyTo' : 1}")
 	//@Query("{'replyTo' : null}")

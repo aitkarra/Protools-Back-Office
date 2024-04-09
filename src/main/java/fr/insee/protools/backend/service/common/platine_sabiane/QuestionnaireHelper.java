@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.campaign.CampaignDto;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.campaign.MetadataValue;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.surveyunit.SurveyUnitResponseDto;
@@ -21,9 +22,7 @@ import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -348,8 +347,12 @@ public class QuestionnaireHelper {
         //Call service
 //        service.postSurveyUnit(dto, contextRootNode.path(CTX_CAMPAGNE_ID).asText());
 
+        JsonNode ue = objectMapper.valueToTree(dto);
+
+//        HashMap<String,Object> result = new ObjectMapper().readValue(ue, HashMap.class);
+
         log.info("SAVE to MongoDB - DelegateExecution");
-        iUniteEnquetee.addNewUniteEnquetee(dto);
+        iUniteEnquetee.addNewUniteEnquetee(ue);
 
         log.debug("ProcessInstanceId={}  end", execution.getProcessInstanceId());
     }
