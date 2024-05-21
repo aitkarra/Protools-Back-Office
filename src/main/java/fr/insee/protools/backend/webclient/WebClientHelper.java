@@ -44,8 +44,8 @@ import java.util.*;
 @Slf4j
 public class WebClientHelper {
 
-        private static final int DEFAULT_FILE_BUFFER_SIZE = 100 * 1024*1024;
-        private static final int DEFAULT_API_BUFFER_SIZE =  100 * 1024*1024;
+        private static final int DEFAULT_FILE_BUFFER_SIZE = 3000 * 1024*1024;
+        private static final int DEFAULT_API_BUFFER_SIZE =  3000 * 1024*1024;
         private final KeycloakService keycloakService;
         private final ApiConfigProperties apiConfigProperties;
 

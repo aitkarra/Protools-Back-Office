@@ -156,6 +156,8 @@ public interface QuestionnairePlatineSabianeService {
     default void postSurveyUnit(SurveyUnitResponseDto suDto, String idCampaign) {
         WebClientHelper.logJson("postSurveyUnit: idCampaign="+idCampaign, suDto,getLogger(),Level.DEBUG);
         try {
+            //TODO : delete this log
+            getLogger().debug("postSurveyUnit: BEFORE - idCampaign={} - idSu={}", idCampaign,suDto.getId());
             var response = webClient()
                     .post()
                     .uri(uriBuilder -> uriBuilder
@@ -165,7 +167,7 @@ public interface QuestionnairePlatineSabianeService {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            getLogger().info("postSurveyUnit: idCampaign={} - idSu={} - response={} ", idCampaign,suDto.getId(), response);
+            getLogger().info("postSurveyUnit: AFTER - idCampaign={} - idSu={} - response={} ", idCampaign,suDto.getId(), response);
         }
         catch (WebClient4xxBPMNError e){
             if(e.getHttpStatusCodeError().equals(HttpStatus.BAD_REQUEST)){

@@ -1,5 +1,6 @@
 package fr.insee.protools.backend.service.rem;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.era.CensusJsonDto;
 import fr.insee.protools.backend.dto.rem.REMSurveyUnitDto;
 import fr.insee.protools.backend.dto.rem.SuIdMappingJson;
@@ -21,8 +22,8 @@ public class RemService {
 
     private final WebClientHelper webClientHelper;
 
-    public Long[] getSampleSuIds(Long partitionId) {
-        log.debug("getSampleSuIds - partitionId={} ",partitionId);
+    public Long[] getPartitionSuIds(Long partitionId) {
+        log.debug("getPartitionSuIds - partitionId={} ",partitionId);
         try {
             var response = webClientHelper.getWebClient(KNOWN_API_REM)
                     .get()
@@ -32,13 +33,43 @@ public class RemService {
                     .retrieve()
                     .bodyToMono(Long[].class)
                     .block();
-            log.trace("partitionIds={} - response={} ", partitionId, response);
+            log.trace("partitionId={} - response={} ", partitionId, response);
             return response;
         }
         catch (WebClient4xxBPMNError e){
             if(e.getHttpStatusCodeError().equals(HttpStatus.NOT_FOUND)){
                 String msg=
-                        "Error 404/NOT_FOUND during get sample on REM with partitionId="+partitionId
+                        "Error 404/NOT_FOUND during get partition on REM with partitionId="+partitionId
+                                + " - msg="+e.getMessage();
+                log.error(msg);
+                throw new WebClient4xxBPMNError(msg,e.getHttpStatusCodeError());
+            }
+            //Currently no remediation so just rethrow
+            throw e;
+        }
+    }
+
+
+    public JsonNode[] getPartitionAllSU(Long partitionId) {
+        log.error("getPartitionAllSU - partitionId={} ",partitionId);
+        try {
+            var response = webClientHelper.getWebClient(KNOWN_API_REM)
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/survey-units/partitions/{partitionId}")
+                            .queryParam("withExternals", true)
+                            .build(partitionId))
+                    //.uri("/starter/ues")
+                    .retrieve()
+                    .bodyToMono(JsonNode[].class)
+                    .block();
+            log.error("partitionId={} - response.length={} ", partitionId, response.length);
+            return response;
+        }
+        catch (WebClient4xxBPMNError e){
+            if(e.getHttpStatusCodeError().equals(HttpStatus.NOT_FOUND)){
+                String msg=
+                        "Error 404/NOT_FOUND during get SU on REM with partitionId="+partitionId
                                 + " - msg="+e.getMessage();
                 log.error(msg);
                 throw new WebClient4xxBPMNError(msg,e.getHttpStatusCodeError());

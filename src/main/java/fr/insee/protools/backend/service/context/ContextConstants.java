@@ -7,7 +7,8 @@ public final class ContextConstants {
     public static final String CTX_CAMPAGNE_LABEL = "label";
     public static final String CTX_CAMPAGNE_CONTEXTE = "contexte"; //Values: Enum CampaignContext...
 
-
+    //Treatment using REST APIs or Asynch queue
+    public static final String CTX_MODE =  "mode"; //api or queue
     //Metadonnees Part
     public static final String CTX_METADONNEES = "metadonnees";
     public static final String CTX_META_OPERATION_ID = "operationId";//== platine : Survey

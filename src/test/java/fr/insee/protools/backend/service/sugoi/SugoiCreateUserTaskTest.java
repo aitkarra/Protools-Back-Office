@@ -77,6 +77,7 @@ class SugoiCreateUserTaskTest {
         User userParam = acUserDto.getValue();
         assertEquals(1, userParam.getHabilitations().size(),"We should have exactly one habilitation");
         assertTrue(userParam.getHabilitations().contains(PLATINE_HABILITATION),"Platine habilitiation not found");
+        assertEquals("repondant_platine",userParam.getHabilitations().get(0).getId(),"Platine habilitation should be repondant_platine");
 
         //verif on password
         verify(sugoiService).postInitPassword(userId,expectedPwd);

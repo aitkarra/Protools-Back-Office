@@ -82,14 +82,14 @@ class RemGetPartitionListOfSuIdTaskTest {
         when(execution.getParent()).thenReturn(executionParent);
 
         List<Long> expectedResult = List.of(remSuIdList);
-        when(remService.getSampleSuIds(currentPartitionId)).thenReturn(remSuIdList);
+        when(remService.getPartitionSuIds(currentPartitionId)).thenReturn(remSuIdList);
         //Execute the unit under test
         remGetPartitionListOfSuIdTask.execute(execution);
 
 
         //Post conditions
         //Service called once and for the right partition
-        verify(remService).getSampleSuIds(currentPartitionId);
+        verify(remService).getPartitionSuIds(currentPartitionId);
         //Process instance variable set with the list of retrieved Ids
         verify(executionParent).setVariableLocal(VARNAME_REM_SU_ID_LIST, expectedResult);
     }

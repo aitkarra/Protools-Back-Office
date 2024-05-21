@@ -1,7 +1,6 @@
 package fr.insee.protools.backend.service.platine.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.repository.IUniteEnquetee;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.common.platine_sabiane.QuestionnaireHelper;
 import fr.insee.protools.backend.service.context.ContextService;
@@ -14,21 +13,29 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import static fr.insee.protools.backend.service.context.ContextConstants.CTX_CAMPAGNE_CONTEXTE;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PlatineQuestionnaireCreateSurveyUnitTask implements JavaDelegate, DelegateContextVerifier {
+public class PlatineQuestionnaireCreateSurveyUnitTaskv2 implements JavaDelegate, DelegateContextVerifier {
 
     private final ContextService protoolsContext;
-//    private final PlatineQuestionnaireService platineQuestionnaireService;
-    private final IUniteEnquetee iUniteEnquetee;
+    private final PlatineQuestionnaireService platineQuestionnaireService;
 
     @Override
     public void execute(DelegateExecution execution) {
         JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
+        //TODO: delete this log if necessary
+        log.debug("ProcessInstanceId={}  - campagne={} - begin"
+                ,execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
+
         checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
-//        QuestionnaireHelper.createSUTaskPlatine(execution,protoolsContext,platineQuestionnaireService);
-        QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,iUniteEnquetee);
+        QuestionnaireHelper.createAllSUTaskPlatine(execution,protoolsContext,platineQuestionnaireService);
+        log.debug("ProcessInstanceId={}  - campagne={} - end",
+                execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
+
+
     }
 
     @Override

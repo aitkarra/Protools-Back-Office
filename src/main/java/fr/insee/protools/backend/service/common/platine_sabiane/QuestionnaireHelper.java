@@ -12,6 +12,7 @@ import fr.insee.protools.backend.dto.rem.REMSurveyUnitDto;
 import fr.insee.protools.backend.repository.IUniteEnquetee;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
+import fr.insee.protools.backend.service.exception.IncorrectSUBPMNError;
 import fr.insee.protools.backend.service.exception.JsonParsingBPMNError;
 import fr.insee.protools.backend.service.nomenclature.NomenclatureService;
 import fr.insee.protools.backend.service.platine.questionnaire.PlatineQuestionnaireService;
@@ -20,14 +21,19 @@ import fr.insee.protools.backend.service.questionnaire_model.QuestionnaireModelS
 import fr.insee.protools.backend.service.sabiane.SabianeIdHelper;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 
 import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 import static fr.insee.protools.backend.service.context.ContextConstants.*;
 import static fr.insee.protools.backend.service.utils.ContextUtils.getCurrentPartitionNode;
 
@@ -253,6 +259,74 @@ public class QuestionnaireHelper {
         createSUTaskPlatineSabiane(execution, protoolsContext, service, false);
     }
 
+    public static void createAllSUTaskPlatine(DelegateExecution execution, ContextService protoolsContext, QuestionnairePlatineSabianeService service) {
+        JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
+
+        Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, Long.class);
+        List<JsonNode> listeUe =   FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_SU_LIST, List.class);
+
+
+        Boolean parallele = FlowableVariableUtils.getVariableOrThrow(execution, "parallele", Boolean.class);
+        JsonNode currentPartitionNode = getCurrentPartitionNode(contextRootNode, currentPartitionId);
+        log.info("parallele="+parallele+"- Boolean.FALSE.equals(parallele)="+Boolean.FALSE.equals(parallele));
+
+        String idCampaign = contextRootNode.path(CTX_CAMPAGNE_ID).asText();
+
+        if(Boolean.FALSE.equals(parallele)) {
+            for (JsonNode remSUNode : listeUe){
+                //Create the DTO object
+                SurveyUnitResponseDto dto =
+                        QuestionnaireHelper.computeDtoPlatine(remSUNode, currentPartitionNode);
+                log.trace("ProcessInstanceId={} - mode={} - currentPartitionId={} - remSU.id={}",
+                        execution.getProcessInstanceId(), "platine", currentPartitionId, dto.getId());
+
+                //Call service
+                postSUWithRetry(service, dto, idCampaign);
+            }
+        }
+        else{
+
+                listeUe.stream().parallel().forEach(remSUNode -> {
+                    //Create the DTO object
+                    SurveyUnitResponseDto dto =
+                            QuestionnaireHelper.computeDtoPlatine(remSUNode, currentPartitionNode);
+                    log.trace("ProcessInstanceId={} - mode={} - currentPartitionId={} - remSU.id={}",
+                            execution.getProcessInstanceId(), "platine", currentPartitionId, dto.getId());
+
+                    postSUWithRetry(service, dto, idCampaign);
+                });
+            }
+
+        log.debug("ProcessInstanceId={}  end", execution.getProcessInstanceId());
+    }
+
+    private static void postSUWithRetry(QuestionnairePlatineSabianeService service, SurveyUnitResponseDto dto, String idCampaign) {
+        int retryCount = 0;
+        boolean finished=false;
+        while(retryCount<10 && !finished)
+        try {
+            //Call service
+            service.postSurveyUnit(dto, idCampaign);
+            finished=true;
+        }
+        catch (Throwable e){
+            int sleepMs = 1000 + retryCount*10000;
+            retryCount++;
+            log.error(" Exception : remSU.id={} - retryCount={} - sleepMs={} - msg={} ",
+                    dto.getId(), retryCount,sleepMs,e.getMessage());;
+            if(retryCount>=10){
+                throw e;
+            }
+
+
+            try {
+                Thread.sleep(15000);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
     /**
      * Create a SU in Sabiane Questionnaire
      * @param execution
@@ -278,7 +352,7 @@ public class QuestionnaireHelper {
                         :
                         QuestionnaireHelper.computeDtoPlatine(remSUNode, currentPartitionNode);
 
-        log.info("ProcessInstanceId={} - mode={} - currentPartitionId={} - remSU.id={}",
+        log.debug("ProcessInstanceId={} - mode={} - currentPartitionId={} - remSU.id={}",
                 execution.getProcessInstanceId(), modeSabiane ? "sabiane" : "platine", currentPartitionId, dto.getId());
 
         //Call service

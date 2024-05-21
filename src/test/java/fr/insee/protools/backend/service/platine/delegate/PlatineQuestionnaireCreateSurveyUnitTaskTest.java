@@ -34,11 +34,11 @@ class PlatineQuestionnaireCreateSurveyUnitTaskTest extends TestWithContext {
     PlatineQuestionnaireService platineQuestionnaireService;
 
     @InjectMocks
-    PlatineQuestionnaireCreateSurveyUnitTask platineQuestionnaireCreateSurveyUnitTask;
+    PlatineQuestionnaireCreateSurveyUnitTask_old platineQuestionnaireCreateSurveyUnitTask;
 
 
 
-    final static String ressourceFolder = ClassUtils.convertClassNameToResourcePath(PlatineQuestionnaireCreateSurveyUnitTask.class.getPackageName());
+    final static String ressourceFolder = ClassUtils.convertClassNameToResourcePath(PlatineQuestionnaireCreateSurveyUnitTask_old.class.getPackageName());
     final static String platine_context_json = ressourceFolder+"/protools-contexte-platine-individu.json";
     final static String platine_context_logement_json = ressourceFolder+"/protools-contexte-platine-individu.json";
 
