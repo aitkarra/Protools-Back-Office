@@ -1,0 +1,28 @@
+### GET TOKEN
+< {%
+    client.global.set("host", "https://api-orchestration-protocole-enquete.developpement.insee.fr/");
+    // client.global.set("host", "https://api-orchestration-protocole-enquete.developpement2.insee.fr/");
+    // client.global.set("host", "http://localhost:8082/");
+    client.global.set("host", "https://pocprotools.dev.kube.insee.fr");
+%}
+POST https://auth.insee.test/auth/realms/{{realm}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_secret}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+  client.global.set("auth_token", response.body.access_token);
+  client.log("TOKEN = "+client.global.get("auth_token"));
+    client.log("RESPONSE = "+client.global);
+%}
+
+###
+# curl -X 'GET'
+#  'https://poc-protools.dev.kube.insee.fr/starter/token_details_by_api'
+#  -H 'accept: */*'
+GET https://pocprotools.dev.kube.insee.fr/starter/token_details_by_api
+Authorization: Bearer {{auth_token}}
+

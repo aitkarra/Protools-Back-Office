@@ -348,6 +348,7 @@ public class QuestionnaireHelper {
 //        service.postSurveyUnit(dto, contextRootNode.path(CTX_CAMPAGNE_ID).asText());
 
         JsonNode ue = objectMapper.valueToTree(dto);
+        ((ObjectNode) ue).put("processId", execution.getProcessInstanceId());
 
 //        HashMap<String,Object> result = new ObjectMapper().readValue(ue, HashMap.class);
 
