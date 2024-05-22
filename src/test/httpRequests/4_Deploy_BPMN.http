@@ -29,7 +29,8 @@ Content-Type: multipart/form-data; boundary=WebAppBoundary
 Content-Disposition: form-data; name="file"; filename="testDeploy.bpmn20.xml"
 
 #< ./bpmnAndContext/creation_context_and_su_platine/noCTX_getREMAvecSousProcess_noUELimit.bpmn20.xml
-< ../../tmp/poc-platine-questionnaire.bpmn
+#< ../../tmp/poc-platine-questionnaire.bpmn
+< ../../tmp/poc-all-su.bpmn
 
 --WebAppBoundary--
 

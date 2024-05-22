@@ -15,7 +15,8 @@ grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_sec
     });
     client.global.set("auth_token", response.body.access_token);
     // client.global.set("processDefinitionKey", "famille");
-    client.global.set("processDefinitionKey", "poc-platine-questionnaire");
+    // client.global.set("processDefinitionKey", "poc-platine-questionnaire");
+    client.global.set("processDefinitionKey", "poc-allSU");
     client.global.set("businessKey", "AAA");
     //Set the context file in the last query
 %}
