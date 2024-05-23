@@ -405,7 +405,7 @@ public class QuestionnaireHelper {
         return results;
     }
 
-    public static void createSUTaskPlatineAsync(DelegateExecution execution, ContextService protoolsContext, IUniteEnquetee iUniteEnquetee) {
+    public static void createSUTaskPlatineAsync(DelegateExecution execution, ContextService protoolsContext, IUniteEnquetee iUniteEnquetee, QuestionnairePlatineSabianeService service) {
         JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
 
         Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, Long.class);
@@ -418,7 +418,42 @@ public class QuestionnaireHelper {
 
         String idCampaign = contextRootNode.path(CTX_CAMPAGNE_ID).asText();
 
-        iUniteEnquetee.addManyUniteEnquetee(listeUe);
+        if(Boolean.FALSE.equals(parallele)) {
+            for (JsonNode remSUNode : listeUe){
+                //Create the DTO object
+                SurveyUnitResponseDto dto =
+                        QuestionnaireHelper.computeDtoPlatine(remSUNode, currentPartitionNode);
+                log.trace("ProcessInstanceId={} - mode={} - currentPartitionId={} - remSU.id={}",
+                        execution.getProcessInstanceId(), "platine", currentPartitionId, dto.getId());
+
+                //Call service
+//                postSUWithRetry(service, dto, idCampaign);
+                JsonNode ue = objectMapper.valueToTree(dto);
+                ((ObjectNode) ue).put("processId", execution.getProcessInstanceId());
+                log.info("SAVE to MongoDB - DelegateExecution");
+                iUniteEnquetee.addNewUniteEnquetee(ue);
+                log.debug("ProcessInstanceId={}  end", execution.getProcessInstanceId());
+            }
+        }
+        else{
+
+            listeUe.stream().parallel().forEach(remSUNode -> {
+                //Create the DTO object
+                SurveyUnitResponseDto dto =
+                        QuestionnaireHelper.computeDtoPlatine(remSUNode, currentPartitionNode);
+                log.trace("ProcessInstanceId={} - mode={} - currentPartitionId={} - remSU.id={}",
+                        execution.getProcessInstanceId(), "platine", currentPartitionId, dto.getId());
+
+//                postSUWithRetry(service, dto, idCampaign);
+                JsonNode ue = objectMapper.valueToTree(dto);
+                ((ObjectNode) ue).put("processId", execution.getProcessInstanceId());
+                log.info("SAVE to MongoDB - DelegateExecution");
+                iUniteEnquetee.addNewUniteEnquetee(ue);
+                log.debug("ProcessInstanceId={}  end", execution.getProcessInstanceId());
+            });
+        }
+
+//        iUniteEnquetee.addManyUniteEnquetee(listeUe);
     }
 
     public static void createSUTaskPlatineAsync2(DelegateExecution execution, ContextService protoolsContext, IUniteEnquetee iUniteEnquetee) {

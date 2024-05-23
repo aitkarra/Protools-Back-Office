@@ -32,7 +32,7 @@ public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelega
                 ,execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
 
         checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
-        QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,iUniteEnquetee);
+        QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,iUniteEnquetee,platineQuestionnaireService);
         log.debug("ProcessInstanceId={}  - campagne={} - end",
                 execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
 
