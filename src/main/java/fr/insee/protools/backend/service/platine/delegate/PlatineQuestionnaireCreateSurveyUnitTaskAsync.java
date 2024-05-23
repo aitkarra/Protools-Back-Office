@@ -1,6 +1,7 @@
 package fr.insee.protools.backend.service.platine.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.protools.backend.repository.IUniteEnquetee;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.common.platine_sabiane.QuestionnaireHelper;
 import fr.insee.protools.backend.service.context.ContextService;
@@ -22,7 +23,7 @@ public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelega
 
     private final ContextService protoolsContext;
     private final PlatineQuestionnaireService platineQuestionnaireService;
-
+    private final IUniteEnquetee iUniteEnquetee;
     @Override
     public void execute(DelegateExecution execution) {
         JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
@@ -31,7 +32,7 @@ public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelega
                 ,execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
 
         checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
-        QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,platineQuestionnaireService);
+        QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,iUniteEnquetee);
         log.debug("ProcessInstanceId={}  - campagne={} - end",
                 execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
 

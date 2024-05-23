@@ -49,14 +49,14 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 
 	@Override
 	public JsonNode addNewUniteEnquetee(JsonNode ue) {
-        //JSonNode jackson
-        //mongoTemplate.save(objectMapper.valueToTree(ue), "MaCollectionDeFarid");
+		//JSonNode jackson
+		//mongoTemplate.save(objectMapper.valueToTree(ue), "MaCollectionDeFarid");
 
-        //JSonNode
+		//JSonNode
 //        mongoTemplate.save(ue, "SurveyUnitJSonNode");
 		//String
-        //            mongoTemplate.save(objectMapper.writeValueAsString(ue), "SurveyUnitString");
-        // Now, user object will contain the ID as well
+		//            mongoTemplate.save(objectMapper.writeValueAsString(ue), "SurveyUnitString");
+		// Now, user object will contain the ID as well
 
 		String correlationID = UUID.randomUUID().toString();
 //		((ObjectNode) ue).put("correlationID", correlationID);
@@ -64,17 +64,37 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 //		((ObjectNode) ue).put("done", false);
 
 		BasicDBObject dbObject = new BasicDBObject();
-        HashMap<String, Object> keyValuePairs = null;
-        //            keyValuePairs = new ObjectMapper().readValue(ue.traverse(), HashMap.class);
-        keyValuePairs = new HashMap<>();
-        keyValuePairs.put("payload", ue);
-        keyValuePairs.put("correlationID", correlationID);
-        keyValuePairs.put("inProgress", false);
-        keyValuePairs.put("done", false);
+		HashMap<String, Object> keyValuePairs = null;
+		//            keyValuePairs = new ObjectMapper().readValue(ue.traverse(), HashMap.class);
+		keyValuePairs = new HashMap<>();
+		keyValuePairs.put("payload", ue);
+		keyValuePairs.put("correlationID", correlationID);
+		keyValuePairs.put("inProgress", false);
+		keyValuePairs.put("done", false);
 		dbObject.putAll(keyValuePairs);
-        mongoTemplate.save(dbObject, "commandes");
+		mongoTemplate.save(dbObject, "commandes");
 
-        return ue;
+		return ue;
+	}
+
+	@Override
+	public void addManyUniteEnquetee(List<JsonNode> listeUe) {
+		for(JsonNode ue : listeUe)
+		{
+			String correlationID = UUID.randomUUID().toString();
+
+			BasicDBObject dbObject = new BasicDBObject();
+			HashMap<String, Object> keyValuePairs = null;
+			//            keyValuePairs = new ObjectMapper().readValue(ue.traverse(), HashMap.class);
+			keyValuePairs = new HashMap<>();
+			keyValuePairs.put("payload", ue);
+			keyValuePairs.put("correlationID", correlationID);
+			keyValuePairs.put("inProgress", false);
+			keyValuePairs.put("done", false);
+			dbObject.putAll(keyValuePairs);
+			mongoTemplate.save(dbObject, "commandes");
+		}
+		log.info("===>La collection listeUe est vide<===");
 	}
 
 	@Override

@@ -12,6 +12,10 @@ public interface IUniteEnquetee {
 
 	@Transactional
 	JsonNode addNewUniteEnquetee(JsonNode ue);
+
+	@Transactional
+	void addManyUniteEnquetee(List<JsonNode> listeUe);
+
 //	@Query("{ 'replyTo': 0 }")
 //	@Query(value = "{ 'replyTo' : 1 }", fields = "{ 'replyTo' : 1}")
 	//@Query("{'replyTo' : null}")

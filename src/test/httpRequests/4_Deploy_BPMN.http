@@ -2,8 +2,8 @@
 < {%
     // client.global.set("host", "https://api-orchestration-protocole-enquete.developpement.insee.fr/");
     // client.global.set("host", "https://api-orchestration-protocole-enquete.developpement2.insee.fr/");
-    // client.global.set("host", "http://localhost:8082/");
-    client.global.set("host", "https://pocprotools.dev.kube.insee.fr/");
+    client.global.set("host", "http://localhost:8082/");
+    // client.global.set("host", "https://pocprotools.dev.kube.insee.fr/");
 %}
 POST https://auth.insee.test/auth/realms/{{realm}}/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
