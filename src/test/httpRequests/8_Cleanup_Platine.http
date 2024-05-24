@@ -22,9 +22,9 @@ grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_sec
 %}
 
 ### suppression campagne dans platine questionnaire (et des SU rattachées)
-DELETE https://api-questionnaire-enquetes.developpement2.insee.fr/api/campaign/{{CAMPAGNE_ID}}?force=true
+#DELETE https://api-questionnaire-enquetes.developpement2.insee.fr/api/campaign/{{CAMPAGNE_ID}}?force=true
 #DELETE http://localhost:8080/api/campaign/{{CAMPAGNE_ID}}?force=true
-#DELETE  http://pocprotools-queen-bo.dev.kube.insee.fr/api/campaign/{{CAMPAGNE_ID}}?force=true
+DELETE  https://pocprotools-queen-bo-rest.dev.kube.insee.fr/api/campaign/{{CAMPAGNE_ID}}?force=true
 accept: */*
 Authorization: Bearer {{auth_token}}
 
