@@ -39,7 +39,7 @@ public class ProtoolsProcessControllerAdvice {
 
     @ExceptionHandler({ TaskNotFoundException.class })
     public ResponseEntity<String> exeptionTaskNotFoundHandler(/*final HttpServletRequest req, */final TaskNotFoundException exception) {
-        log.error("exceptionContextIncorrectHandler  : "+exception.getMessage());
+        log.error("exeptionTaskNotFoundHandler  : "+exception.getMessage());
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
