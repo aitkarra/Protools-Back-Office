@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 #### BPMN TASKS
 - [sugoiCreateUserTask](TODO)
   La longueur du mot de passe crée dépend du contexte (8 pour household ; 12 sinon)
-
+- [cleanUserPasswordTask](TODO)
+  Suppression de toutes les variables de mots de passe (sur le contexte et dans l'historique)
 
 ## [1.1.0] - 14-05-2024
 ### Added
