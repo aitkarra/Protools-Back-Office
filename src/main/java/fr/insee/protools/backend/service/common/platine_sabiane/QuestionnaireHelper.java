@@ -4,28 +4,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.campaign.CampaignDto;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.campaign.MetadataValue;
 import fr.insee.protools.backend.dto.platine_sabiane_questionnaire.surveyunit.SurveyUnitResponseDto;
+import fr.insee.protools.backend.dto.rem.REMSurveyUnitDto;
+import fr.insee.protools.backend.repository.IUniteEnquetee;
+import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.exception.IncorrectSUBPMNError;
 import fr.insee.protools.backend.service.exception.JsonParsingBPMNError;
 import fr.insee.protools.backend.service.nomenclature.NomenclatureService;
 import fr.insee.protools.backend.service.platine.utils.PlatineHelper;
 import fr.insee.protools.backend.service.questionnaire_model.QuestionnaireModelService;
-import fr.insee.protools.backend.dto.rem.REMSurveyUnitDto;
 import fr.insee.protools.backend.service.sabiane.SabianeIdHelper;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -400,4 +398,23 @@ public class QuestionnaireHelper {
         }
         return results;
     }
+
+    public static void createSUTaskPlatineAsync(DelegateExecution execution, ContextService protoolsContext, IUniteEnquetee iUniteEnquetee, QuestionnairePlatineSabianeService service) {
+        JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
+
+        Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, Long.class);
+        List<JsonNode> listeUe =   FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_SU_LIST, List.class);
+
+        Boolean parallele = FlowableVariableUtils.getVariableOrThrow(execution, "parallele", Boolean.class);
+        JsonNode currentPartitionNode = getCurrentPartitionNode(contextRootNode, currentPartitionId);
+        String questionnaireId = currentPartitionNode.path(CTX_PARTITION_QUESTIONNAIRE_MODEL).asText();
+        log.info("parallele="+parallele+"- Boolean.FALSE.equals(parallele)="+Boolean.FALSE.equals(parallele));
+
+        String processInstanceId = execution.getProcessInstanceId();
+        String campaignId = contextRootNode.path(CTX_CAMPAGNE_ID).asText();
+
+        iUniteEnquetee.addManyUniteEnquetee(listeUe, processInstanceId, campaignId, questionnaireId);
+//        iUniteEnquetee.addManyUniteEnqueteeDeleteColonneClass(listeUe);
+    }
+
 }
