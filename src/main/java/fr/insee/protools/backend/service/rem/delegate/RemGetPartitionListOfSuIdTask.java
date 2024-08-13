@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SU_ID_LIST;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERRO_ID_LIST;
 
 @Slf4j
 @Component
@@ -29,7 +29,7 @@ public class RemGetPartitionListOfSuIdTask implements JavaDelegate, DelegateCont
 
         Long[] partitionSUIds = remService.getSampleSuIds(currentPartitionId);
         List<Long> remSuIdList = List.of(partitionSUIds);
-        execution.getParent().setVariableLocal(VARNAME_REM_SU_ID_LIST, remSuIdList);
+        execution.getParent().setVariableLocal(VARNAME_REM_INTERRO_ID_LIST, remSuIdList);
         log.debug("ProcessInstanceId={} -  partition={} - remSuIdList={} end",execution.getProcessInstanceId(),currentPartitionId,remSuIdList);
     }
 }

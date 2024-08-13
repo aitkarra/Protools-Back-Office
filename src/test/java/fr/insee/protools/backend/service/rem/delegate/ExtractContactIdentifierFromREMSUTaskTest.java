@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_DIRECTORYACCESS_ID_CONTACT;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERROGATION;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -35,7 +35,7 @@ class ExtractContactIdentifierFromREMSUTaskTest extends TestWithContext {
         assertThrows(FlowableIllegalArgumentException.class, () -> extractTask.execute(execution));
 
         //Wrong Type ==> Error
-        lenient().doReturn(Boolean.FALSE).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT, Boolean.class);
+        lenient().doReturn(Boolean.FALSE).when(execution).getVariable(VARNAME_REM_INTERROGATION, Boolean.class);
         assertThrows(FlowableIllegalArgumentException.class, () -> extractTask.execute(execution));
 
     }
@@ -57,7 +57,7 @@ class ExtractContactIdentifierFromREMSUTaskTest extends TestWithContext {
                                             "missing_tag": [ ]
                                 }
                         """;
-        doReturn(objectMapper.readTree(content)).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT, JsonNode.class);
+        doReturn(objectMapper.readTree(content)).when(execution).getVariable(VARNAME_REM_INTERROGATION, JsonNode.class);
         //Execute
         assertThrows(IncorrectSUBPMNError.class, () -> extractTask.execute(execution));
 
@@ -77,7 +77,7 @@ class ExtractContactIdentifierFromREMSUTaskTest extends TestWithContext {
                                   } ]
                                 }
                         """;
-        doReturn(objectMapper.readTree(content)).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT, JsonNode.class);
+        doReturn(objectMapper.readTree(content)).when(execution).getVariable(VARNAME_REM_INTERROGATION, JsonNode.class);
         //Execute
         assertThrows(IncorrectSUBPMNError.class, () -> extractTask.execute(execution));
     }
@@ -109,7 +109,7 @@ class ExtractContactIdentifierFromREMSUTaskTest extends TestWithContext {
                                       } ]
                         }
                         """;
-        doReturn(objectMapper.readTree(content)).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT, JsonNode.class);
+        doReturn(objectMapper.readTree(content)).when(execution).getVariable(VARNAME_REM_INTERROGATION, JsonNode.class);
 
         //Execute
         assertDoesNotThrow(() -> extractTask.execute(execution));

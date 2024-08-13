@@ -78,7 +78,7 @@ class PlatinePilotageCreateSurveyUnitTaskTest extends TestWithContext {
         JsonNode remSU = ProtoolsTestUtils.asJsonNode(RemSUData.rem_su_3personnes);
         Long idPArtition=1l;
         lenient().doReturn(idPArtition).when(execution).getVariable(VARNAME_CURRENT_PARTITION_ID,Long.class);
-        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT,JsonNode.class);
+        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_INTERROGATION,JsonNode.class);
         lenient().doReturn("TOTO").when(execution).getVariable(VARNAME_DIRECTORYACCESS_ID_CONTACT,String.class);
 
         //Execute the unit under test
@@ -128,17 +128,17 @@ class PlatinePilotageCreateSurveyUnitTaskTest extends TestWithContext {
     @Test
     @DisplayName("convertREMGenderToPlatineCivility should return Female when param '2' ; 'Male' when param is '1' and Undefined in other cases")
     void convertREMGenderToPlatineCivility_should_ReturnCorrectValues() {
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("2")).isEqualTo(PlatinePilotageGenderType.Female);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("1")).isEqualTo(PlatinePilotageGenderType.Male);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("22")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility(" 2")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility(" 2 ")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("3")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("23JZKEOSJF")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("0")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("-1")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("-2")).isEqualTo(PlatinePilotageGenderType.Undefined);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.convertREMGenderToPlatineCivility("& ukdslw,kvlk,l")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("2")).isEqualTo(PlatinePilotageGenderType.Female);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("1")).isEqualTo(PlatinePilotageGenderType.Male);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("22")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility(" 2")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility(" 2 ")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("3")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("23JZKEOSJF")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("0")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("-1")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("-2")).isEqualTo(PlatinePilotageGenderType.Undefined);
+        assertThat(PlatinePilotageCreateInterrogationListTask.convertREMGenderToPlatineCivility("& ukdslw,kvlk,l")).isEqualTo(PlatinePilotageGenderType.Undefined);
     }
 
     @Test
@@ -146,10 +146,10 @@ class PlatinePilotageCreateSurveyUnitTaskTest extends TestWithContext {
     void getPlatineLastname_should_work(){
         String lastname="lastname";
         String birthname="birthname";
-        assertThat(PlatinePilotageCreateSurveyUnitTask.getPlatineLastname(lastname,birthname)).isEqualTo(lastname);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.getPlatineLastname(null,birthname)).isEqualTo(birthname);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.getPlatineLastname(lastname,null)).isEqualTo(lastname);
-        assertThat(PlatinePilotageCreateSurveyUnitTask.getPlatineLastname(null,null)).isEmpty();
+        assertThat(PlatinePilotageCreateInterrogationListTask.getPlatineLastname(lastname,birthname)).isEqualTo(lastname);
+        assertThat(PlatinePilotageCreateInterrogationListTask.getPlatineLastname(null,birthname)).isEqualTo(birthname);
+        assertThat(PlatinePilotageCreateInterrogationListTask.getPlatineLastname(lastname,null)).isEqualTo(lastname);
+        assertThat(PlatinePilotageCreateInterrogationListTask.getPlatineLastname(null,null)).isEmpty();
 
     }
 
@@ -164,7 +164,7 @@ class PlatinePilotageCreateSurveyUnitTaskTest extends TestWithContext {
         ((ObjectNode) remSU).remove("repositoryId");
         Long idPartition=1l;
         lenient().doReturn(idPartition).when(execution).getVariable(VARNAME_CURRENT_PARTITION_ID,Long.class);
-        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT,JsonNode.class);
+        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_INTERROGATION,JsonNode.class);
         lenient().doReturn("TOTO").when(execution).getVariable(VARNAME_DIRECTORYACCESS_ID_CONTACT,String.class);
 
 

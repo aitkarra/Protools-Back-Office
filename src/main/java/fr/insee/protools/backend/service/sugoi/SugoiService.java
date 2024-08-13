@@ -4,15 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.protools.backend.dto.sugoi.User;
 import fr.insee.protools.backend.service.exception.UsernameAlreadyExistsSugoiBPMNError;
-import fr.insee.protools.backend.webclient.WebClientHelper;
-import fr.insee.protools.backend.webclient.exception.runtime.WebClient4xxBPMNError;
+import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
+import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient4xxBPMNError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import static fr.insee.protools.backend.webclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_SUGOI;
+import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_SUGOI;
 
 @Service
 @Slf4j
@@ -27,7 +27,7 @@ public class SugoiService {
     private String realm;
 
     public User postCreateUsers(User userBody) {
-        log.info("postCreateUsers");
+        log.debug("postCreateUsers");
         try {
             User userCreated = webClientHelper.getWebClient(KNOWN_API_SUGOI)
                     .post()
@@ -38,10 +38,9 @@ public class SugoiService {
                     .retrieve()
                     .bodyToMono(User.class)
                     .block();
-            log.trace("postCreateUsers - response={} ", userCreated);
-            log.info("postCreateUsers: end");
+            log.info("postCreateUsers - response={} ", userCreated);
             return userCreated;
-        } catch (WebClient4xxBPMNError e) {
+        } catch (HttpClient4xxBPMNError e) {
             if (e.getHttpStatusCodeError().equals(HttpStatus.CONFLICT)) {
                 String msg =
                         "Error 409/CONFLICT during SUGOI post create users userBody.username=" + ((userBody == null) ? "null" : userBody.getUsername())
@@ -56,7 +55,7 @@ public class SugoiService {
 
 
     public void postInitPassword(String userId, String password) {
-        log.info("postInitPassword - userId={} begin", userId);
+        log.debug("postInitPassword - userId={} begin", userId);
         ObjectNode body = objectMapper.createObjectNode();
         body.put("password", password);
         webClientHelper.getWebClient(KNOWN_API_SUGOI)

@@ -4,8 +4,8 @@ import fr.insee.protools.backend.service.context.exception.BadContextIOException
 import fr.insee.protools.backend.service.context.exception.BadContextIncorrectBPMNError;
 import fr.insee.protools.backend.service.context.exception.BadContextNotJSONBPMNError;
 import fr.insee.protools.backend.service.exception.*;
-import fr.insee.protools.backend.webclient.exception.runtime.WebClient4xxBPMNError;
-import fr.insee.protools.backend.webclient.exception.runtime.WebClient5xxBPMNError;
+import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient4xxBPMNError;
+import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient5xxBPMNError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,14 +49,14 @@ public class ProtoolsProcessControllerAdvice {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({ WebClient4xxBPMNError.class })
-    public ResponseEntity<String> exceptionWebClient4xxHandler(/*final HttpServletRequest req, */final WebClient4xxBPMNError exception) {
+    @ExceptionHandler({ HttpClient4xxBPMNError.class })
+    public ResponseEntity<String> exceptionWebClient4xxHandler(/*final HttpServletRequest req, */final HttpClient4xxBPMNError exception) {
         log.error("exceptionWebClient4xxHandler  : "+exception.getMessage());
         return new ResponseEntity<>(exception.getMessage(), exception.getHttpStatusCodeError());
     }
 
-    @ExceptionHandler({ WebClient5xxBPMNError.class })
-    public ResponseEntity<String> exceptionWebClient5xxHandler(/*final HttpServletRequest req, */final WebClient5xxBPMNError exception) {
+    @ExceptionHandler({ HttpClient5xxBPMNError.class })
+    public ResponseEntity<String> exceptionWebClient5xxHandler(/*final HttpServletRequest req, */final HttpClient5xxBPMNError exception) {
         log.error("exceptionWebClient5xxHandler  : "+exception.getMessage());
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }

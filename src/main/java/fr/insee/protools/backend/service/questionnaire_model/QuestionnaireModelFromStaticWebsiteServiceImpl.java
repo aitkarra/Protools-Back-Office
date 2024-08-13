@@ -1,7 +1,7 @@
 package fr.insee.protools.backend.service.questionnaire_model;
 
 import fr.insee.protools.backend.service.context.exception.BadContextIncorrectBPMNError;
-import fr.insee.protools.backend.webclient.WebClientHelper;
+import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

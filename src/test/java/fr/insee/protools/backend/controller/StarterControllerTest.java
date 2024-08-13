@@ -1,6 +1,6 @@
 package fr.insee.protools.backend.controller;
 
-import fr.insee.protools.backend.webclient.WebClientHelper;
+import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

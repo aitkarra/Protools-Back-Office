@@ -31,4 +31,18 @@ public class FlowableVariableUtils {
     public static String getMissingVariableMessage(String variableName){
         return "Variable '" + variableName + "' was not found";
     }
+
+    /**
+     * Helper to call VariableScopeImpl#getVariable(String,Class<T>).
+     * Throws Protools VariableClassCastException if the cast is not successful
+     * return null if the variable is not defined
+     */
+    public static <T> T getVariableOrNull(DelegateExecution execution, String variableName, Class<T> variableClass ){
+        try{
+            return execution.getVariable(variableName, variableClass);
+        }
+        catch (ClassCastException e) {
+            throw new VariableClassCastException(String.format("Variable ID=[%s] val=[%s] cannot be casted to %s", variableName, execution.getVariable(variableName), variableClass));
+        }
+    }
 }

@@ -1,17 +1,20 @@
 package fr.insee.protools.backend.service.platine.pilotage;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageEligibleDto;
 import fr.insee.protools.backend.dto.platine.pilotage.contact.PlatineContactDto;
 import fr.insee.protools.backend.dto.platine.pilotage.query.QuestioningWebclientDto;
 import fr.insee.protools.backend.service.platine.pilotage.metadata.MetadataDto;
-import fr.insee.protools.backend.webclient.WebClientHelper;
+import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 import org.springframework.stereotype.Service;
 
-import static fr.insee.protools.backend.webclient.WebClientHelper.logJson;
-import static fr.insee.protools.backend.webclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
+import java.util.List;
+
+import static fr.insee.protools.backend.httpclients.webclient.WebClientHelper.logJson;
+import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
 
 @Service
 @Slf4j
@@ -33,6 +36,7 @@ public class PlatinePilotageService {
                 .block();
         log.trace("putMetadata : partitionId={} - response={} ",partitionId,response);
     }
+
     public void putQuestionings(QuestioningWebclientDto dto) {
         log.debug("putQuestionings: idPartitioning={} - idSu={}",dto.getIdPartitioning(),dto.getSurveyUnit().getIdSu());
         logJson("putMetadata ",dto,log,Level.TRACE);
@@ -77,4 +81,29 @@ public class PlatinePilotageService {
         return  result;
     }
 
+    //V2
+    public void putQuestionings(String campaignId, List<JsonNode> interrogations) {
+        log.trace("putQuestionings: campaignId={}",campaignId);
+        logJson("putMetadata ",interrogations,log,Level.TRACE);
+        var response = webClientHelper.getWebClient(KNOWN_API_PLATINE_PILOTAGE)
+                .put()
+                .uri("/api/questionings")
+                .bodyValue(interrogations)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        log.trace("putQuestionings: campaignId={} - response={} ",campaignId,response);
+    }
+
+    public void postCreateCampaign(String campaignId,JsonNode contextRootNode) {
+        log.trace("postCreateCampaign: campaignId={}",campaignId);
+        var response = webClientHelper.getWebClient(KNOWN_API_PLATINE_PILOTAGE)
+                .post()
+                .uri("/api/campaign")
+                .bodyValue(contextRootNode)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        log.trace("postCreateCampaign: campaignId={} - response={} ",campaignId,response);
+    }
 }

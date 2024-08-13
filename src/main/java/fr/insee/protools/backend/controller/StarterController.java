@@ -1,7 +1,7 @@
 package fr.insee.protools.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.webclient.WebClientHelper;
+import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;

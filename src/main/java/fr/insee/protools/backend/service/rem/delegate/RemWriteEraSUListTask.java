@@ -33,7 +33,7 @@ public class RemWriteEraSUListTask implements JavaDelegate, DelegateContextVerif
         Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution,VARNAME_CURRENT_PARTITION_ID, Long.class);
         if(eraSUList==null||eraSUList.isEmpty()){
             log.info("ProcessInstanceId={} - currentPartitionId={} - variable {} is empty",execution.getProcessInstanceId(), currentPartitionId,VARNAME_ERA_RESPONSE);
-            execution.getParent().setVariableLocal(VARNAME_REM_SU_ID_LIST, List.of());
+            execution.getParent().setVariableLocal(VARNAME_REM_INTERRO_ID_LIST, List.of());
             return;
         }
 
@@ -42,13 +42,13 @@ public class RemWriteEraSUListTask implements JavaDelegate, DelegateContextVerif
         SuIdMappingJson remMapping = remService.writeERASUList(currentPartitionId, eraSUList);
         if(remMapping==null){
             log.error("ProcessInstanceId={} - currentPartitionId={}  remMapping is empty/null end",execution.getProcessInstanceId(), currentPartitionId);
-            execution.getParent().setVariableLocal(VARNAME_REM_SU_ID_LIST, List.of());
+            execution.getParent().setVariableLocal(VARNAME_REM_INTERRO_ID_LIST, List.of());
             throw new ProtoolsTaskBPMNError("Error while writing list of Era SU to REM : REM returned a null result ");
         }
 
         //STORE the list of REM identifier created
         List<Long> remSuIdList = remMapping.getData().stream().map(SuIdMappingRecord::repositoryId).toList();
-        execution.getParent().setVariableLocal(VARNAME_REM_SU_ID_LIST, remSuIdList);
+        execution.getParent().setVariableLocal(VARNAME_REM_INTERRO_ID_LIST, remSuIdList);
         log.info("ProcessInstanceId={} - currentPartitionId={} - remSuIdList={}  end",execution.getProcessInstanceId(), currentPartitionId,remSuIdList);
     }
 }

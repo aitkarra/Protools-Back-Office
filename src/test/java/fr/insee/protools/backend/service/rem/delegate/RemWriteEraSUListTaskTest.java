@@ -95,6 +95,6 @@ class RemWriteEraSUListTaskTest {
 
         //Post conditions
         verify(remService,times(1)).writeERASUList(partitionID,listOfEraSU);
-        verify(executionParent,times(1)).setVariableLocal(VARNAME_REM_SU_ID_LIST,List.of(remId1,remId2));
+        verify(executionParent,times(1)).setVariableLocal(VARNAME_REM_INTERRO_ID_LIST,List.of(remId1,remId2));
     }
 }

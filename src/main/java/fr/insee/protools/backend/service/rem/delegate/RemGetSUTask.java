@@ -11,7 +11,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERROGATION;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT_IDENTIFIER;
 
 @Slf4j
@@ -31,7 +31,7 @@ public class RemGetSUTask implements JavaDelegate, DelegateContextVerifier {
         log.info("ProcessInstanceId={} - suId={}",execution.getProcessInstanceId(), suId);
         //TODO : ne pas créer le DTO ici : Ca ne sert à rien...
         REMSurveyUnitDto remSurveyUnitDto = remService.getSurveyUnit(suId);
-        execution.setVariableLocal(VARNAME_REM_SURVEY_UNIT,objectMapper.valueToTree(remSurveyUnitDto));
+        execution.setVariableLocal(VARNAME_REM_INTERROGATION,objectMapper.valueToTree(remSurveyUnitDto));
         log.trace("suId={} - content={}", suId, remSurveyUnitDto);
         log.debug("ProcessInstanceId={} - suId={} end",execution.getProcessInstanceId(), suId);
     }

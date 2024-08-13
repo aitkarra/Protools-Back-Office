@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERROGATION;
 import static fr.insee.protools.backend.service.utils.FlowableVariableUtils.getMissingVariableMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,10 +87,10 @@ class SabianeQuestionnaireCreateSUTaskTest extends TestWithContext {
         //Execute again
         exception = assertThrows(FlowableIllegalArgumentException.class, () -> sabianePilotageTask.execute(execution));
         //Check the error
-        assertThat(exception.getMessage()).isEqualTo(getMissingVariableMessage(VARNAME_REM_SURVEY_UNIT));
+        assertThat(exception.getMessage()).isEqualTo(getMissingVariableMessage(VARNAME_REM_INTERROGATION));
 
         //Create 2nd variable
-        when(execution.getVariable(VARNAME_REM_SURVEY_UNIT, JsonNode.class)).thenReturn(ProtoolsTestUtils.asJsonNode(RemSUData.rem_su_1personne));
+        when(execution.getVariable(VARNAME_REM_INTERROGATION, JsonNode.class)).thenReturn(ProtoolsTestUtils.asJsonNode(RemSUData.rem_su_1personne));
         //Execute again
         assertDoesNotThrow(() -> sabianePilotageTask.execute(execution));
     }
@@ -110,7 +110,7 @@ class SabianeQuestionnaireCreateSUTaskTest extends TestWithContext {
         DelegateExecution execution = createMockedExecution();
         //Variables
         lenient().when(execution.getVariable(VARNAME_CURRENT_PARTITION_ID, Long.class)).thenReturn(CtxExamples.ctx_partition1);
-        lenient().when(execution.getVariable(VARNAME_REM_SURVEY_UNIT, JsonNode.class)).thenReturn(ProtoolsTestUtils.asJsonNode(RemSUData.rem_su_1personne));
+        lenient().when(execution.getVariable(VARNAME_REM_INTERROGATION, JsonNode.class)).thenReturn(ProtoolsTestUtils.asJsonNode(RemSUData.rem_su_1personne));
         //Ctx
         ProtoolsTestUtils.initContexteMockFromString(protoolsContext, context_json);
 
@@ -128,7 +128,7 @@ class SabianeQuestionnaireCreateSUTaskTest extends TestWithContext {
         lenient().when(execution.getProcessInstanceId()).thenReturn(dumyId);
         lenient().when(execution.getVariable(VARNAME_CURRENT_PARTITION_ID, Long.class)).thenReturn(CtxExamples.ctx_partition1);
         JsonNode remSU = ProtoolsTestUtils.asJsonNode(inputRemSU);
-        lenient().when(execution.getVariable(VARNAME_REM_SURVEY_UNIT, JsonNode.class)).thenReturn(remSU);
+        lenient().when(execution.getVariable(VARNAME_REM_INTERROGATION, JsonNode.class)).thenReturn(remSU);
         //Ctx
         JsonNode ctxNode = initContexteMockWithString(inputCtx);
 

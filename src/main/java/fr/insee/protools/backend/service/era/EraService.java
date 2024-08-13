@@ -2,7 +2,7 @@ package fr.insee.protools.backend.service.era;
 
 import fr.insee.protools.backend.dto.era.CensusJsonDto;
 import fr.insee.protools.backend.dto.era.GenderType;
-import fr.insee.protools.backend.webclient.WebClientHelper;
+import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static fr.insee.protools.backend.webclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_ERA;
+import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_ERA;
 
 @Service
 @Slf4j

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_DIRECTORYACCESS_ID_CONTACT;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERROGATION;
 
 /**
  * This delegate will search for the identifiantCompte (internet identifier) in a REM SU
@@ -30,7 +30,7 @@ public class ExtractContactIdentifierFromREMSUTask implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         //No need protools context ==> no checkContextOrThrow
         log.debug("ProcessInstanceId={} -  begin",execution.getProcessInstanceId());
-        JsonNode remSUNode = FlowableVariableUtils.getVariableOrThrow(execution,VARNAME_REM_SURVEY_UNIT, JsonNode.class);
+        JsonNode remSUNode = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_INTERROGATION, JsonNode.class);
 
         Optional<String> optionalIdentifiantCompte = RemDtoUtils.searchAdditionalInformation(REM_ADDITIONALINFOS_KEY_IDENTIFIANTCOMPTE,remSUNode);
         String idInternaute = optionalIdentifiantCompte.orElseThrow(() -> {

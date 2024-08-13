@@ -18,8 +18,8 @@
 
     <subProcess id="partition-subprocess" name="sous process traitement des partitions">
       <multiInstanceLoopCharacteristics isSequential="false">
-        <loopDataInputRef>contexte_partition_id_list</loopDataInputRef>
-        <inputDataItem name="current_partition_id" />
+        <loopDataInputRef>contexte_lot_id_list</loopDataInputRef>
+        <inputDataItem name="current_lot_id" />
       </multiInstanceLoopCharacteristics>
 
       <startEvent id="partition-subprocess-start" flowable:formFieldValidation="true"></startEvent>

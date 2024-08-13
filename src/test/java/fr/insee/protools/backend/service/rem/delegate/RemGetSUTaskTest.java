@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERROGATION;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT_IDENTIFIER;
 import static fr.insee.protools.backend.service.utils.FlowableVariableUtils.getMissingVariableMessage;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,6 +60,6 @@ class RemGetSUTaskTest {
         //Service called once and for the right SU ID
         verify(remService).getSurveyUnit(variableSuId);
         //Process instance variable set with the retrieved SU content
-        verify(execution).setVariableLocal(VARNAME_REM_SURVEY_UNIT, objectMapper.valueToTree(expectedREMSU));
+        verify(execution).setVariableLocal(VARNAME_REM_INTERROGATION, objectMapper.valueToTree(expectedREMSU));
     }
 }

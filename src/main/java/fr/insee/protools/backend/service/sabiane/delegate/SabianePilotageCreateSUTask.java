@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SURVEY_UNIT;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERROGATION;
 import static fr.insee.protools.backend.service.context.ContextConstants.*;
 import static fr.insee.protools.backend.service.utils.ContextUtils.getCurrentPartitionNode;
 
@@ -56,7 +56,7 @@ public class SabianePilotageCreateSUTask implements JavaDelegate, DelegateContex
         checkContextOrThrow(log, execution.getProcessInstanceId(), contextRootNode);
 
         Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, Long.class);
-        JsonNode remSUNode = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_SURVEY_UNIT, JsonNode.class);
+        JsonNode remSUNode = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_INTERROGATION, JsonNode.class);
         JsonNode currentPartitionNode = getCurrentPartitionNode(contextRootNode, currentPartitionId);
 
         Boolean priority = currentPartitionNode.path(CTX_PARTITION_PRIORITAIRE).asBoolean();
@@ -226,7 +226,7 @@ public class SabianePilotageCreateSUTask implements JavaDelegate, DelegateContex
     }
 
     protected static SurveyUnitContextDto createSabianeSUContextDto(JsonNode contextRootNode, Long currentPartitionId, JsonNode remSUNode, Boolean isLogement, Boolean priority) {
-        REMSurveyUnitDto remSurveyUnitDto = PlatineHelper.parseRemSUNode(objectMapper, VARNAME_REM_SURVEY_UNIT, remSUNode);
+        REMSurveyUnitDto remSurveyUnitDto = PlatineHelper.parseRemSUNode(objectMapper,  remSUNode);
         Pair<PersonDto, Optional<PersonDto>> mainAndSecondaryPerson = RemDtoUtils.findContactAndSecondary(remSUNode, remSurveyUnitDto, isLogement);
         String id = SabianeIdHelper.computeSabianeID(currentPartitionId.toString(), remSurveyUnitDto.getRepositoryId().toString());
 

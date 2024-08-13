@@ -69,7 +69,7 @@ class PlatineQuestionnaireCreateSurveyUnitTaskTest extends TestWithContext {
         JsonNode remSU = ProtoolsTestUtils.asJsonNode(RemSUData.rem_su_3personnes);
         Long idPartition=1l;
         lenient().doReturn(idPartition).when(execution).getVariable(VARNAME_CURRENT_PARTITION_ID,Long.class);
-        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT,JsonNode.class);
+        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_INTERROGATION,JsonNode.class);
         lenient().doReturn("TOTO").when(execution).getVariable(VARNAME_DIRECTORYACCESS_ID_CONTACT,String.class);
 
         //Execute the unit under test
@@ -101,7 +101,7 @@ class PlatineQuestionnaireCreateSurveyUnitTaskTest extends TestWithContext {
         ((ObjectNode) remSU).remove("repositoryId");
         Long idPartition=1l;
         lenient().doReturn(idPartition).when(execution).getVariable(VARNAME_CURRENT_PARTITION_ID,Long.class);
-        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_SURVEY_UNIT,JsonNode.class);
+        lenient().doReturn(remSU).when(execution).getVariable(VARNAME_REM_INTERROGATION,JsonNode.class);
         lenient().doReturn("TOTO").when(execution).getVariable(VARNAME_DIRECTORYACCESS_ID_CONTACT,String.class);
 
 

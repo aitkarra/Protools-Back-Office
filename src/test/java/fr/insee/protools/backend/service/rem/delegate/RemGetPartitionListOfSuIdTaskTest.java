@@ -17,7 +17,7 @@ import org.springframework.util.ClassUtils;
 import java.util.List;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_SU_ID_LIST;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERRO_ID_LIST;
 import static fr.insee.protools.backend.service.utils.FlowableVariableUtils.getMissingVariableMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -91,7 +91,7 @@ class RemGetPartitionListOfSuIdTaskTest {
         //Service called once and for the right partition
         verify(remService).getSampleSuIds(currentPartitionId);
         //Process instance variable set with the list of retrieved Ids
-        verify(executionParent).setVariableLocal(VARNAME_REM_SU_ID_LIST, expectedResult);
+        verify(executionParent).setVariableLocal(VARNAME_REM_INTERRO_ID_LIST, expectedResult);
     }
 
     @Test
