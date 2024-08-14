@@ -26,8 +26,8 @@ import static fr.insee.protools.backend.httpclients.configuration.ApiConfigPrope
 public class RemService {
 
     private final RestClientHelper restClientHelper;
-    @Value("${fr.insee.protools.api.rem.su.page.size:5000}")
-    private int pageSizeGetSU;
+    @Value("${fr.insee.protools.api.rem.interrogation.page.size:5000}")
+    private int pageSizeGetInterro;
 
     public Long[] getSampleSuIds(Long partitionId) {
         log.debug("getSampleSuIds - partitionId={} ",partitionId);
@@ -118,23 +118,37 @@ public class RemService {
     }
 
 
-    public PageResponse<JsonNode> getPartitionAllSuPaginated(Long partitionId, long page) {
-        log.debug("partitionId={} - page={} - pageSizeGetSU={}",partitionId,page,pageSizeGetSU);
-        ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() {
-        };
+    public PageResponse<JsonNode> getPartitionAllInterroPaginated(Long partitionId, long page, Boolean hasAccount) {
+        log.debug("partitionId={} - page={} - pageSizeGetInterro={} - hasAccount={}",partitionId,page,pageSizeGetInterro,hasAccount);
+        ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
         try {
-
-            PageResponse<JsonNode> response = restClientHelper.getRestClient(KNOWN_API_REM)
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("survey-units/partitions/paginated/{partitionId}")
-                            .queryParam("page", page)
-                            .queryParam("size", pageSizeGetSU)
-                            .queryParam("withExternals", true)
-                            .build(partitionId))
-                    .retrieve()
-                    .body(typeReference) ;
-            log.trace("partitionId={} - page={} - pageSizeGetSU={} - response={} ", partitionId,page,pageSizeGetSU, response.getContent().size());
+            PageResponse<JsonNode> response;
+            if(hasAccount!=null) {
+                response = restClientHelper.getRestClient(KNOWN_API_REM)
+                        .get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("interrogations/ids")
+                                .queryParam("page", page)
+                                .queryParam("size", pageSizeGetInterro)
+                                .queryParam("partition_id", partitionId)
+                                .queryParam("hasAccount", false)
+                                .build(partitionId))
+                        .retrieve()
+                        .body(typeReference);
+            }
+            else {
+                response = restClientHelper.getRestClient(KNOWN_API_REM)
+                        .get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("interrogations/ids")
+                                .queryParam("page", page)
+                                .queryParam("size", pageSizeGetInterro)
+                                .queryParam("partition_id", partitionId)
+                                .build(partitionId))
+                        .retrieve()
+                        .body(typeReference);
+            }
+            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, response.getContent().size());
             return response;
         }
         catch (HttpClient4xxBPMNError e){

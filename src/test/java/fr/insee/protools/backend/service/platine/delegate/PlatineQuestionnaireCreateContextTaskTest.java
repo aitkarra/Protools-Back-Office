@@ -119,11 +119,14 @@ class PlatineQuestionnaireCreateContextTaskTest {
                 Set.of("L_DEPNAIS-1-1-0","L_PAYSNAIS-1-1-0","L_NATIONETR-1-1-0"));
 
         //Verify postCampaign
-        ArgumentCaptor<CampaignDto> acCampaignDto = ArgumentCaptor.forClass(CampaignDto.class);
-        verify(platineQuestionnaireService,times(1)).postCampaign(acCampaignDto.capture());
-        List<CampaignDto> allValues = acCampaignDto.getAllValues();
-        assertEquals(1, allValues.size(),"We should have exactly one campaign");
-        MetadataValue expectedMetadataNode = ProtoolsTestUtils.asObject(ressourceFolder + "/expected_post_questionnaire_metadata.json", MetadataValue.class);
-        assertEquals(expectedMetadataNode,allValues.get(0).getMetadata(),"Erreur with generated Metadata");
+        ArgumentCaptor<JsonNode> acContext = ArgumentCaptor.forClass(JsonNode.class);
+        ArgumentCaptor<String> acCampaignId = ArgumentCaptor.forClass(String.class);
+        verify(platineQuestionnaireService,times(1)).postContext(acCampaignId.capture(),acContext.capture());
+
+        List<JsonNode> allCtxValues = acContext.getAllValues();
+        assertEquals(1, allCtxValues.size(),"We should have exactly one campaign");
+
+        JsonNode expectedCtx = ProtoolsTestUtils.asJsonNode(platine_context_json);
+        assertEquals(expectedCtx,allCtxValues.get(0),"Error with the passed json context");
     }
 }

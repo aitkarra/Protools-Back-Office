@@ -12,15 +12,19 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class PageResponse <T> {
-    private int totalElements;
-    private int totalPages;
-    private int size;
-    @ToString.Exclude
-    private List<T> content;
-    private long number;
-    private int numberOfElements;
-    private boolean first;
-    private boolean last;
-    private boolean empty;
+public class PageResponse<T> {
+    private List<T> content = new ArrayList<>();
+    private Integer currentPage;
+    private Integer pageSize;
+    private Long totalElements;
+    private Integer pageCount;
+
+    public Boolean isLastPage(){
+        if(currentPage==null || pageCount==null){
+            return true;
+        }
+        else return (currentPage>=pageCount);
+    }
+
 }
+

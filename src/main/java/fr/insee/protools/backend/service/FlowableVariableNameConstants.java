@@ -24,6 +24,7 @@ public class FlowableVariableNameConstants {
     public static final String VARNAME_REM_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE ="rem_su_list_page_is_last";
     public static final String VARNAME_REM_INTERRO_LIST_PAGEABLE_CURRENT_PAGE ="rem_interro_list_page_current";
 
+    public static final String VARNAME_REM_PROTOOLS_INTERRO_LIST = "rem_protools_interrogation_list";
 
     //Sugoi ID/PWD
     public static final String VARNAME_DIRECTORYACCESS_ID_CONTACT ="directory_access_id_contact";

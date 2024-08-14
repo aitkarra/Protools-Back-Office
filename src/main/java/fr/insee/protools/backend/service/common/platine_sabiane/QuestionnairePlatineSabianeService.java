@@ -11,6 +11,7 @@ import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient5xxBPMN
 import fr.insee.protools.backend.httpclients.exception.runtime.HttpClientNullReturnBPMNError;
 import org.slf4j.event.Level;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashSet;
@@ -18,23 +19,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
+
 public interface QuestionnairePlatineSabianeService {
 
     //Internal methods
-    WebClient webClient();
+    RestClient restClient();
     org.slf4j.Logger getLogger();
 
     /** Create a new nomenclature **/
     default void postNomenclature(String nomenclatureId,  String nomenclatureLabel , JsonNode nomenclatureValue) {
         NomenclatureDto dto = new NomenclatureDto(nomenclatureId,nomenclatureLabel,nomenclatureValue);
         NomenclatureDto response =
-                webClient()
+                restClient()
                         .post()
                         .uri("/api/nomenclature")
-                        .bodyValue(dto)
+                        .body(dto)
                         .retrieve()
-                        .bodyToMono(NomenclatureDto.class)
-                        .block();
+                        .body(NomenclatureDto.class);
         getLogger().info("postNomenclature: nomenclatureId={} - response={}",nomenclatureId,response);
         //TODO:  gestion des erreurs (ex: 403...)
     }
@@ -45,13 +47,12 @@ public interface QuestionnairePlatineSabianeService {
                 new QuestionnaireModelCreateDto(questionnaireId,questionnaireLabel,questionnaireValue,requiredNomenclatures);
 
         QuestionnaireModelCreateDto response =
-                webClient()
+                restClient()
                         .post()
                         .uri("/api/questionnaire-models")
-                        .bodyValue(dto)
+                        .body(dto)
                         .retrieve()
-                        .bodyToMono(QuestionnaireModelCreateDto.class)
-                        .block();
+                        .body(QuestionnaireModelCreateDto.class);
         getLogger().info("postQuestionnaireModel: questionnaireId={} - response={}",questionnaireId,response);
         //TODO:  gestion des erreurs (ex: 403...)
 
@@ -59,12 +60,11 @@ public interface QuestionnairePlatineSabianeService {
 
     /** Get the list of existing nomenclatures */
     default Set<String> getNomenclaturesId() {
-        List<String> response = webClient()
+        List<String> response = restClient()
                 .get()
                 .uri("/api/nomenclatures")
                 .retrieve()
-                .bodyToMono(List.class)
-                .block();
+                .body(List.class);
         getLogger().info("getNomenclaturesId: response= {}",response);
         return (response==null)?new HashSet<>():response.stream().collect(Collectors.toSet());
     }
@@ -74,12 +74,12 @@ public interface QuestionnairePlatineSabianeService {
         getLogger().info("questionnaireModelExists: idQuestionnaireModel={} ",idQuestionnaireModel);
         boolean modelExists = false;
         try{
-            var response = webClient()
+            var response = restClient()
                     .get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/api/questionnaire/{id}")
                             .build(idQuestionnaireModel))
-                    .retrieve().toBodilessEntity().block();
+                    .retrieve().toBodilessEntity();
             if(response==null) {
                 throw new HttpClientNullReturnBPMNError("Error while checking if questionnaireModel exists - null result");
             }
@@ -113,35 +113,33 @@ public interface QuestionnairePlatineSabianeService {
     }
 
     /** Create the campaign **/
-    default void postCampaign(CampaignDto campaignDto) {
-        WebClientHelper.logJson("postCampaign: ", campaignDto,getLogger(), Level.DEBUG);
+    default void postContext(String campaignId,JsonNode contextRootNode) {
+        getLogger().trace("postContext: campaignId={}",campaignId);
         //Http Status Codes : https://github.com/InseeFr/Queen-Back-Office/blob/3.5.36-rc/src/main/java/fr/insee/queen/api/controller/CampaignController.java
         // HttpStatus.BAD_REQUEST(400) if campaign already exists
         // HttpStatus.FORBIDDEN (403) if the questionnaire does not exist or is already associated (Request to change it to 409)
         // WARNING : 403 will also be returned if user does not have an authorized role
         try {
-            var response = webClient()
+            var response = restClient()
                     .post()
-                    .uri("/api/campaigns")
-                    .bodyValue(campaignDto)
+                    .uri("/context")
+                    .body(contextRootNode)
                     .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-            getLogger().info("postCampaign: idCampaign={} -  response={} ", campaignDto.getId(), response);
+                    .body(String.class);
+            getLogger().info("postContext: idCampaign={} -  response={} ", campaignId, response);
         }
         catch (HttpClient4xxBPMNError e){
             if(e.getHttpStatusCodeError().equals(HttpStatus.FORBIDDEN)){
                 String msg=
-                        "Error 403/FORBIDEN during Questionnaire postCampaign."
+                        "Error 403/FORBIDEN during Questionnaire postContext."
                                 + " It can be caused by a missing permission or if a questionnaire model"
-                                + " "+campaignDto.getQuestionnaireIds()
                                 +" is already assigned to another campaign."
                                 + " msg="+e.getMessage();
                 getLogger().error(msg);
                 throw new HttpClient4xxBPMNError(msg,e.getHttpStatusCodeError());
             }
             else if(e.getHttpStatusCodeError().equals(HttpStatus.BAD_REQUEST)){
-                String msg="Error 400/BAD_REQUEST during Questionnaire postCampaign."
+                String msg="Error 400/BAD_REQUEST during Questionnaire postContext."
                                 + " One possible cause is that the campaign already exists "
                                 + " msg="+e.getMessage();
                 getLogger().error(msg);
@@ -156,15 +154,14 @@ public interface QuestionnairePlatineSabianeService {
     default void postSurveyUnit(SurveyUnitResponseDto suDto, String idCampaign) {
         WebClientHelper.logJson("postSurveyUnit: idCampaign="+idCampaign, suDto,getLogger(),Level.DEBUG);
         try {
-            var response = webClient()
+            var response = restClient()
                     .post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/api/campaign/{id}/survey-unit")
                             .build(idCampaign))
-                    .bodyValue(suDto)
+                    .body(suDto)
                     .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
+                    .body(String.class);
             getLogger().info("postSurveyUnit: idCampaign={} - idSu={} - response={} ", idCampaign,suDto.getId(), response);
         }
         catch (HttpClient4xxBPMNError e){
@@ -183,15 +180,14 @@ public interface QuestionnairePlatineSabianeService {
     default void postSurveyUnits(String idCampaign, List<JsonNode> interrogations) {
         WebClientHelper.logJson("postSurveyUnits: idCampaign=" + idCampaign, interrogations, getLogger(), Level.DEBUG);
         try {
-            var response = webClient()
+            var response = restClient()
                     .post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/api/campaign/{id}/survey-unit")
                             .build(idCampaign))
-                    .bodyValue(interrogations)
+                    .body(interrogations)
                     .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
+                    .body(String.class);
             getLogger().info("postSurveyUnits: idCampaign={} - response={} ", idCampaign, response);
         } catch (HttpClient4xxBPMNError e) {
             if (e.getHttpStatusCodeError().equals(HttpStatus.BAD_REQUEST)) {

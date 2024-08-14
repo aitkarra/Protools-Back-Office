@@ -61,13 +61,7 @@ public class QuestionnaireHelper {
 
         //Get the list of Questionnaire Models defined in Protools Context
         Set<String> questionnaireModelIds = initQuestionnaireModels(questionnairePlatineSabianeService, questionnaireModelService, processInstanceId, contextRootNode);
-        CampaignDto campaignDto = CampaignDto.builder()
-                .id(contextRootNode.path(CTX_CAMPAGNE_ID).textValue())
-                .label(contextRootNode.path(CTX_CAMPAGNE_LABEL).textValue())
-                .metadata(metadataDto)
-                .questionnaireIds(questionnaireModelIds)
-                .build();
-        questionnairePlatineSabianeService.postCampaign(campaignDto);
+        questionnairePlatineSabianeService.postContext(contextRootNode.path(CTX_CAMPAGNE_ID).textValue(),contextRootNode);
     }
 
     static void initRequiredNomenclatures(QuestionnairePlatineSabianeService questionnairePlatineSabianeService, NomenclatureService nomenclatureService, String processInstanceId, Iterator<JsonNode> nomenclatureIterator) {
