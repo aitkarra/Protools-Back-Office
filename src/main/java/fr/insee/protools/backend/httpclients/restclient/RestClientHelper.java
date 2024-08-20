@@ -14,6 +14,8 @@ import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient4xxBPMN
 import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient5xxBPMNError;
 import io.netty.handler.logging.LogLevel;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -174,4 +176,23 @@ public class RestClientHelper  {
                 }
                 return result;
         }
+
+    public static void logJson(String msg, Object dto, Logger logger, Level level) {
+        if (logger.isEnabledForLevel(level)) {
+            try {
+                String json = new ObjectMapper().writeValueAsString(dto);
+                String logLine = msg +" - " + json;
+                switch (level) {
+                    case TRACE -> logger.trace(logLine);
+                    case DEBUG -> logger.debug(logLine);
+                    case INFO -> logger.info(logLine);
+                    case WARN -> logger.warn(logLine);
+                    case ERROR -> logger.error(logLine);
+                    default -> logger.trace(logLine);
+                }
+            } catch (JsonProcessingException e) {
+                log.error("Could not parse json");
+            }
+        }
+    }
 }

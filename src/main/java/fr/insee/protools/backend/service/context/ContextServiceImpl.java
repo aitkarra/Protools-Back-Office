@@ -11,6 +11,7 @@ import fr.insee.protools.backend.service.context.exception.BadContextIncorrectBP
 import fr.insee.protools.backend.service.context.exception.BadContextNotJSONBPMNError;
 import fr.insee.protools.backend.service.exception.ProcessDefinitionNotFoundException;
 import fr.insee.protools.backend.service.exception.TaskNotFoundException;
+import fr.insee.protools.backend.service.utils.log.TimeLogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,9 +37,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -168,12 +166,12 @@ public class ContextServiceImpl implements ContextService {
                 throw new BadContextIncorrectBPMNError(msg);
             }
 
-            List<Long> partitionIds = new ArrayList<>();
-            HashMap<Long,HashMap<String, Serializable>> variablesByPartition= new HashMap<>();
+            List<String> partitionIds = new ArrayList<>();
+            HashMap<String,HashMap<String, Serializable>> variablesByPartition= new HashMap<>();
 
             for (JsonNode partition : partitions) {
                 Pair<Instant, Instant> startEndDT = getCollectionStartAndEndFromPartition(partition);
-                Long partitionId = partition.path(CTX_PARTITION_ID).asLong();
+                String partitionId = partition.path(CTX_PARTITION_ID).asText();
                 partitionIds.add(partitionId);
 
                 HashMap<String,Serializable> partitionVariables = new HashMap<>();
@@ -188,7 +186,7 @@ public class ContextServiceImpl implements ContextService {
 
             return Pair.of(variables, rootContext);
         } catch (IOException e) {
-            throw new BadContextIOException("Error while reading context content", e);
+            throw new BadContextIOException("Error while reading context content: "+e.getMessage(), e);
         }
     }
 
@@ -201,21 +199,21 @@ public class ContextServiceImpl implements ContextService {
     //TODO : soit les json schema permettent de valider les dates, soit il faudra valider toutes les dates comme ça
     public static Pair<Instant, Instant> getCollectionStartAndEndFromPartition(JsonNode partitionNode) {
         String start = partitionNode.get(CTX_PARTITION_DATE_DEBUT_COLLECTE).asText();
-        String end = partitionNode.get(CTX_PARTITION_DATE_DEBUT_COLLECTE).asText();
+        String end = partitionNode.get(CTX_PARTITION_DATE_FIN_COLLECTE).asText();
 
         if(start==null || end==null){
             throw new BadContextIncorrectBPMNError(String.format("%s and %s must be defined on every partition", CTX_PARTITION_DATE_DEBUT_COLLECTE, CTX_PARTITION_DATE_FIN_COLLECTE));
         }
 
         try {
-            LocalDateTime collectionStart = LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME);
-            LocalDateTime collectionEnd = LocalDateTime.parse(end, DateTimeFormatter.ISO_DATE_TIME);
-            log.info("partition_id={} - CollectionStartDate={} - CollectionEndDate={}", partitionNode.path(CTX_PARTITION_ID), collectionStart, collectionEnd);
-            return Pair.of(collectionStart.atZone(ZoneId.systemDefault()).toInstant(),
-                    collectionEnd.atZone(ZoneId.systemDefault()).toInstant());
+            Instant collectionStart = Instant.parse(start);
+            Instant collectionEnd = Instant.parse(end);
+            log.info("partition_id={} - CollectionStartDate={} - CollectionEndDate={}", partitionNode.path(CTX_PARTITION_ID), TimeLogUtils.format(collectionStart), TimeLogUtils.format(collectionEnd));
+            return Pair.of(collectionStart,
+                    collectionEnd);
 
         } catch (DateTimeParseException e) {
-            throw new BadContextIncorrectBPMNError(String.format("%s or %s cannot be casted to DateTime : %s", CTX_PARTITION_DATE_DEBUT_COLLECTE, CTX_PARTITION_DATE_FIN_COLLECTE, e.getMessage()));
+            throw new BadContextIncorrectBPMNError(String.format("%s or %s cannot be read as Instant : %s", CTX_PARTITION_DATE_DEBUT_COLLECTE, CTX_PARTITION_DATE_FIN_COLLECTE, e.getMessage()));
         }
     }
 

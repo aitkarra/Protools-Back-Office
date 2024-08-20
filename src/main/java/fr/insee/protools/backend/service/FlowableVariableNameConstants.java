@@ -21,7 +21,7 @@ public class FlowableVariableNameConstants {
     //To pass a list of REM interrogations content (JsonNode)
     public static final String VARNAME_REM_INTERRO_LIST ="rem_interrogation_list";
     //REM PAGEABLE
-    public static final String VARNAME_REM_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE ="rem_su_list_page_is_last";
+    public static final String VARNAME_REM_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE ="rem_interro_list_page_is_last";
     public static final String VARNAME_REM_INTERRO_LIST_PAGEABLE_CURRENT_PAGE ="rem_interro_list_page_current";
 
     public static final String VARNAME_REM_PROTOOLS_INTERRO_LIST = "rem_protools_interrogation_list";
@@ -43,6 +43,17 @@ public class FlowableVariableNameConstants {
     //List with for each SU the Instant when the opening communication has been sent
     //each row is Tuple<Instant: creation instant,String : partitionId , String : remSUId>
     public static final String VARNAME_SU_CREATION_ITEM="su_creation_date_item";
+
+
+    //For communication
+    public static final String VARNAME_CURRENT_COMMUNICATION_ID="current_communication_id";
+    public static final String VARNAME_COMMUNICATION_REQUEST_ID_FOR_INTERRO_ID_MAP="communication_request_id_by_interrogation_id";
+    //List of the UUIDs of the communications that have already been scheduled
+    public static final String VARNAME_ALREADY_SCHEDULED_COMMUNICATION_ID_SET = "communication_already_scheduled_id_set";
+    //List of the UUIDs of the communcation that are in error (echeance was too far past)
+    public static final String VARNAME_COMMUNICATION_ERROR_ID_SET = "communication_in_error_id_set";
+
+
 
     private FlowableVariableNameConstants(){}
 }

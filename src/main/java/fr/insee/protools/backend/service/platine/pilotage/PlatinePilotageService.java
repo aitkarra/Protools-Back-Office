@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageEligibleDto;
 import fr.insee.protools.backend.dto.platine.pilotage.contact.PlatineContactDto;
 import fr.insee.protools.backend.dto.platine.pilotage.query.QuestioningWebclientDto;
+import fr.insee.protools.backend.dto.platine.pilotage.v2.PlatinePilotageCommunicationEventDto;
 import fr.insee.protools.backend.httpclients.restclient.RestClientHelper;
 import fr.insee.protools.backend.service.platine.pilotage.metadata.MetadataDto;
-import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.util.List;
 
@@ -101,5 +100,18 @@ public class PlatinePilotageService {
                 .retrieve()
                 .body(String.class);
         log.trace("postContext: campaignId={} - response={} ",campaignId,response);
+    }
+
+    public void postCommunicationEvent(List<PlatinePilotageCommunicationEventDto> platinePilotageCommunicationEventList) {
+        log.trace("postCommunicationEvent: ");
+        logJson("postCommunicationEvent ",platinePilotageCommunicationEventList,log,Level.TRACE);
+
+        var response = restClientHelper.getRestClient(KNOWN_API_PLATINE_PILOTAGE)
+                .post()
+                .uri("/interrogations/communication-events")
+                .body(platinePilotageCommunicationEventList)
+                .retrieve()
+                .body(String.class);
+        log.trace("postCommunicationEvent: response={} ",response);
     }
 }

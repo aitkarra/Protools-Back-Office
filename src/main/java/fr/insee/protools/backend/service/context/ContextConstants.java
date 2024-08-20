@@ -93,6 +93,9 @@ public final class ContextConstants {
 
     // Partitions Communications
     public static final String CTX_PARTITION_COMMUNICATIONS = "communications";
+    public static final String CTX_PARTITION_COMMUNICATION_ID = "id";
+    public static final String CTX_PARTITION_COMMUNICATION_ECHEANCE = "echeance";
+
     public static final String CTX_PARTITION_COMMUNICATION_MOYEN = "moyenCommunication";
     public static final String CTX_PARTITION_COMMUNICATION_PHASE = "phaseCommunication";
     public static final String CTX_PARTITION_COMMUNICATION_AVEC_QUESTIONNAIRE_PAPIER = "avecQuestionnairePapier";
@@ -105,6 +108,7 @@ public final class ContextConstants {
     public static final String CTX_PARTITION_COMMUNICATION_RELANCE_LIBRE_PARAGRAPHE3 = "relanceLibreMailParagraphe3";
     public static final String CTX_PARTITION_COMMUNICATION_RELANCE_LIBRE_PARAGRAPHE4 = "relanceLibreMailParagraphe4";
     public static final String CTX_PARTITION_COMMUNICATION_COMPLEMENT_CONNEXION = "complementConnexion";
+    public static final String CTX_PARTITION_COMMUNICATION_TYPE = "typeCommunication";
 
 
 

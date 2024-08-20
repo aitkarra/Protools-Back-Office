@@ -21,7 +21,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RemGetPartitionListOfInterroPaginatedTask extends RemGetPartitionListOfInterroDefaultPaginated {
+public class RemGetPartitionListOfInterroPaginatedTask implements JavaDelegate, DelegateContextVerifier, PaginationHelper {
 
     RemService remService;
 
@@ -39,5 +39,11 @@ public class RemGetPartitionListOfInterroPaginatedTask extends RemGetPartitionLi
     @Override
     public Logger getLogger() {
         return log;
+    }
+
+    @Override
+    public Map<String, Object> treatPage(DelegateExecution execution, List<JsonNode> contentList) {
+        Map<String, Object> variables = Map.of(VARNAME_REM_INTERRO_LIST, contentList);
+        return variables;
     }
 }

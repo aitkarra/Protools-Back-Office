@@ -21,7 +21,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RemGetPartitionListOfInterroWithoutWebAccountPaginatedTask extends RemGetPartitionListOfInterroDefaultPaginated {
+public class RemGetPartitionListOfInterroWithoutWebAccountPaginatedTask implements JavaDelegate, DelegateContextVerifier, PaginationHelper  {
 
     private final RemService remService;
 
@@ -39,5 +39,23 @@ public class RemGetPartitionListOfInterroWithoutWebAccountPaginatedTask extends 
     @Override
     public Logger getLogger() {
         return log;
+    }
+
+    @Override
+    public Map<String, Object> treatPage(DelegateExecution execution, List<JsonNode> contentList) {
+
+        String jsonKeyId = "id";
+        List<ProtoolsInterrogationDto> protoolsInterrogationDtos = contentList.stream()
+                //TODO: remove as it should not occurs?
+                .filter(jsonNode -> {
+                    boolean hasId = jsonNode.has(jsonKeyId) && !jsonNode.get(jsonKeyId).isNull();
+                    if (!hasId) {
+                        log.warn("Skipping interrogation without id: {}", jsonNode);
+                    }
+                    return hasId;
+                }).map(jsonNode -> ProtoolsInterrogationDto.builder().idInterrogation(jsonNode.get(jsonKeyId).asText()).remInterrogation(jsonNode).build()).toList();
+
+        Map<String, Object> variables = Map.of(VARNAME_REM_PROTOOLS_INTERRO_LIST, protoolsInterrogationDtos);
+        return variables;
     }
 }
