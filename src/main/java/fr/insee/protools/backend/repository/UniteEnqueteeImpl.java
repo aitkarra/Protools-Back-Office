@@ -12,6 +12,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -101,6 +103,16 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 		converter.setTypeMapper(new DefaultMongoTypeMapper(null));
 		MongoTemplate mongoTemplate2 = new MongoTemplate(mongoTemplate.getMongoDatabaseFactory(), converter);
 		mongoTemplate2.insert(bo, "commandes");
+	}
+
+	@Override
+	public boolean isTerminated() {
+		log.info("UniteEnqueteeImpl.isTerminated.");
+		boolean result=false;
+		Query query = new Query();
+		query.addCriteria(Criteria.where("inProgress").is(true).and("done").is(true));
+		mongoTemplate.find(query, String.class, "commandes");
+		return result;
 	}
 
 }

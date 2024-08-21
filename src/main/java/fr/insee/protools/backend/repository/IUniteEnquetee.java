@@ -13,4 +13,6 @@ public interface IUniteEnquetee {
 	void addManyUniteEnquetee(List<JsonNode> listeUe, String processInstanceId, String campaignId, String questionnaireId);
 
 	void addManyUniteEnqueteeDeleteColonneClass(List<JsonNode> listeUe);
+
+	boolean isTerminated();
 }
