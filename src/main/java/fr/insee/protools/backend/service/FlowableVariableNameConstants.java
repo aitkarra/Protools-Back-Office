@@ -18,12 +18,6 @@ public class FlowableVariableNameConstants {
     public static final String VARNAME_REM_SURVEY_UNIT_IDENTIFIER ="rem_survey_unit_id";
     //to pass a REM survey unit content (JsonNode)
     public static final String VARNAME_REM_INTERROGATION ="rem_interrogation";
-    //To pass a list of REM interrogations content (JsonNode)
-    public static final String VARNAME_REM_INTERRO_LIST ="rem_interrogation_list";
-    //REM PAGEABLE
-    public static final String VARNAME_REM_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE ="rem_interro_list_page_is_last";
-    public static final String VARNAME_REM_INTERRO_LIST_PAGEABLE_CURRENT_PAGE ="rem_interro_list_page_current";
-
     public static final String VARNAME_REM_PROTOOLS_INTERRO_LIST = "rem_protools_interrogation_list";
 
     //Sugoi ID/PWD
@@ -52,6 +46,13 @@ public class FlowableVariableNameConstants {
     public static final String VARNAME_ALREADY_SCHEDULED_COMMUNICATION_ID_SET = "communication_already_scheduled_id_set";
     //List of the UUIDs of the communcation that are in error (echeance was too far past)
     public static final String VARNAME_COMMUNICATION_ERROR_ID_SET = "communication_in_error_id_set";
+
+
+    //To pass a list of REM interrogations content (JsonNode)
+    public static final String VARNAME_REM_INTERRO_LIST ="rem_interrogation_list";
+    //REM PAGEABLE
+    public static final String VARNAME_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE ="interro_list_page_is_last";
+    public static final String VARNAME_INTERRO_LIST_PAGEABLE_CURRENT_PAGE ="interro_list_page_current";
 
 
 

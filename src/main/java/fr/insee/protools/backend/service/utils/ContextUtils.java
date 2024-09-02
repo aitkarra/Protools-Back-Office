@@ -12,6 +12,7 @@ import java.util.stream.StreamSupport;
 
 import static fr.insee.protools.backend.service.context.ContextConstants.*;
 
+//TODO : à déplacer dans ContextService??
 public class ContextUtils {
 
     //TODO: supprimer??
@@ -42,6 +43,12 @@ public class ContextUtils {
             }
         }
         return Optional.ofNullable(currentPartitionNode);
+    }
+
+    public static Optional<JsonNode> getCommunicationFromPartition(JsonNode contextRootNode,String partitionId, String communicationId){
+        return getPartitionNodeIfExists(contextRootNode,partitionId)
+                .map(partitionNode -> getCommunicationFromPartition(partitionNode,communicationId))
+                .orElse(Optional.empty());
     }
 
     public static Optional<JsonNode> getCommunicationFromPartition(JsonNode partitionNode, String communicationId){

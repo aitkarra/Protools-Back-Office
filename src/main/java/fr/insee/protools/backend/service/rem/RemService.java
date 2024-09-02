@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_REM;
 
@@ -118,36 +119,20 @@ public class RemService {
     }
 
 
-    public PageResponse<JsonNode> getPartitionAllInterroPaginated(Long partitionId, long page, Boolean hasAccount) {
+    public PageResponse<JsonNode> getPartitionAllInterroPaginated(String partitionId, long page) {
         log.debug("partitionId={} - page={} - pageSizeGetInterro={} - hasAccount={}",partitionId,page,pageSizeGetInterro,hasAccount);
         ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
         try {
-            PageResponse<JsonNode> response;
-            if(hasAccount!=null) {
-                response = restClientHelper.getRestClient(KNOWN_API_REM)
+            PageResponse<JsonNode>   response = restClientHelper.getRestClient(KNOWN_API_REM)
                         .get()
                         .uri(uriBuilder -> uriBuilder
-                                .path("interrogations/ids")
-                                .queryParam("page", page)
-                                .queryParam("size", pageSizeGetInterro)
-                                .queryParam("partition_id", partitionId)
-                                .queryParam("hasAccount", false)
-                                .build(partitionId))
-                        .retrieve()
-                        .body(typeReference);
-            }
-            else {
-                response = restClientHelper.getRestClient(KNOWN_API_REM)
-                        .get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("interrogations/ids")
+                                .path("interrogations")
                                 .queryParam("page", page)
                                 .queryParam("size", pageSizeGetInterro)
                                 .queryParam("partition_id", partitionId)
                                 .build(partitionId))
                         .retrieve()
                         .body(typeReference);
-            }
             log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, response.getContent().size());
             return response;
         }

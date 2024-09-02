@@ -5,15 +5,22 @@ import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageEligibleDto
 import fr.insee.protools.backend.dto.platine.pilotage.contact.PlatineContactDto;
 import fr.insee.protools.backend.dto.platine.pilotage.query.QuestioningWebclientDto;
 import fr.insee.protools.backend.dto.platine.pilotage.v2.PlatinePilotageCommunicationEventDto;
+import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient4xxBPMNError;
+import fr.insee.protools.backend.httpclients.pagination.PageResponse;
 import fr.insee.protools.backend.httpclients.restclient.RestClientHelper;
 import fr.insee.protools.backend.service.platine.pilotage.metadata.MetadataDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_REM;
 import static fr.insee.protools.backend.httpclients.webclient.WebClientHelper.logJson;
 import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
 
@@ -23,6 +30,10 @@ import static fr.insee.protools.backend.httpclients.configuration.ApiConfigPrope
 public class PlatinePilotageService {
 
     private final RestClientHelper restClientHelper;
+
+    @Value("${fr.insee.protools.api.platine-pilotage.interrogation.page.size:5000}")
+    private int pageSizeGetInterro;
+
     public void putMetadata(String partitionId , MetadataDto dto) {
         log.debug("putMetadata : partitionId={} - dto.su.id={} ",partitionId,dto.getSurveyDto().getId());
         logJson(String.format("putMetadata - partitionId=%s : ",partitionId),dto, log,Level.DEBUG);
@@ -113,5 +124,36 @@ public class PlatinePilotageService {
                 .retrieve()
                 .body(String.class);
         log.trace("postCommunicationEvent: response={} ",response);
+    }
+
+    public PageResponse<JsonNode> getInterrogationToFollowUpPaginated(Long partitionId, long page, Optional<Boolean>  isToFollowUp) {
+        log.debug("partitionId={} - page={} - pageSizeGetInterro={} - hasAccount={}",partitionId,page,pageSizeGetInterro,isToFollowUp);
+        ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
+        try {
+            PageResponse<JsonNode> response = restClientHelper.getRestClient(KNOWN_API_PLATINE_PILOTAGE)
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("interrogations")
+                        .queryParam("page", page)
+                        .queryParam("size", pageSizeGetInterro)
+                        .queryParam("partition_id", partitionId)
+                        .queryParamIfPresent("follow-up", isToFollowUp)
+                        .build(partitionId))
+                .retrieve()
+                .body(typeReference);
+            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, response.getContent().size());
+            return response;
+        }
+        catch (HttpClient4xxBPMNError e){
+            if(e.getHttpStatusCodeError().equals(HttpStatus.NOT_FOUND)){
+                String msg=
+                        "Error 404/NOT_FOUND during Platine Pilotage getInterrogationToFollowUpPaginated with partitionId="+partitionId
+                                + " - msg="+e.getMessage();
+                log.error(msg);
+                throw new HttpClient4xxBPMNError(msg,e.getHttpStatusCodeError());
+            }
+            //Currently no remediation so just rethrow
+            throw e;
+        }
     }
 }

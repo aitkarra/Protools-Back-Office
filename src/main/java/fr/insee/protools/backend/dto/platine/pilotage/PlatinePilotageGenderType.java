@@ -3,7 +3,6 @@ package fr.insee.protools.backend.dto.platine.pilotage;
 import lombok.Getter;
 
 @Getter
-@SuppressWarnings("java:S115") //allow constants not in capital letters
 public enum PlatinePilotageGenderType {
     Female("1", "Female"), Male("2", "Male"),Undefined("3","Undefined")  ;
 

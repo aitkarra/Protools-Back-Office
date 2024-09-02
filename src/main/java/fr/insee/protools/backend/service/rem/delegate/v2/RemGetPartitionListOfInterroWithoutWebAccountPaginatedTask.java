@@ -6,6 +6,7 @@ import fr.insee.protools.backend.httpclients.pagination.PageResponse;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.rem.RemService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
+import fr.insee.protools.backend.service.utils.delegate.PaginationHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -21,19 +22,19 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RemGetPartitionListOfInterroWithoutWebAccountPaginatedTask implements JavaDelegate, DelegateContextVerifier, PaginationHelper  {
+public class RemGetPartitionListOfInterroWithoutWebAccountPaginatedTask implements JavaDelegate, DelegateContextVerifier, PaginationHelper {
 
     private final RemService remService;
 
     private PageResponse readFunction(Integer pageToRead, Object... objects) {
         Long partitionId = (Long) objects[0];
-        return remService.getPartitionAllInterroPaginated(partitionId, pageToRead,null);
+        return remService.getPartitionAllInterroPaginated(partitionId, pageToRead,false);
     }
 
     @Override
     public void execute(DelegateExecution execution) {
         Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, Long.class);
-        getAndTreat(execution, VARNAME_REM_INTERRO_LIST_PAGEABLE_CURRENT_PAGE, VARNAME_REM_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE, this::readFunction, currentPartitionId);
+        getAndTreat(execution, VARNAME_INTERRO_LIST_PAGEABLE_CURRENT_PAGE, VARNAME_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE, this::readFunction, currentPartitionId);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package fr.insee.protools.backend.service.rem.delegate.v2;
+package fr.insee.protools.backend.service.utils.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.httpclients.pagination.PageResponse;

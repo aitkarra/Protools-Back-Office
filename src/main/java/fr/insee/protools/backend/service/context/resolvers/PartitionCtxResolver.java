@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.exception.ProtoolsBpmnError;
 import fr.insee.protools.backend.service.context.ContextService;
 import fr.insee.protools.backend.service.exception.IncoherentBPMNContextError;
+import fr.insee.protools.backend.service.utils.ContextUtils;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import fr.insee.protools.backend.service.utils.log.TimeLogUtils;
 import lombok.RequiredArgsConstructor;
@@ -74,17 +75,18 @@ public class PartitionCtxResolver {
 
     }
 
+    @SuppressWarnings("unused")     //used in BPMNS
     public String getCommunicationType(ExecutionEntity execution, String partitionId, String communicationId) {
         JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
-        JsonNode partitionNode = getPartitionNodeIfExists(contextRootNode, partitionId)
+        JsonNode communicationNode = ContextUtils.getCommunicationFromPartition(contextRootNode,partitionId,communicationId)
                 .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get communication type on an unknown partition"));
 
-        JsonNode communicationNode = getCommunicationFromPartition(partitionNode,communicationId).orElseThrow(()-> new IncoherentBPMNContextError("Tried to get communication type on an undefined communicationId="+communicationId));
         return communicationNode.path(CTX_PARTITION_COMMUNICATION_TYPE).asText();
     }
 
 
     //TODO: documenter l'histoire des 24H
+    @SuppressWarnings("unused") //Used in BPMN
     public Instant scheduleNextCommunication(ExecutionEntity execution, String partitionId) {
 
         Instant now = Instant.now();

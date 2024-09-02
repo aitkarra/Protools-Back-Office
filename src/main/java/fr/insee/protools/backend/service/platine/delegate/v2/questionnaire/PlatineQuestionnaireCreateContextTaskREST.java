@@ -1,9 +1,8 @@
-package fr.insee.protools.backend.service.platine.delegate.v2;
+package fr.insee.protools.backend.service.platine.delegate.v2.questionnaire;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.platine.pilotage.PlatinePilotageService;
 import fr.insee.protools.backend.service.platine.questionnaire.PlatineQuestionnaireService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
