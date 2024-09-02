@@ -16,7 +16,6 @@ import javax.naming.Context;
 import java.util.List;
 import java.util.Map;
 
-import static fr.insee.protools.backend.dto.platine.pilotage.v2.PlatinePilotageCommunicationEventType.COMMUNICATION_SENT;
 import static fr.insee.protools.backend.dto.platine.pilotage.v2.PlatinePilotageCommunicationEventType.COMMUNICATION_STATE_SENT;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 import static fr.insee.protools.backend.service.utils.ContextUtils.getPartitionNodeIfExists;
@@ -31,7 +30,6 @@ public class PlatinePilotageCreateCommunicationEventTaskREST implements JavaDele
 
     @Override
     public void execute(DelegateExecution execution) {
-        execution.getId()
         String currentCommunicationId= FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_COMMUNICATION_ID, String.class);
         String currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, String.class);
 
