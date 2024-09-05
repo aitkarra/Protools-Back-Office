@@ -10,7 +10,9 @@
     "label",
     "contexte",
     "metadonnees",
-    "partitions"
+    "lots",
+    "questionnairesModeles",
+    "nomenclatures"
   ],
   "properties": {
     "id": {
@@ -49,7 +51,14 @@
         },
         "periodicite": {
           "description": "Périodicité de XXX. X: pluriannuelle; A: annuelle ; S: semestrielle ; T: trimestrielle; B: bi-mensuelle; M: mensuelle",
-          "enum": ["X", "A", "S", "T", "B", "M"],
+          "enum": [
+            "X",
+            "A",
+            "S",
+            "T",
+            "B",
+            "M"
+          ],
           "type": "string"
         },
         "periode": {
@@ -102,7 +111,6 @@
         "anneeVisa": {
           "description": "Année du VISA",
           "$ref": "#/$defs/annee4digit"
-
         },
         "caractereObligatoire": {
           "description": "Caractère obligatoire de l'enquête",
@@ -383,7 +391,7 @@
           "type": "boolean"
         },
         "formatLivraisonDonnees": {
-          "description": "XXX: ENUM?? String??",
+          "description": "Format de livraison des données par le produit traiter",
           "type": "string"
         },
         "mailBoiteFonctionnelle": {
@@ -394,28 +402,28 @@
           "description": "XXX Référents sabiane; peuvent être principaux (sinon considérés comme secondaires) ",
           "type": "array",
           "items": {
-              "type": "object",
-              "properties": {
-                "nom": {
-                  "type": "string"
-                },
-                "prenom": {
-                  "type": "string"
-                },
-                "telephone": {
-                  "type": "string"
-                },
-                "principal": {
-                  "type": "boolean"
-                }
+            "type": "object",
+            "properties": {
+              "nom": {
+                "type": "string"
               },
-              "required": [
-                "nom",
-                "prenom",
-                "telephone",
-                "principal"
-              ]
-             }
+              "prenom": {
+                "type": "string"
+              },
+              "telephone": {
+                "type": "string"
+              },
+              "principal": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "nom",
+              "prenom",
+              "telephone",
+              "principal"
+            ]
+          }
         },
         "champGeographiqueEnquete": {
           "description": "Champ géographique de l'enquête. Ex: France entière",
@@ -564,7 +572,10 @@
                 "lien": {
                   "description": "XXXX : Lien entre le lot lié et le lot décrit. Ex: precedent ==> le lot en lien precede le lot actuel  ",
                   "type": "string",
-                  "enum": ["precedent", "suivant"]
+                  "enum": [
+                    "precedent",
+                    "suivant"
+                  ]
                 },
                 "regleRemiseCollecte": {
                   "description": "XXXX",
@@ -580,7 +591,10 @@
           },
           "typeEchantillon": {
             "description": "Type d'échantillon ",
-            "enum": ["logement", "individu"]
+            "enum": [
+              "logement",
+              "individu"
+            ]
           },
           "modesCollecte": {
             "description": "Modes de collecte de l'échantillon CAPI=XXX...",
@@ -588,12 +602,7 @@
             "uniqueItems": true,
             "minItems": 1,
             "items": {
-              "enum": [
-                "CATI",
-                "CAPI",
-                "CAWI",
-                "PAPI"
-              ]
+              "$ref": "#/$defs/modesDeCollecte"
             }
           },
           "dateDebutVisibiliteGestionnaire": {
@@ -636,13 +645,13 @@
             "type": "string",
             "format": "date-time"
           },
-          "questionnaireModeles": {
-            "description": "XXX Liste des modèles de questionnaires possibles pour les interrogations de ce lot",
+          "questionnairesModeles": {
+            "description": "XXX Liste des identifiants des modèles de questionnaires possibles pour les interrogations de ce lot. Ils doivent tous être décrits dans questionnairesModeles",
             "type": "array",
             "minItems": 1,
             "items": {
-                "type": "string"
-              }
+              "type": "string"
+            }
           },
           "moduleCommentaire": {
             "description": "XXX",
@@ -659,12 +668,21 @@
           "rangInterrogation": {
             "description": "XXX",
             "type": "string",
-            "enum": ["entrant", "intermediaire", "sortant"]
+            "enum": [
+              "entrant",
+              "intermediaire",
+              "sortant"
+            ]
           },
           "reperage": {
             "description": "XXX",
             "type": "string",
-            "enum": ["aucun", "faf_logement", "faf_individu", "telephone"]
+            "enum": [
+              "aucun",
+              "faf_logement",
+              "faf_individu",
+              "telephone"
+            ]
           },
           "essaisContact": {
             "description": "XXX",
@@ -872,12 +890,18 @@
                 "moyenCommunication": {
                   "description": "Moyen de communication à utiliser",
                   "type": "string",
-                  "enum": ["courrier", "mail"]
+                  "enum": [
+                    "courrier",
+                    "mail"
+                  ]
                 },
                 "typeCommunication": {
                   "description": "Type de communication. XXX: ya il autre chose qu'ouverture et relance???",
                   "type": "string",
-                  "enum": ["ouverture", "relance"]
+                  "enum": [
+                    "ouverture",
+                    "relance"
+                  ]
                 },
                 "modeleCommunication": {
                   "description": "XXX:",
@@ -985,7 +1009,7 @@
           "label",
           "lotsEnLien",
           "typeEchantillon",
-          "modeCollecte",
+          "modesCollecte",
           "dateDebutVisibiliteGestionnaire",
           "dateDebutVisibiliteEnqueteur",
           "dateDebutReperage",
@@ -994,7 +1018,7 @@
           "dateFinTraitementGestionnaire",
           "dateFinTraitementReprise",
           "dateRetour",
-          "questionnaireModel",
+          "questionnairesModeles",
           "moduleCommentaire",
           "svi",
           "codeEnquete",
@@ -1042,6 +1066,71 @@
           "communications"
         ]
       }
+    },
+    "questionnairesModeles": {
+      "description": "Tous les modèles de questionnaires dont les id sont référencés dans les lots de ce contexte sont décrits ici",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Identifiant du modèle de questionnaire",
+            "type": "string"
+          },
+          "modeCollecte": {
+            "description": "Mode de collecte de l'échantillon CAPI=XXX...",
+            "$ref": "#/$defs/modesDeCollecte"
+          },
+          "cheminRepertoire": {
+            "description": "XXX:(à modifier pour mettre une URL??) : Chemin du répertoire où le modèle de questionnaire est déposé sur gitlab",
+            "type": "string"
+          },
+          "label": {
+            "description": "Un label pour le modèle",
+            "type": "string"
+          },
+          "nomenclatureReferencees": {
+            "description": "Liste des identifiants des nomenclatures référencées par le modèle de questionnaire",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "modeCollecte",
+        "cheminRepertoire",
+        "label",
+        "nomenclaturesReferencees"
+      ]
+    },
+    "nomenclatures": {
+      "description": "Toutes les nommenclatures référencées par au moins un modèle de questionnaire sont décrites ici",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Identifiant de la nomenclature",
+            "type": "string"
+          },
+          "cheminRepertoire": {
+            "description": "XXX:(à modifier pour mettre une URL??) : Chemin du répertoire où la nomenclature est déposée sur gitlab",
+            "type": "string"
+          },
+          "label": {
+            "description": "Un label pour la nomenclature",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "cheminRepertoire",
+          "label"
+        ]
+      }
     }
   },
   "$defs": {
@@ -1049,6 +1138,15 @@
       "type": "integer",
       "minimum": 1000,
       "maximum": 9999
+    },
+    "modesDeCollecte": {
+      "type": "string",
+      "enum": [
+        "CATI",
+        "CAPI",
+        "CAWI",
+        "PAPI"
+      ]
     },
     "periode": {
       "description": "XXX. A00: annuelle; X00-X99: pluriannuelle; S01-02: 1er et 2nd semestre; T1-4: 1er-4e trimestre; M01-M12: Mois de l'année; B01-B06: Bimestre dans l'année  ",
