@@ -1,27 +1,26 @@
 package fr.insee.protools.backend.service.context.resolvers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.exception.ProtoolsBpmnError;
+import fr.insee.protools.backend.dto.Communication;
+import fr.insee.protools.backend.dto.Lot;
 import fr.insee.protools.backend.service.context.ContextService;
 import fr.insee.protools.backend.service.exception.IncoherentBPMNContextError;
-import fr.insee.protools.backend.service.utils.ContextUtils;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import fr.insee.protools.backend.service.utils.log.TimeLogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.TemporalAmount;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
-import static fr.insee.protools.backend.service.context.ContextConstants.*;
-import static fr.insee.protools.backend.service.utils.ContextUtils.*;
 
 /**
  * Used to make protools context variables available in BPMN expressions
@@ -50,38 +49,35 @@ public class PartitionCtxResolver {
     private final static Instant farAwayInstant = LocalDate.parse("9999-12-31").atStartOfDay(ZoneId.of("Europe/Paris")).toInstant();
 
 
-    private Serializable getVariableOfPartition(ExecutionEntity execution, String partitionId, String key) {
-        HashMap<Long,HashMap<String, Serializable>> variablesByPartition = execution.getVariable(VARNAME_CONTEXT_PARTITION_VARIABLES_BY_ID, HashMap.class);
-        HashMap<String, Serializable> partitionVariables = variablesByPartition.get(partitionId);
-        if(partitionVariables==null) {
-            throw new FlowableException("Could not get variable "+VARNAME_CONTEXT_PARTITION_VARIABLES_BY_ID+ " of partitionId="+partitionId);
-        }
-        return partitionVariables.get(key);
+    private Optional<Lot> getPartition(ExecutionEntity execution, String partitionId){
+        var context = protoolsContext.getContextDtoByProcessInstance(execution.getProcessInstanceId());
+         return context.getLots().stream()
+                .filter(x -> x.getId().toString().equalsIgnoreCase(partitionId))
+                .findAny();
     }
 
     public Instant getCollectionStartDate(ExecutionEntity execution, String partitionId) {
-        return (Instant) getVariableOfPartition(execution,partitionId,CTX_PARTITION_DATE_DEBUT_COLLECTE);
+        return getPartition(execution,partitionId)
+                .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get Collection Start date on undefined partition"))
+                .getDateDebutCollecte();
     }
 
 
     public Instant getCollectionEndDate(ExecutionEntity execution, String partitionId) {
-        //TODO : a supprimer ; Voir si on n'utilise pas le contexte json directement au lieu de variables initalisées au lancement
-        /*Instant s =  (Instant) getVariableOfPartition(execution,partitionId,CTX_PARTITION_DATE_FIN_COLLECTE);
-        System.out.println("partitionId="+partitionId+" getCollectionEndDate="+s);
-        LocalDateTime ldt = LocalDateTime.ofInstant(s, ZoneOffset.systemDefault());	//2023-02-02T13:52:04.824071900
-        System.out.println("partitionId="+partitionId+" getCollectionEndDate LOCAL="+ldt);*/
-
-        return (Instant) getVariableOfPartition(execution,partitionId,CTX_PARTITION_DATE_FIN_COLLECTE);
-
+        return getPartition(execution,partitionId)
+                .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get Collection Start date on undefined partition"))
+                .getDateDebutCollecte();
     }
 
     @SuppressWarnings("unused")     //used in BPMNS
     public String getCommunicationType(ExecutionEntity execution, String partitionId, String communicationId) {
-        JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
-        JsonNode communicationNode = ContextUtils.getCommunicationFromPartition(contextRootNode,partitionId,communicationId)
-                .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get communication type on an unknown partition"));
-
-        return communicationNode.path(CTX_PARTITION_COMMUNICATION_TYPE).asText();
+        return getPartition(execution,partitionId)
+                .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get communication type on an unknown partition : "+partitionId))
+                .getCommunications().stream()
+                .filter(x -> x.getId().toString().equalsIgnoreCase(communicationId))
+                .findAny()
+                .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get communication type on an unknown communication : "+communicationId))
+                .getTypeCommunication().toString();
     }
 
 
@@ -92,7 +88,9 @@ public class PartitionCtxResolver {
         Instant now = Instant.now();
 
         //Context
-        JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
+        Lot partition =  getPartition(execution,partitionId)
+                .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get schedule next communication on an unknown partition : "+partitionId));
+
         Set<String> sentCommunicationIds = FlowableVariableUtils.getVariableOrNull(execution, VARNAME_ALREADY_SCHEDULED_COMMUNICATION_ID_SET, Set.class);
         Set<String> errorCommunicationIds = FlowableVariableUtils.getVariableOrNull(execution, VARNAME_COMMUNICATION_ERROR_ID_SET, Set.class);
 
@@ -103,47 +101,38 @@ public class PartitionCtxResolver {
         if(errorCommunicationIds==null){
             errorCommunicationIds=new HashSet<>();
         }
-        JsonNode partitionNode = getPartitionNodeIfExists(contextRootNode, partitionId)
-                .orElseThrow(() -> new IncoherentBPMNContextError("Tried to schedule next communication of an undefined partition"));
 
-        //if this partition is not defined; obviously there is something wrong
-        String end = partitionNode.get(CTX_PARTITION_DATE_FIN_COLLECTE).asText();
-        Instant collectionEndCollecte = Instant.parse(end);
-
-        if(collectionEndCollecte.isBefore(now)){
+        //Collection End if after current time
+        if(partition.getDateFinCollecte().isBefore(now)){
             log.error("ProcessInstanceId={} - partitionId={} - dateFinCollecte={} is in the past  ==> Timer is set to a far away Instant ",
-                    execution.getProcessInstanceId(), partitionId, TimeLogUtils.format(collectionEndCollecte));
+                    execution.getProcessInstanceId(), partitionId, TimeLogUtils.format(partition.getDateFinCollecte()));
             return farAwayInstant;
         }
 
-        List<JsonNode> communicationNodes = getCommunicationsFromPartition(partitionNode);
         Instant nextCommEcheance = null;
         String nextCommId=null;
 
+        for (Communication communication: partition.getCommunications()){
 
-        for (JsonNode communicationNode : communicationNodes){
-            Instant echeance = Instant.parse(communicationNode.path(CTX_PARTITION_COMMUNICATION_ECHEANCE).asText());
-            String communicationId=communicationNode.path(CTX_PARTITION_COMMUNICATION_ID).asText();
-
-            //null is an error in config so we ignore it; a
+            //null is an error in config so we ignore it;
             // and we also discard communications that have already been sent or that have been marked as in error
-            if(communicationId==null || sentCommunicationIds.contains(communicationId) || errorCommunicationIds.contains(communicationId)){
+            if(communication==null || communication.getEcheance()==null || sentCommunicationIds.contains(communication.getId().toString()) || errorCommunicationIds.contains(communication.getId().toString())){
                 continue;
             }
 
             //verify that echeance of communication to be sent is not too old
-            if(echeance.plus(maxSendCommunicationWindowHours).isBefore(now)){
+            if(communication.getEcheance().plus(maxSendCommunicationWindowHours).isBefore(now)){
                 log.warn("Partition id={} : Communication id={} has not been sent. Its echeance [ {} ] is too far past so it will not be sent",
-                        partitionId,communicationId,TimeLogUtils.format(echeance));
+                        partitionId,communication.getId(),TimeLogUtils.format(communication.getEcheance()));
 
-                errorCommunicationIds.add(communicationId);
+                errorCommunicationIds.add(communication.getId().toString());
                 execution.getRootProcessInstance().setVariableLocal(VARNAME_COMMUNICATION_ERROR_ID_SET,errorCommunicationIds);
             }
 
             //Among the not treated communications we compute the one with the first echeance
-            else if(nextCommEcheance == null || nextCommEcheance.isAfter(echeance)){
-                nextCommEcheance=echeance;
-                nextCommId=communicationNode.path(CTX_PARTITION_COMMUNICATION_ID).asText();
+            else if(nextCommEcheance == null || nextCommEcheance.isAfter(communication.getEcheance())){
+                nextCommEcheance=communication.getEcheance();
+                nextCommId=communication.getId().toString();
             }
         }
 

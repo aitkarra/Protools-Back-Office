@@ -1,7 +1,6 @@
 package fr.insee.protools.backend.dto.internal;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.dto.rem.REMSurveyUnitDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

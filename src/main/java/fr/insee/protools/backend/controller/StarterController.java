@@ -1,7 +1,8 @@
 package fr.insee.protools.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
+import fr.insee.protools.backend.restclient.RestClientHelper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
@@ -17,13 +18,13 @@ import java.util.Optional;
 
 @RequestMapping("/starter")
 @RestController
+@RequiredArgsConstructor
 public class StarterController {
 
         @Autowired(required = false)
         private Optional<BuildProperties> buildProperties;
 
-        @Autowired
-        private WebClientHelper webClientHelper;
+        private final  RestClientHelper restClientHelper;
 
         @GetMapping("/healthcheck")
         public ResponseEntity<String> healthcheck(){
@@ -59,7 +60,7 @@ public class StarterController {
         @GetMapping("/token_details_by_api")
         public ResponseEntity<String> tokensDetailsByAPI(){
                 StringBuilder result = new StringBuilder("List of tokens roles : ");
-                for(var x : webClientHelper.getTokenDetailsByAPI().entrySet()){
+                for(var x : restClientHelper.getTokenDetailsByAPI().entrySet()){
                         result.append("\n").append(x.getKey()).append(" : ").append(x.getValue());
                 }
                 return ResponseEntity.ok(result.toString());
@@ -67,7 +68,7 @@ public class StarterController {
 
         @GetMapping("/api_configuration")
         public ResponseEntity<JsonNode> apiConfiguration(){
-                return ResponseEntity.ok(webClientHelper.getAPIConfigDetails());
+                return ResponseEntity.ok(restClientHelper.getAPIConfigDetails());
         }
 
         @GetMapping(value="/changelog" , produces = MediaType.TEXT_PLAIN_VALUE)

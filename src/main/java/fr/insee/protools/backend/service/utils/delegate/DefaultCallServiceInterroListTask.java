@@ -1,6 +1,7 @@
 package fr.insee.protools.backend.service.utils.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.dto.internal.ProtoolsInterrogationDto;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
@@ -16,7 +17,6 @@ import java.util.List;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERRO_LIST;
-import static fr.insee.protools.backend.service.context.ContextConstants.CTX_CAMPAGNE_ID;
 
 
 @Slf4j
@@ -28,27 +28,26 @@ public abstract class DefaultCallServiceInterroListTask implements JavaDelegate,
     private final ContextService protoolsContext;
 
     // Abstract method for the specific service action
-    protected abstract void serviceAction(String campaignId,List<JsonNode> list,String ... params);
-    protected void callService(DelegateExecution execution, JsonNode contextRootNode, String campaignId,List<JsonNode> list){
-        serviceAction(campaignId,list);
+    protected abstract void serviceAction(ContexteProcessus context,List<JsonNode> list,String ... params);
+    protected void callService(DelegateExecution execution, ContexteProcessus context, List<JsonNode> list){
+        serviceAction(context,list);
     }
 
     @Override
     public void execute(DelegateExecution execution) {
-        JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
-        checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
+        ContexteProcessus context = protoolsContext.getContextDtoByProcessInstance(execution.getProcessInstanceId());
+        checkContextOrThrow(log,execution.getProcessInstanceId(), context);
 
-        String campainId = contextRootNode.path(CTX_CAMPAGNE_ID).asText();
-        Long currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, Long.class);
+        String currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, String.class);
         List<ProtoolsInterrogationDto> protoolsInterrogationList = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_INTERRO_LIST, List.class);
 
         List<JsonNode> interrogationList = protoolsInterrogationList.stream()
                 .map(protoolsInterrogationDto -> {
                     log.trace("ProcessInstanceId={}  - campainId={} - currentPartitionId={} - idInterrogation={}",
-                            execution.getProcessInstanceId(),campainId,currentPartitionId,protoolsInterrogationDto.getIdInterrogation());
+                            execution.getProcessInstanceId(),context.getId(),currentPartitionId,protoolsInterrogationDto.getIdInterrogation());
                     return protoolsInterrogationDto.getRemInterrogation();
                 })
                 .toList();
-        callService(execution,contextRootNode,campainId,interrogationList);
+        callService(execution,context,interrogationList);
     }
 }

@@ -1,6 +1,7 @@
 package fr.insee.protools.backend.service.context;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.protools.backend.dto.ContexteProcessus;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ContextService {
@@ -24,12 +25,21 @@ public interface ContextService {
     String processContextFileAndCreateProcessInstance(MultipartFile file, String processDefinitionId, String businessKey);
 
     /**
-     * Retrieve Protools Context from of a given processInstance ID
+     * Retrieve Protools Context as JsonNode from of a given processInstance ID
      *
      * @param processInstanceId
      * @return the Json context of the process associated with process Instance
      * @throws
      */
-    JsonNode getContextByProcessInstance(String processInstanceId) ;
+    JsonNode getContextJsonNodeByProcessInstance(String processInstanceId);
+
+    /**
+     * Retrieve Protools Context as DTO from of a given processInstance ID
+     *
+     * @param processInstanceId
+     * @return the Dto context of the process associated with process Instance
+     * @throws
+     */
+    ContexteProcessus getContextDtoByProcessInstance(String processInstanceId);
 
 }

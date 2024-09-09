@@ -8,8 +8,6 @@ public class FlowableVariableNameConstants {
     //TODO : renommer toutes ces variables pour remplacer les - par des _ (comme ca ca sera utilisable dans les resolvers)
     //Protools context
     public static final String VARNAME_CONTEXT="context";
-    public static final String VARNAME_CONTEXT_PARTITION_ID_LIST="contexte_partition_id_list";
-    public static final String VARNAME_CONTEXT_PARTITION_VARIABLES_BY_ID="contexte_partition_variables_by_partitionid";
     //To treat partitions one by one (Long)
     public static final String VARNAME_CURRENT_PARTITION_ID="current_partition_id";
     //to pass a list of REM interrogation ids (List<Long>)
@@ -53,6 +51,13 @@ public class FlowableVariableNameConstants {
     //REM PAGEABLE
     public static final String VARNAME_INTERRO_LIST_PAGEABLE_IS_LAST_PAGE ="interro_list_page_is_last";
     public static final String VARNAME_INTERRO_LIST_PAGEABLE_CURRENT_PAGE ="interro_list_page_current";
+
+
+    //Contacts
+    public static final String VARNAME_PLATINE_CONTACT_LIST ="platine_contact_list";
+
+    //Remise en collecte
+    public static final String VARNAME_INTERRO_REMISE_EN_COLLECTE_LIST ="interro_remise_en_collecte_list";
 
 
 

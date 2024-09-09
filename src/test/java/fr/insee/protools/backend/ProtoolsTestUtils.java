@@ -79,7 +79,7 @@ public class ProtoolsTestUtils {
 
     public static JsonNode initContexteMockFromString(ContextService protoolsContext, String contextAsString) throws JsonProcessingException {
         JsonNode contextRootNode = new ObjectMapper().readTree(contextAsString);
-        when(protoolsContext.getContextByProcessInstance(anyString())).thenReturn(contextRootNode);
+        when(protoolsContext.getContextJsonNodeByProcessInstance(anyString())).thenReturn(contextRootNode);
         return contextRootNode;
     }
 }

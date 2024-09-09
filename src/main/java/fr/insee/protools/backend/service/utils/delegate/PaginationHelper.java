@@ -1,7 +1,7 @@
 package fr.insee.protools.backend.service.utils.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.httpclients.pagination.PageResponse;
+import fr.insee.protools.backend.restclient.pagination.PageResponse;
 import fr.insee.protools.backend.service.exception.PageableAPIBPMNError;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import org.flowable.engine.delegate.DelegateExecution;

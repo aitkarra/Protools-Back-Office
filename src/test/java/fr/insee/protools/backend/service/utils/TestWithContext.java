@@ -1,9 +1,13 @@
 package fr.insee.protools.backend.service.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.protools.backend.ProtoolsTestUtils;
+import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.service.context.ContextService;
+import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
 import fr.insee.protools.backend.service.context.exception.BadContextIncorrectBPMNError;
+import lombok.SneakyThrows;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.junit.jupiter.api.AfterEach;
@@ -25,14 +29,18 @@ public abstract class TestWithContext {
     @Spy protected ContextService protoolsContext;
 
     protected final String dumyId="ID1";
+    private ObjectMapper objectMapper=new ObjectMapper();
 
     @AfterEach
     void mockitoResetContext() {
         Mockito.reset(protoolsContext);
     }
-    protected JsonNode initContexteMockWithFile(String contexteToLoad){
+    @SneakyThrows
+    protected JsonNode initContexteMockWithFile(String contexteToLoad) {
         JsonNode contextRootNode = ProtoolsTestUtils.asJsonNode(contexteToLoad);
-        doReturn(contextRootNode).when(protoolsContext).getContextByProcessInstance(anyString());
+        ContexteProcessus schema = objectMapper.readValue(contexteToLoad, ContexteProcessus.class);
+        doReturn(contextRootNode).when(protoolsContext).getContextJsonNodeByProcessInstance(anyString());
+        doReturn(schema).when(protoolsContext).getContextDtoByProcessInstance(anyString());
         return contextRootNode;
     }
 
@@ -53,8 +61,9 @@ public abstract class TestWithContext {
         //Precondition
         DelegateExecution execution = mock(DelegateExecution.class);
         lenient().when(execution.getProcessInstanceId()).thenReturn(dumyId);
-        doReturn(null).when(protoolsContext).getContextByProcessInstance(anyString());
+        doThrow(new BadContexMissingBPMNError("Erreur")).when(protoolsContext).getContextDtoByProcessInstance(anyString());
+        doThrow(new BadContexMissingBPMNError("Erreur")).when(protoolsContext).getContextJsonNodeByProcessInstance(anyString());
 
-        assertThrows(BadContextIncorrectBPMNError.class, () -> delegate.execute(execution));
+        assertThrows(BadContexMissingBPMNError.class, () -> delegate.execute(execution));
     }
 }

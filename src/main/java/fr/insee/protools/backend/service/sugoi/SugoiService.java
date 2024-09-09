@@ -3,16 +3,16 @@ package fr.insee.protools.backend.service.sugoi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.protools.backend.dto.sugoi.User;
+import fr.insee.protools.backend.restclient.RestClientHelper;
+import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
 import fr.insee.protools.backend.service.exception.UsernameAlreadyExistsSugoiBPMNError;
-import fr.insee.protools.backend.httpclients.webclient.WebClientHelper;
-import fr.insee.protools.backend.httpclients.exception.runtime.HttpClient4xxBPMNError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import static fr.insee.protools.backend.httpclients.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_SUGOI;
+import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_SUGOI;
 
 @Service
 @Slf4j
@@ -21,7 +21,7 @@ public class SugoiService {
     //TODO:  a quel niveau configure on ça?
 
     static final String STORAGE = "default";
-    private final WebClientHelper webClientHelper;
+    private final RestClientHelper restClientHelper;
     private final ObjectMapper objectMapper;
     @Value("${fr.insee.protools.api.sugoi.dmz-account-creation-realm:questionnaire-particuliers}")
     private String realm;
@@ -29,15 +29,14 @@ public class SugoiService {
     public User postCreateUsers(User userBody) {
         log.debug("postCreateUsers");
         try {
-            User userCreated = webClientHelper.getWebClient(KNOWN_API_SUGOI)
+            User userCreated = restClientHelper.getRestClient(KNOWN_API_SUGOI)
                     .post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/realms/{realm}/storages/{storage}/users")
                             .build(realm, STORAGE))
-                    .bodyValue(userBody)
+                    .body(userBody)
                     .retrieve()
-                    .bodyToMono(User.class)
-                    .block();
+                    .body(User.class);
             log.info("postCreateUsers - response={} ", userCreated);
             return userCreated;
         } catch (HttpClient4xxBPMNError e) {
@@ -58,16 +57,15 @@ public class SugoiService {
         log.debug("postInitPassword - userId={} begin", userId);
         ObjectNode body = objectMapper.createObjectNode();
         body.put("password", password);
-        webClientHelper.getWebClient(KNOWN_API_SUGOI)
+        restClientHelper.getRestClient(KNOWN_API_SUGOI)
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/realms/{realm}/users/{id}/init-password")
                         .queryParam("change-password-reset-status", true)
                         .build(realm, userId))
-                .bodyValue(body)
+                .body(body)
                 .retrieve()
-                .toBodilessEntity()
-                .block();
+                .toBodilessEntity();
         log.info("postInitPassword - userId={} end", userId);
     }
 }
