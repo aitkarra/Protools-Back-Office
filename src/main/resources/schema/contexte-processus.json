@@ -4,16 +4,6 @@
   "title": "Contexte de processus",
   "description": "Le contexte d'un processus",
   "type": "object",
-  "required": [
-    "id",
-    "labelCourt",
-    "label",
-    "contexte",
-    "metadonnees",
-    "lots",
-    "questionnairesModeles",
-    "nomenclatures"
-  ],
   "properties": {
     "id": {
       "description": "Identifiant de la campagne",
@@ -50,7 +40,7 @@
           "type": "string"
         },
         "periodicite": {
-          "description": "Périodicité de XXX. X: pluriannuelle; A: annuelle ; S: semestrielle ; T: trimestrielle; B: bi-mensuelle; M: mensuelle",
+          "description": "Fréquence de la collecte (code). X: pluriannuelle; A: annuelle ; S: semestrielle ; T: trimestrielle; B: bi-mensuelle; M: mensuelle",
           "enum": [
             "X",
             "A",
@@ -69,7 +59,7 @@
           "$ref": "#/$defs/annee4digit"
         },
         "operationId": {
-          "description": "XXXX",
+          "description": "Identifiant de l'opération statistique",
           "type": "string"
         },
         "operationLabelCourt": {
@@ -93,15 +83,15 @@
           "type": "string"
         },
         "diffusionUrl": {
-          "description": "XXXX",
+          "description": "URL d'information de diffusion sur l'enquête",
           "type": "string"
         },
         "noticeUrl": {
-          "description": "XXXX",
+          "description": "URL de la notice de l'enquête",
           "type": "string"
         },
         "specimenUrl": {
-          "description": "XXXX",
+          "description": "URL du specimen de l'enquête",
           "type": "string"
         },
         "numeroVisa": {
@@ -110,7 +100,7 @@
         },
         "anneeVisa": {
           "description": "Année du VISA",
-          "$ref": "#/$defs/annee4digit"
+          "type": "string"
         },
         "caractereObligatoire": {
           "description": "Caractère obligatoire de l'enquête",
@@ -121,35 +111,36 @@
           "type": "boolean"
         },
         "qualiteStatistique": {
-          "description": "XXXX",
+          "description": "Obtention du caractère de qualité statistique de l'enquête",
           "type": "boolean"
         },
         "testNonLabellise": {
-          "description": "XXXX",
+          "description": "Enquête non labellisée",
           "type": "boolean"
         },
         "parutionJo": {
-          "description": "XXXX",
+          "description": "Publication du visa Cnis au journal officiel",
           "type": "boolean"
         },
         "dateParutionJo": {
+          "description": "Date de publication au journal officiel, apparaissant sur les courriers/mails envoyés aux enquêtés",
           "type": "string",
           "format": "date"
         },
         "portailMesEnquetesOperation": {
-          "description": "XXXX",
+          "description": "Présence ou non d'un portail Mes enquêtes pour la réponse à une enquête web",
           "type": "boolean"
         },
         "proprietaireId": {
-          "description": "XXXX (visiblement ca part dans les metadonnees proprietaire de platine)",
+          "description": "Identifiant du propriétaire de l'enquête",
           "type": "string"
         },
         "proprietaireLabel": {
-          "description": "XXXX (visiblement ca part dans les metadonnees proprietaire de platine)",
+          "description": "Nom du propriétaire de l'enquête",
           "type": "string"
         },
         "imageLogos": {
-          "description": "XXXX",
+          "description": "Logo de l'entête des courriers envoyés aux enquêtés",
           "type": "string"
         },
         "ministereTutelle": {
@@ -157,34 +148,35 @@
           "type": "string"
         },
         "commanditaire": {
-          "description": "Commanditaire de cette enquête",
+          "description": "Le ou les  organisme(s) en charge de l’enquête statistique affiché(s) sur les courriers envoyés aux enquêtés.",
           "type": "string"
         },
         "responsableOperationnel": {
-          "description": "XXXX",
+          "description": "Responsable opérationnel en charge du traitement pour l’exercice des droits",
           "type": "string"
         },
         "mailResponsableOperationnel": {
-          "description": "XXXX",
+          "description": "Mail du responsable opérationnel du traitement pour l’exercice des droits",
           "type": "string"
         },
         "responsableTraitement": {
-          "description": "XXXX",
+          "description": "Nom du responsable du traitement",
           "type": "string"
         },
         "responsableTraitementIdenti": {
+          "description": "Nom court du responsable du traitement",
           "type": "string"
         },
         "responsableTraitementIdentiFem": {
-          "description": "XXXX",
+          "description": "Genre féminin du responsable du traitement",
           "type": "boolean"
         },
         "urlResponsableTraitement": {
-          "description": "XXXX",
+          "description": "Url du site du responsable du traitement",
           "type": "string"
         },
         "prestataire": {
-          "description": "L'equête est elle réalisée par un prestataire",
+          "description": "Présence d'un prestataire pour réaliser l'enquête",
           "type": "boolean"
         },
         "nomPrestataire": {
@@ -196,198 +188,199 @@
           "type": "string"
         },
         "logoPartenaire": {
-          "description": "Logo du partenaire",
+          "description": "Logo du partenaire de l'Insee participant à l'enquête, affiché dans les mails envoyés aux enquêtés",
           "type": "string"
         },
         "serviceCollecteurSignataireFonction": {
-          "description": "XXX",
+          "description": "Fonction du signataire des communications",
           "type": "string"
         },
         "serviceCollecteurSignataireNom": {
-          "description": "XXX",
+          "description": "Prénom et nom du signataire des communications",
           "type": "string"
         },
         "imageLogoSignataire": {
-          "description": "XXX",
+          "description": "Logo affiché dans les courriers envoyés aux enquêtés, à côté du signataire du courrier",
           "type": "string"
         },
         "assistanceTel": {
-          "description": "Numéro de téléphone pour l'assitance",
+          "description": "Numéro de téléphone pour l'assistance, affiché sur les courriers",
           "type": "string"
         },
         "assistanceMail": {
-          "description": "Moyen pour envoyer un mail à l'assistance",
+          "description": "Assistance par internet, affiché dans la rubrique Nous contacter des courriers",
           "type": "string"
         },
         "assistanceAdresseL1": {
-          "description": "Ligne 1 de l'adresse postale du service responsables de l'enquête",
+          "description": "Ligne 1 de l'adresse postale de l'assistance, affiché sur les courriers",
           "type": "string"
         },
         "assistanceAdresseL2": {
-          "description": "Ligne 2 de l'adresse postale du service responsables de l'enquête",
+          "description": "Ligne 2 de l'adresse postale de l'assistance, affiché sur les courriers",
           "type": "string"
         },
         "assistanceAdresseL3": {
-          "description": "Ligne 3 de l'adresse postale du service responsables de l'enquête",
+          "description": "Ligne 3 de l'adresse postale de l'assistance, affiché sur les courriers",
           "type": "string"
         },
         "assistanceAdresseL4": {
-          "description": "Ligne 4 de l'adresse postale du service responsables de l'enquête",
+          "description": "Ligne 4 de l'adresse postale de l'assistance, affiché sur les courriers",
           "type": "string"
         },
         "assistanceAdresseL5": {
-          "description": "Ligne 5 de l'adresse postale du service responsables de l'enquête",
+          "description": "Ligne 5 de l'adresse postale de l'assistance, affiché sur les courriers",
           "type": "string"
         },
         "adresseRetourQL1": {
-          "description": "XXX",
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 1",
           "type": "string"
         },
         "adresseRetourQL2": {
-          "description": "XXX",
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 2",
           "type": "string"
         },
         "adresseRetourQL3": {
-          "description": "XXX",
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 3",
           "type": "string"
         },
         "adresseRetourQL4": {
-          "description": "XXX",
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 4",
           "type": "string"
         },
         "adresseRetourQL5": {
-          "description": "XXX",
+          "description": "XAdresse du site en charge de la numérisation des questionnaires papier – ligne 5",
           "type": "string"
         },
         "adresseRetourQL6": {
-          "description": "XXX",
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 6",
           "type": "string"
         },
         "adresseRetourQL7": {
-          "description": "XXX",
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 7",
           "type": "string"
         },
         "representantLegal": {
-          "description": "XXX",
+          "description": "Mention des représentants légaux dans les courriers",
           "type": "boolean"
         },
         "mineur": {
-          "description": "XXX",
+          "description": "Présence de mineurs parmi les personnes échantillonnées",
           "type": "boolean"
         },
         "mineurDroit": {
-          "description": "XXX",
+          "description": "Phrase à ajouter dans le cartouche en cas de présence de mineurs parmi les personnes échantillonnées",
           "type": "string"
         },
         "dpd": {
-          "description:": "XXX délégué à la protection des données",
+          "description:": "Mention du délégué à la protection des données dans les courriers et mails envoyés aux enquêtés",
           "type": "boolean"
         },
         "mailDPD": {
-          "description:": "Courriel permettant de contacter le DPD",
+          "description:": "Mail du délégué à la protection des données du Ministère de tutelle pour l’exercice des droits",
           "type": "string"
         },
         "appariement": {
-          "description": "XXX",
+          "description": "Données obtenues par appariement ou non, et précisés dans les courriers",
           "type": "boolean"
         },
         "sourceAdmin": {
-          "description": "XXX",
+          "description": "Données administratives utilisées pour les appariements, affichées dans les courriers en cas d'appariement",
           "type": "string"
         },
         "archivage": {
-          "description": "XXX",
+          "description": "Archivage ou non des données",
           "type": "boolean"
         },
         "dureeConservation": {
-          "description": "Durée de conservation (textuelle)",
+          "description": "Durée de conservation des données indiquée dans le document de conformité RGPD, affichée sur les courriers aux enquêtés ",
           "type": "string"
         },
         "dureeConservationIdenti": {
-          "description": "XXX",
+          "description": "Durée de conservation des données d’identification (affichée sur les courriers)",
           "type": "string"
         },
         "urlEnquete": {
-          "description": "XXX",
+          "description": "Url de l’enquête",
           "type": "string"
         },
         "incitationARepondre": {
-          "description": "XXX",
+          "description": "Phrase sur les courriers pour inciter l’enquêté à répondre à l’enquête",
           "type": "string"
         },
         "mailBoiteRetour": {
-          "description": "XXX",
+          "description": "Boîte fonctionnelle qui accueille les échecs de remise de mail par SPOC",
           "type": "string"
         },
         "themeMieuxConnaitreMail": {
-          "description": "Adresse de contact pour XXX",
+          "description": "Texte affiché dans le bandeau du mail après le Mieux Connaître",
           "type": "string"
         },
         "ville": {
-          "description": "XXX",
+          "description": "Ville de rédaction du courrier",
           "type": "string"
         },
         "complementOpportunite": {
-          "description": "XXX",
+          "description": "Précisions sur l’opportunité de l’enquête dans le cadre légal",
           "type": "string"
         },
         "paragrapheDonneesPersonnelles": {
-          "description": "XXX",
+          "description": "Affichage ou non d’un paragraphe sur les données personnelles dans les courriers",
           "type": "boolean"
         },
         "messageOffline": {
-          "description": "XXX",
+          "description": "Message affiché sur le portail de promotion de l'enquête lorsqu'elle est terminée",
           "type": "string"
         },
         "messageInfoOffline": {
+          "description": "Message supplémentaire affiché sur le portail de promotion de l'enquête lorsqu'elle est terminée",
           "type": "string"
         },
         "configurationVerificationMail": {
-          "description": "XXX",
+          "description": "Demande de confirmation du mail de l’enquêté à la connexion",
           "type": "boolean"
         },
         "imageResultat": {
-          "description": "XXX",
+          "description": "Image de la rubrique Quelques résultats du portail de promotion de l’enquête",
           "type": "string"
         },
         "paragrapheResultat": {
-          "description": "XXX",
+          "description": "Texte de la rubrique Quelques résultats du portail de promotion de l’enquête",
           "type": "string"
         },
         "urlInformationEnquete": {
-          "description": "XXX",
+          "description": "Url de la page d’information sur l’enquête",
           "type": "string"
         },
         "dureeConservationDonneesConnexion": {
-          "description": "XXX",
+          "description": "Durée de conservation des données de connexion, mentionné sur le portail de promotion de l'enquête",
           "type": "string"
         },
         "urlAQuoiServentVosReponses": {
-          "description": "XXX",
+          "description": "Url affiché dans la rubrique « a quoi servent vos réponses » du portail de promotion Platine",
           "type": "string"
         },
         "texteUrlAQuoiServentVosReponses": {
-          "description": "XXX",
+          "description": "Texte de l'url affiché dans la rubrique « a quoi servent vos réponses » du portail de promotion Platine",
           "type": "string"
         },
         "paragrapheAQuoiServentVosReponses": {
-          "description": "XXX",
+          "description": "Paragraphe affiché dans la rubrique « a quoi servent vos réponses » du portail de promotion Platine",
           "type": "string"
         },
         "frequenceExtraction": {
-          "description": "XXX : Visiblement une expression de type cron ; préciser le format",
+          "description": "Fréquence d'extraction des données -- Visiblement une expression de type cron ; préciser le format",
           "type": "string"
         },
         "cheminLivraisonDonnees": {
-          "description": "XXX",
+          "description": "Pour préciser l'endroit où sont transmises les données -- A preciser format",
           "type": "string"
         },
         "chiffrement": {
-          "description": "XXX",
+          "description": "Chiffrement des données -- A préciser le format",
           "type": "string"
         },
         "livraisonDifferentielle": {
-          "description": "XXX",
+          "description": "Livraison différentielle des données",
           "type": "boolean"
         },
         "formatLivraisonDonnees": {
@@ -395,11 +388,11 @@
           "type": "string"
         },
         "mailBoiteFonctionnelle": {
-          "description": "XXX",
+          "description": "Boite fonctionnelle en charge de l’enquête",
           "type": "string"
         },
         "referents": {
-          "description": "XXX Référents sabiane; peuvent être principaux (sinon considérés comme secondaires) ",
+          "description": "Référents de l'enquête, affiché dans Sabiane Gestion - peuvent être principaux (sinon considérés comme secondaires)",
           "type": "array",
           "items": {
             "type": "object",
@@ -416,13 +409,7 @@
               "principal": {
                 "type": "boolean"
               }
-            },
-            "required": [
-              "nom",
-              "prenom",
-              "telephone",
-              "principal"
-            ]
+            }
           }
         },
         "champGeographiqueEnquete": {
@@ -434,7 +421,7 @@
           "type": "string"
         },
         "urlLoiStatistique": {
-          "description": "URL légifrance de la loi relative aux statistiques",
+          "description": "URL légifrance de la loi relative aux statistiques (loi de 1951)",
           "type": "string"
         },
         "urlLoiRGPD": {
@@ -445,104 +432,7 @@
           "description": "URL légifrance de la loi relative à l'informatique, aux fichiers et aux libertés",
           "type": "string"
         }
-      },
-      "required": [
-        "serieId",
-        "serieLabelCourt",
-        "serieLabelLong",
-        "periodicite",
-        "periode",
-        "annee",
-        "operationId",
-        "operationLabelCourt",
-        "operationLabelLong",
-        "objectifsCourts",
-        "objectifsLongs",
-        "cnisUrl",
-        "diffusionUrl",
-        "noticeUrl",
-        "specimenUrl",
-        "numeroVisa",
-        "anneeVisa",
-        "caractereObligatoire",
-        "interetGeneral",
-        "qualiteStatistique",
-        "testNonLabellise",
-        "parutionJo",
-        "dateParutionJo",
-        "portailMesEnquetesOperation",
-        "proprietaireId",
-        "proprietaireLabel",
-        "imageLogos",
-        "ministereTutelle",
-        "commanditaire",
-        "responsableOperationnel",
-        "mailResponsableOperationnel",
-        "responsableTraitement",
-        "responsableTraitementIdenti",
-        "responsableTraitementIdentiFem",
-        "urlResponsableTraitement",
-        "prestataire",
-        "nomPrestataire",
-        "urlPrestataire",
-        "logoPartenaire",
-        "serviceCollecteurSignataireFonction",
-        "serviceCollecteurSignataireNom",
-        "imageLogoSignataire",
-        "assistanceTel",
-        "assistanceMail",
-        "assistanceAdresseL1",
-        "assistanceAdresseL2",
-        "assistanceAdresseL3",
-        "assistanceAdresseL4",
-        "assistanceAdresseL5",
-        "adresseRetourQL1",
-        "adresseRetourQL2",
-        "adresseRetourQL3",
-        "adresseRetourQL4",
-        "adresseRetourQL5",
-        "adresseRetourQL6",
-        "adresseRetourQL7",
-        "representantLegal",
-        "mineur",
-        "mineurDroit",
-        "dpd",
-        "mailDPD",
-        "appariement",
-        "sourceAdmin",
-        "archivage",
-        "dureeConservation",
-        "dureeConservationIdenti",
-        "urlEnquete",
-        "incitationARepondre",
-        "mailBoiteRetour",
-        "themeMieuxConnaitreMail",
-        "ville",
-        "complementOpportunite",
-        "paragrapheDonneesPersonnelles",
-        "messageOffline",
-        "messageInfoOffline",
-        "configurationVerificationMail",
-        "imageResultat",
-        "paragrapheResultat",
-        "urlInformationEnquete",
-        "dureeConservationDonneesConnexion",
-        "urlAQuoiServentVosReponses",
-        "texteUrlAQuoiServentVosReponses",
-        "paragrapheAQuoiServentVosReponses",
-        "frequenceExtraction",
-        "cheminLivraisonDonnees",
-        "chiffrement",
-        "livraisonDifferentielle",
-        "formatLivraisonDonnees",
-        "mailBoiteFonctionnelle",
-        "referents",
-        "champGeographiqueEnquete",
-        "champStatistiqueEnquete",
-        "urlLoiStatistique",
-        "urlLoiRGPD",
-        "urlLoiInformatique"
-      ]
+      }
     },
     "lots": {
       "type": "array",
@@ -559,7 +449,7 @@
             "type": "string"
           },
           "lotsEnLien": {
-            "description": "Lots précédants et suivants pour les remises en collecte",
+            "description": "Lots précédents et suivants pour les remises en collecte",
             "type": "array",
             "items": {
               "type": "object",
@@ -570,7 +460,7 @@
                   "format": "uuid"
                 },
                 "lien": {
-                  "description": "XXXX : Lien entre le lot lié et le lot décrit. Ex: precedent ==> le lot en lien precede le lot actuel  ",
+                  "description": "Lien entre le lot lié et le lot décrit. Ex: precedent ==> le lot en lien precede le lot actuel",
                   "type": "string",
                   "enum": [
                     "precedent",
@@ -578,15 +468,10 @@
                   ]
                 },
                 "regleRemiseCollecte": {
-                  "description": "XXXX",
+                  "description": "Règle de remise en collecte entre le lot décrit et le lot lié -- A PRECISER LE FORMAT",
                   "type": "string"
                 }
-              },
-              "required": [
-                "id",
-                "lien",
-                "regleRemiseCollecte"
-              ]
+              }
             }
           },
           "typeEchantillon": {
@@ -1081,8 +966,8 @@
             "description": "Mode de collecte de l'échantillon CAPI=XXX...",
             "$ref": "#/$defs/modesDeCollecte"
           },
-          "cheminRepertoire": {
-            "description": "XXX:(à modifier pour mettre une URL??) : Chemin du répertoire où le modèle de questionnaire est déposé sur gitlab",
+          "url": {
+            "description": "URL permettant d'accéder au modèle de questionnaire",
             "type": "string"
           },
           "label": {
@@ -1101,7 +986,7 @@
       "required": [
         "id",
         "modeCollecte",
-        "cheminRepertoire",
+        "url",
         "label",
         "nomenclaturesReferencees"
       ]
@@ -1116,8 +1001,8 @@
             "description": "Identifiant de la nomenclature",
             "type": "string"
           },
-          "cheminRepertoire": {
-            "description": "XXX:(à modifier pour mettre une URL??) : Chemin du répertoire où la nomenclature est déposée sur gitlab",
+          "url": {
+            "description": "URL permettant d'accéder à la nommenclature",
             "type": "string"
           },
           "label": {
@@ -1127,7 +1012,7 @@
         },
         "required": [
           "id",
-          "cheminRepertoire",
+          "url",
           "label"
         ]
       }
@@ -1149,7 +1034,7 @@
       ]
     },
     "periode": {
-      "description": "XXX. A00: annuelle; X00-X99: pluriannuelle; S01-02: 1er et 2nd semestre; T1-4: 1er-4e trimestre; M01-M12: Mois de l'année; B01-B06: Bimestre dans l'année  ",
+      "description": "Période de l'enquête. A00: annuelle; X00-X99: pluriannuelle; S01-02: 1er et 2nd semestre; T1-4: 1er-4e trimestre; M01-M12: Mois de l'année; B01-B06: Bimestre dans l'année  ",
       "type": "string",
       "enum": [
         "A00",
