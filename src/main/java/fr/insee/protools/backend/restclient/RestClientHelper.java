@@ -13,7 +13,6 @@ import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNE
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient5xxBPMNError;
 import fr.insee.protools.backend.restclient.keycloak.KeycloakService;
 import io.netty.handler.logging.LogLevel;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
@@ -24,9 +23,9 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.ReactorNettyClientRequestFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.logging.AdvancedByteBufFormat;
 

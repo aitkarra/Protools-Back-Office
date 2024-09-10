@@ -55,14 +55,14 @@ public class ContextServiceImpl implements ContextService {
     //Value: Pair <raw json of Context as String; Dto representing this json Context>
     private static final Map<String, ContextPair> contextCache = new ConcurrentHashMap<>();
     //TODO: Peut être que ca va sortir dans une dépendance externe
-    private static final String SCHEMA_VALIDATION_FILE = "schema/contexte-processus.json";
+    private static final String SCHEMA_VALIDATION_FILE = "/schema/contexte-processus.json";
     private final RuntimeService runtimeService;
     private final TaskService taskService;
     private final RepositoryService repositoryService;
     private final ApplicationContext springApplicationContext;
-    JsonSchema contextJsonSchema = JsonSchemaFactory
+    private static final JsonSchema contextJsonSchema = JsonSchemaFactory
             .getInstance(SpecVersion.VersionFlag.V202012)
-            .getSchema(getClass().getResourceAsStream(SCHEMA_VALIDATION_FILE));
+            .getSchema(ContextServiceImpl.class.getResourceAsStream(SCHEMA_VALIDATION_FILE));
 
     //TODO : soit les json schema permettent de valider les dates, soit il faudra valider toutes les dates comme ça
     public static Pair<Instant, Instant> getCollectionStartAndEndFromPartition(JsonNode partitionNode) {
