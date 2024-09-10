@@ -86,7 +86,12 @@ public class SpringDocConfiguration {
             .info(
                 new Info()
                     .title(buildProperties.map(BuildProperties::getName).orElse("n.a"))
-                    .description(springdocProperties.getDescription())
+                    .description(
+                            String.format("`Application version : %s`\n\n%s",
+                                    buildProperties.map(BuildProperties::getVersion).orElse("n.a"),
+                                    springdocProperties.getDescription()
+                            )
+                    )
                     .version(buildProperties.map(BuildProperties::getVersion).orElse("n.a"))
                     /*.license(
                         new License()
