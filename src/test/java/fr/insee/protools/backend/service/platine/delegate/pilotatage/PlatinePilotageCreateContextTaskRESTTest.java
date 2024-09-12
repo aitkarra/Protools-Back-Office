@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
 import fr.insee.protools.backend.service.utils.TestWithContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.test.FlowableTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 
 import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty;
 import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty_id;
@@ -31,12 +33,6 @@ class PlatinePilotageCreateContextTaskRESTTest extends TestWithContext {
 
     @InjectMocks
     PlatinePilotageCreateContextTaskREST platinePilotageTask;
-
-
-    @Test
-    void execute_should_throwError_when_null_context(){
-        assertThat_delegate_throwError_when_null_context(platinePilotageTask);
-    }
 
     @Test
     void execute_should_work_when_contextOK() {
@@ -56,4 +52,13 @@ class PlatinePilotageCreateContextTaskRESTTest extends TestWithContext {
 
     }
 
+    @Override
+    protected JavaDelegate getTaskUnderTest() {
+        return platinePilotageTask;
+    }
+
+    @Override
+    protected Map<String, Class> getVariablesAndTypes() {
+        return Map.of();
+    }
 }

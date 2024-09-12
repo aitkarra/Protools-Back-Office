@@ -76,10 +76,4 @@ public class ProtoolsTestUtils {
         return result;
     }
 
-
-    public static JsonNode initContexteMockFromString(ContextService protoolsContext, String contextAsString) throws JsonProcessingException {
-        JsonNode contextRootNode = new ObjectMapper().readTree(contextAsString);
-        when(protoolsContext.getContextJsonNodeByProcessInstance(anyString())).thenReturn(contextRootNode);
-        return contextRootNode;
-    }
 }

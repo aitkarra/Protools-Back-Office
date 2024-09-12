@@ -52,7 +52,7 @@ public class PartitionCtxResolver {
     private Optional<Lot> getPartition(ExecutionEntity execution, String partitionId){
         var context = protoolsContext.getContextDtoByProcessInstance(execution.getProcessInstanceId());
          return context.getLots().stream()
-                .filter(x -> x.getId().toString().equalsIgnoreCase(partitionId))
+                .filter(x -> String.valueOf(x.getId()).equalsIgnoreCase(partitionId))
                 .findAny();
     }
 
@@ -74,7 +74,7 @@ public class PartitionCtxResolver {
         return getPartition(execution,partitionId)
                 .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get communication type on an unknown partition : "+partitionId))
                 .getCommunications().stream()
-                .filter(x -> x.getId().toString().equalsIgnoreCase(communicationId))
+                .filter(x -> String.valueOf(x.getId()).equalsIgnoreCase(communicationId))
                 .findAny()
                 .orElseThrow(() -> new IncoherentBPMNContextError("Tried to get communication type on an unknown communication : "+communicationId))
                 .getTypeCommunication().toString();
@@ -116,7 +116,7 @@ public class PartitionCtxResolver {
 
             //null is an error in config so we ignore it;
             // and we also discard communications that have already been sent or that have been marked as in error
-            if(communication==null || communication.getEcheance()==null || sentCommunicationIds.contains(communication.getId().toString()) || errorCommunicationIds.contains(communication.getId().toString())){
+            if(communication==null || communication.getEcheance()==null || sentCommunicationIds.contains(String.valueOf(communication.getId())) || errorCommunicationIds.contains(communication.getId().toString())){
                 continue;
             }
 
@@ -125,14 +125,14 @@ public class PartitionCtxResolver {
                 log.warn("Partition id={} : Communication id={} has not been sent. Its echeance [ {} ] is too far past so it will not be sent",
                         partitionId,communication.getId(),TimeLogUtils.format(communication.getEcheance()));
 
-                errorCommunicationIds.add(communication.getId().toString());
+                errorCommunicationIds.add(String.valueOf(communication.getId()));
                 execution.getRootProcessInstance().setVariableLocal(VARNAME_COMMUNICATION_ERROR_ID_SET,errorCommunicationIds);
             }
 
             //Among the not treated communications we compute the one with the first echeance
             else if(nextCommEcheance == null || nextCommEcheance.isAfter(communication.getEcheance())){
                 nextCommEcheance=communication.getEcheance();
-                nextCommId=communication.getId().toString();
+                nextCommId=String.valueOf(communication.getId());
             }
         }
 

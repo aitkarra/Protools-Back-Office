@@ -55,7 +55,7 @@ public class PlatinePilotageService {
 
     public void postInterrogations(String campaignId, List<JsonNode> interrogations) {
         log.trace("postInterrogations: campaignId={}",campaignId);
-        logJson("putQuestionings ",interrogations,log,Level.TRACE);
+        logJson("postInterrogations ",interrogations,log,Level.TRACE);
         var response = restClientHelper.getRestClient(KNOWN_API_PLATINE_PILOTAGE)
                 .put()
                 .uri("/interrogations")

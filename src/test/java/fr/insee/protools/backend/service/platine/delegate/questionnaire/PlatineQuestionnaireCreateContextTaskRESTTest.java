@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.platine.service.PlatineQuestionnaireService;
 import fr.insee.protools.backend.service.utils.TestWithContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.List;
+import java.util.Map;
 
 import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty;
 import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty_id;
@@ -27,9 +29,14 @@ class PlatineQuestionnaireCreateContextTaskRESTTest  extends TestWithContext {
     PlatineQuestionnaireCreateContextTaskREST platineQuestionnaireTask;
 
 
-    @Test
-    void execute_should_throwError_when_null_context(){
-        assertThat_delegate_throwError_when_null_context(platineQuestionnaireTask);
+    @Override
+    protected JavaDelegate getTaskUnderTest() {
+        return platineQuestionnaireTask;
+    }
+
+    @Override
+    protected Map<String, Class> getVariablesAndTypes() {
+        return Map.of();
     }
 
     @Test

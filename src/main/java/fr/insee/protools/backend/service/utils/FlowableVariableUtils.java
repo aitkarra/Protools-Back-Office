@@ -18,6 +18,9 @@ public class FlowableVariableUtils {
             if(res==null){
                 throw new FlowableIllegalArgumentException(getMissingVariableMessage(variableName));
             }
+            else if(!variableClass.isAssignableFrom(res.getClass())){
+                throw new VariableClassCastException(String.format("Variable ID=[%s] val=[%s] cannot be casted to %s", variableName, res, variableClass));
+            }
         }
         catch (ClassCastException e) {
             throw new VariableClassCastException(String.format("Variable ID=[%s] val=[%s] cannot be casted to %s", variableName, execution.getVariable(variableName), variableClass));

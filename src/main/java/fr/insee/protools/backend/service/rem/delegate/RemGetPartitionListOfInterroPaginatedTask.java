@@ -25,6 +25,7 @@ public class RemGetPartitionListOfInterroPaginatedTask implements JavaDelegate, 
 
     RemService remService;
 
+
     private PageResponse readFunction(Integer pageToRead, Object... objects) {
         String partitionId = (String) objects[0];
         return remService.getPartitionAllInterroPaginated(partitionId, pageToRead);

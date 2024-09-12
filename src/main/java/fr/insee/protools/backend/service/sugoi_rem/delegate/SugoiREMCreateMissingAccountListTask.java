@@ -1,4 +1,4 @@
-package fr.insee.protools.backend.service.sugoi.delegate;
+package fr.insee.protools.backend.service.sugoi_rem.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
