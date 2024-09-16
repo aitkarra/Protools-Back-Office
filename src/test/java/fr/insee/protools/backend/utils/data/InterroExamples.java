@@ -3,8 +3,7 @@ package fr.insee.protools.backend.utils.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.util.ClassUtils;
+
 import java.util.UUID;
 
 public class InterroExamples {

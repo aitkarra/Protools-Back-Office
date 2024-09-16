@@ -11,9 +11,6 @@ public class KeycloakResponse {
     @JsonProperty("expires_in")
     private Integer expiresIn;
 
-    public KeycloakResponse() {
-    }
-
     public KeycloakResponse(String accesToken, Integer expiresIn) {
         this.accesToken = accesToken;
         this.expiresIn = expiresIn;

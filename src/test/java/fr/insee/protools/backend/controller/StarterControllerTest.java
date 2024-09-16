@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.protools.backend.restclient.RestClientHelper;
 import fr.insee.protools.backend.restclient.configuration.APIProperties;
 import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
-import fr.insee.protools.backend.restclient.keycloak.KeycloakResponse;
 import fr.insee.protools.backend.restclient.keycloak.KeycloakService;
 import fr.insee.protools.backend.service.utils.CustomJWTHelper;
 import org.junit.jupiter.api.Test;
@@ -17,13 +16,12 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.eq;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;

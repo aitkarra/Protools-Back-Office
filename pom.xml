@@ -169,12 +169,24 @@
                 <version>${pitest.version}</version>
                 <configuration>
                     <targetTests>
-                        <param>fr.insee.protools.backend.service.*</param>
-                        <param>fr.insee.protools.backend.controller.StarterController</param>
+                        <param>fr.insee.protools.backend.*</param>
                     </targetTests>
                     <mutators>
                         <mutator>STRONGER</mutator>
                     </mutators>
+                    <avoidCallsTo>
+                        <avoidCallsTo>java.util.logging</avoidCallsTo>
+                        <avoidCallsTo>org.apache.log4j</avoidCallsTo>
+                        <avoidCallsTo>org.slf4j</avoidCallsTo>
+                        <avoidCallsTo>org.apache.commons.logging</avoidCallsTo>
+                        <avoidCallsTo>fr.insee.protools.backend.logging</avoidCallsTo>
+                        <avoidCallsTo>fr.insee.protools.backend.logging.LoggingHelper</avoidCallsTo>
+                    </avoidCallsTo>
+                    <excludedClasses>
+                        <excludedClass>fr.insee.protools.backend.logging.*</excludedClass>
+                        <excludedClass>fr.insee.protools.backend.dto.*</excludedClass>
+                        <excludedClass>*xxBPMNError</excludedClass>
+                    </excludedClasses>
                 </configuration>
                 <dependencies>
                     <dependency>

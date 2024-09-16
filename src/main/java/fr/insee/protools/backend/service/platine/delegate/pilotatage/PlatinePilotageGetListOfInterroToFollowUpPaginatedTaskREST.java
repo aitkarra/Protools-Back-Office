@@ -13,6 +13,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,8 +28,8 @@ public class PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskREST implemen
 
     private final PlatinePilotageService pilotageService;
 
-    private PageResponse readFunction(Integer pageToRead, Object... objects) {
-        Long partitionId = (Long) objects[0];
+    protected PageResponse readFunction(Integer pageToRead, Object... objects) {
+        String partitionId = (String) objects[0];
         return pilotageService.getInterrogationToFollowUpPaginated(partitionId, pageToRead, Optional.of(Boolean.TRUE));
     }
 
@@ -45,7 +46,8 @@ public class PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskREST implemen
 
     @Override
     public Map<String, Object> treatPage(DelegateExecution execution, List<JsonNode> contentList) {
-        Map<String, Object> variables = Map.of(VARNAME_REM_INTERRO_LIST, contentList);
+        Map<String, Object> variables = new HashMap();
+        variables.put(VARNAME_REM_INTERRO_LIST, contentList);
         return variables;
     }
 }

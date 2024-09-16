@@ -2,7 +2,7 @@ package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
-import fr.insee.protools.backend.service.utils.TestWithContext;
+import fr.insee.protools.backend.service.utils.delegate.TestDelegateWithContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.test.FlowableTest;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @FlowableTest
-class PlatinePilotageCreateContextTaskRESTTest extends TestWithContext {
+class PlatinePilotageCreateContextTaskRESTTestDelegate extends TestDelegateWithContext {
 
     @Mock
     PlatinePilotageService platinePilotageService;
@@ -53,12 +52,12 @@ class PlatinePilotageCreateContextTaskRESTTest extends TestWithContext {
     }
 
     @Override
-    protected JavaDelegate getTaskUnderTest() {
+    public JavaDelegate getTaskUnderTest() {
         return platinePilotageTask;
     }
 
     @Override
-    protected Map<String, Class> getVariablesAndTypes() {
+    public Map<String, Class> getVariablesAndTypes() {
         return Map.of();
     }
 }

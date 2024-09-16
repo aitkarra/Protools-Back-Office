@@ -1,14 +1,12 @@
 package fr.insee.protools.backend.dto.rem_tmp;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.UUID;
-
+import jakarta.annotation.Generated;
 import jakarta.validation.Valid;
 
-
-import jakarta.annotation.Generated;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * InterrogationAccountDto

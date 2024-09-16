@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
-import fr.insee.protools.backend.ProtoolsTestUtils;
 import fr.insee.protools.backend.restclient.configuration.APIProperties;
 import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
 import fr.insee.protools.backend.restclient.exception.ApiNotConfiguredBPMNError;
@@ -23,32 +22,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -90,24 +81,6 @@ class RestClientHelperTest {
         mockWebServer.start(port);
     }
 
-
-    private File createDummyFile(int sizeInByte, String extension) throws IOException {
-        File file = File.createTempFile("tempFile", ".json");
-        file.deleteOnExit();
-        RandomAccessFile rafile;
-        rafile = new RandomAccessFile(file, "rw");
-        //In Bytes ==> 1024 = 1Ko ==> 1024X1024 : 1Mo
-        rafile.setLength(sizeInByte);
-        return file;
-    }
-
-    private MockResponse fileToResponse(String contentType, File file) throws IOException {
-        return new MockResponse()
-                .setResponseCode(HttpStatus.OK.value())
-                .setBody(ProtoolsTestUtils.fileToBytes(file))
-                .addHeader("content-type: " + contentType);
-    }
-
     @Test
     @DisplayName("Test getRestClient method without specifying an API")
     void testgetRestClientWithoutApi() {
@@ -144,7 +117,7 @@ class RestClientHelperTest {
     }
 
     @Test
-    void getRestClient() throws IOException {
+    void getRestClient_should_work_when_OK() throws IOException {
 
         APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties();
         kcAuth.setClientId("clientId-toto");
@@ -157,9 +130,7 @@ class RestClientHelperTest {
         RestClient client = restClientHelper.getRestClient(ApiConfigProperties.KNOWN_API.KNOWN_API_ERA);
         assertThat(client).isNotNull();
 
-        KeycloakResponse kcResponse = new KeycloakResponse();
-        kcResponse.setAccesToken("MYTOKEN");
-        kcResponse.setExpiresIn(5*60*1000);
+        KeycloakResponse kcResponse = new KeycloakResponse("MYTOKEN",5*60*1000);
         MockResponse mockResponseKC = new MockResponse()
                 .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .setResponseCode(HttpStatus.OK.value())
@@ -175,7 +146,231 @@ class RestClientHelperTest {
 
         assertThat(client.get().uri(getDummyUriWithPort()).retrieve().toBodilessEntity().getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
-/*
+
+    @Test
+    void getRestClient_withInvalidApiConfig() {
+        when(apiConfigProperties.getAPIProperties(any())).thenReturn(null);
+        assertThatThrownBy(() -> restClientHelper.getRestClient(any()))
+                .isInstanceOf(ApiNotConfiguredBPMNError.class)
+                .hasMessageContaining("is not configured in properties");
+    }
+
+    @Test
+    void getRestClient_withDisabledApiConfig() {
+        when(apiConfigProperties.getAPIProperties(any())).thenReturn(new APIProperties("http://localhost:8080", new APIProperties.AuthProperties(), false ));
+        assertThatThrownBy(() -> restClientHelper.getRestClient(any()))
+                .isInstanceOf(ApiNotConfiguredBPMNError.class)
+                .hasMessageContaining("is disabled in properties");
+    }
+
+    @Test
+    void getTokenDetailsByAPI_should_workForOkNullAndNotConfiguredApi() throws Exception {
+        //Prepare :
+        // Platine pilotage is disabled
+        // Meshuggah is null
+        // All other are confired and returns the same token
+        APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties("https://test.test","realm", "client","xxx");
+        APIProperties apiPropertiesAll = new APIProperties("url-all",kcAuth ,true);
+        APIProperties apiPropertiesPlatinePil = new APIProperties("url-platine",kcAuth ,false);
+
+        doReturn(apiPropertiesAll).when(apiConfigProperties).getAPIProperties(any());
+        doReturn(apiPropertiesPlatinePil).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE));
+        doReturn(null).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_MESHUGGAH));
+
+        doReturn(CustomJWTHelper.getEncodedToken(List.of("ROLE_TOTO","ROLE_Administrateurs_BEATLES"))).when(keycloakService).getToken(eq(kcAuth));
+
+
+        Map<String,String>  details = restClientHelper.getTokenDetailsByAPI();
+
+        assertThat(details).containsEntry("KNOWN_API_PLATINE_PILOTAGE","API KNOWN_API_PLATINE_PILOTAGE is disabled in properties");
+        assertThat(details).containsEntry("KNOWN_API_MESHUGGAH","API KNOWN_API_MESHUGGAH is not configured in properties");
+        assertThat(details).containsEntry("KNOWN_API_REM","[\"ROLE_TOTO\",\"ROLE_Administrateurs_BEATLES\"]");
+
+    }
+
+    @Test
+    void getTokenDetailsByAPI_should_workWhenNoRoleInToken() throws Exception {
+        //Prepare :
+        // Platine pilotage is disabled
+        // Meshuggah is null
+        // All other are confired and returns the same token
+        APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties("https://test.test","realm", "client","xxx");
+        APIProperties apiPropertiesAll = new APIProperties("url-all",kcAuth ,true);
+        APIProperties apiPropertiesPlatinePil = new APIProperties("url-platine",kcAuth ,false);
+
+        doReturn(apiPropertiesAll).when(apiConfigProperties).getAPIProperties(any());
+        doReturn(apiPropertiesPlatinePil).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE));
+        doReturn(null).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_MESHUGGAH));
+
+        doReturn(CustomJWTHelper.getEncodedToken(List.of())).when(keycloakService).getToken(eq(kcAuth));
+
+
+        Map<String,String>  details = restClientHelper.getTokenDetailsByAPI();
+
+        assertThat(details).containsEntry("KNOWN_API_PLATINE_PILOTAGE","API KNOWN_API_PLATINE_PILOTAGE is disabled in properties");
+        assertThat(details).containsEntry("KNOWN_API_MESHUGGAH","API KNOWN_API_MESHUGGAH is not configured in properties");
+        assertThat(details).containsEntry("KNOWN_API_REM","No Role found in token");
+
+    }
+
+
+    @Test
+    void getTokenDetailsByAPI_should_workWhenNoDot() throws Exception {
+        //Prepare :
+        // Platine pilotage is disabled
+        // Meshuggah is null
+        // All other are confired and returns the same token
+        APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties("https://test.test","realm", "client","xxx");
+        APIProperties apiPropertiesAll = new APIProperties("url-all",kcAuth ,true);
+        APIProperties apiPropertiesPlatinePil = new APIProperties("url-platine",kcAuth ,false);
+
+        doReturn(apiPropertiesAll).when(apiConfigProperties).getAPIProperties(any());
+        doReturn(apiPropertiesPlatinePil).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE));
+        doReturn(null).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_MESHUGGAH));
+
+        doReturn("{THIS TOKEN IS INCORRECT AND THERE IS NO DOT SEPARING HEADER}}}}").when(keycloakService).getToken(eq(kcAuth));
+
+
+        Map<String,String>  details = restClientHelper.getTokenDetailsByAPI();
+
+        assertThat(details).containsEntry("KNOWN_API_PLATINE_PILOTAGE","API KNOWN_API_PLATINE_PILOTAGE is disabled in properties");
+        assertThat(details).containsEntry("KNOWN_API_MESHUGGAH","API KNOWN_API_MESHUGGAH is not configured in properties");
+        assertThat(details).containsEntry("KNOWN_API_REM","Token size is incorrect. It should contain at least one dot");
+
+    }
+
+
+    @Test
+    void getTokenDetailsByAPI_should_workWhenIncorrectJsonContent() throws Exception {
+        //Prepare :
+        // Platine pilotage is disabled
+        // Meshuggah is null
+        // All other are confired and returns the same token
+        APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties("https://test.test","realm", "client","xxx");
+        APIProperties apiPropertiesAll = new APIProperties("url-all",kcAuth ,true);
+        APIProperties apiPropertiesPlatinePil = new APIProperties("url-platine",kcAuth ,false);
+
+        doReturn(apiPropertiesAll).when(apiConfigProperties).getAPIProperties(any());
+        doReturn(apiPropertiesPlatinePil).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE));
+        doReturn(null).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_MESHUGGAH));
+
+        String header= Base64.getEncoder().encodeToString("random header".getBytes(StandardCharsets.UTF_8));
+        String incorrectPayload= Base64.getEncoder().encodeToString("incorrect json".getBytes(StandardCharsets.UTF_8));
+        String signature=CustomJWTHelper.createSignature(header, incorrectPayload);
+        String signedToken = header + "." + incorrectPayload + "." + signature;
+
+        doReturn(signedToken).when(keycloakService).getToken(eq(kcAuth));
+
+
+        Map<String,String>  details = restClientHelper.getTokenDetailsByAPI();
+
+        assertThat(details).containsEntry("KNOWN_API_PLATINE_PILOTAGE","API KNOWN_API_PLATINE_PILOTAGE is disabled in properties");
+        assertThat(details).containsEntry("KNOWN_API_MESHUGGAH","API KNOWN_API_MESHUGGAH is not configured in properties");
+        assertThat(details).containsEntry("KNOWN_API_REM","Exception during json token parsing");
+
+    }
+
+
+
+    @Test
+    void getAPIConfigDetails_shouldNotThrow() {
+        APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties("https://test.test","realm", "client","xxx");
+        APIProperties apiPropertiesAll = new APIProperties("url-all",kcAuth ,true);
+        doReturn(apiPropertiesAll).when(apiConfigProperties).getAPIProperties(any());
+
+        JsonNode result = restClientHelper.getAPIConfigDetails();
+        assertEquals(JsonNodeType.ARRAY,result.getNodeType());
+        ArrayNode resultArray = (ArrayNode) result;
+        assertEquals(ApiConfigProperties.KNOWN_API.values().length,resultArray.size());
+    }
+
+    @Test
+    @DisplayName("Test that the retrieval of spring private field still works")
+    void extractClientResponseRequestDescriptionPrivateFiledUsingReflexion_shouldWork() throws IOException {
+        RestClient restClient = restClientHelper.getRestClient();
+        assertThat(restClient).isNotNull();
+
+        //Mock an error response
+        MockResponse mockResponse = new MockResponse()
+                .setResponseCode(HttpStatus.BAD_REQUEST.value())
+                .setBody("XXX");
+
+        initMockWebServer();
+        mockWebServer.enqueue(mockResponse);
+
+        //Call method under test
+        HttpClient4xxBPMNError exception = assertThrows(HttpClient4xxBPMNError.class , ()  ->restClient.get().uri(getDummyUriWithPort()).retrieve()
+                .body(String.class));
+
+        //Post call conditions (we get more or less the expected message with the original request)
+        //IF it is not the case, check that the spring private field has not changed or been renamed
+        String actualMessage = exception.getMessage();
+        assertThat(actualMessage)
+                .contains("GET")
+                .contains(getDummyUriWithPort())
+                .contains(String.valueOf(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    @DisplayName("Test that containsCauseOfType find an existing cause")
+    void containsCauseOfType_shouldFindCauseIfExists() {
+        //Prepare
+        String rootMessage="TEST";
+        ArithmeticException exRoot=new ArithmeticException(rootMessage);
+        Exception exLvl1=new Exception("dummy",exRoot );
+        Exception ex = new Exception("dummy",exLvl1 );
+
+        //Call
+        boolean found = RestClientHelper.containsCauseOfType(ex, List.of(ArithmeticException.class));
+        //Check
+        assertTrue(found,"ArithmeticException should be found");
+
+        //Call
+        found = RestClientHelper.containsCauseOfType(exLvl1, List.of(ArithmeticException.class));
+        //Check
+        assertTrue(found,"ArithmeticException should be found");
+
+        //Call
+        found = RestClientHelper.containsCauseOfType(exRoot, List.of(ArithmeticException.class));
+        //Check
+        assertTrue(found,"ArithmeticException should be found");
+
+        //Call
+        found = RestClientHelper.containsCauseOfType(exRoot, List.of(RuntimeException.class));
+        //Check
+        assertTrue(found,"RuntimeException should be found");
+
+        //Call
+        found = RestClientHelper.containsCauseOfType(exRoot, List.of(IOException.class,RuntimeException.class));
+        //Check
+        assertTrue(found,"RuntimeException should be found");
+
+        //Call
+        found = RestClientHelper.containsCauseOfType(exRoot, List.of(IOException.class));
+        //Check (should not be found)
+        assertFalse(found,"IOException should not be found");
+    }
+
+    /*
+
+
+    private MockResponse fileToResponse(String contentType, File file) throws IOException {
+        return new MockResponse()
+                .setResponseCode(HttpStatus.OK.value())
+                .setBody(ProtoolsTestUtils.fileToBytes(file))
+                .addHeader("content-type: " + contentType);
+    }
+
+    private File createDummyFile(int sizeInByte, String extension) throws IOException {
+        File file = File.createTempFile("tempFile", ".json");
+        file.deleteOnExit();
+        RandomAccessFile rafile;
+        rafile = new RandomAccessFile(file, "rw");
+        //In Bytes ==> 1024 = 1Ko ==> 1024X1024 : 1Mo
+        rafile.setLength(sizeInByte);
+        return file;
+    }
+
     @Test
     @DisplayName("Test getRestClientForFile method - get the client and download files of different sizes")
     void getRestClientForFile() throws IOException {
@@ -262,125 +457,5 @@ class RestClientHelperTest {
     }
 
         };*/
-    @Test
-    void getRestClient_withInvalidApiConfig() {
-        when(apiConfigProperties.getAPIProperties(any())).thenReturn(null);
-        assertThatThrownBy(() -> restClientHelper.getRestClient(any()))
-                .isInstanceOf(ApiNotConfiguredBPMNError.class)
-                .hasMessageContaining("is not configured in properties");
-    }
-
-    @Test
-    void getRestClient_withDisabledApiConfig() {
-        when(apiConfigProperties.getAPIProperties(any())).thenReturn(new APIProperties("http://localhost:8080", new APIProperties.AuthProperties(), false ));
-        assertThatThrownBy(() -> restClientHelper.getRestClient(any()))
-                .isInstanceOf(ApiNotConfiguredBPMNError.class)
-                .hasMessageContaining("is disabled in properties");
-    }
-
-    @Test
-    void getTokenDetailsByAPI_should_workForOkNullAndNotConfiguredApi() throws Exception {
-        //Prepare :
-        // Platine pilotage is disabled
-        // Meshuggah is null
-        // All other are confired and returns the same token
-        APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties("https://test.test","realm", "client","xxx");
-        APIProperties apiPropertiesAll = new APIProperties("url-all",kcAuth ,true);
-        APIProperties apiPropertiesPlatinePil = new APIProperties("url-platine",kcAuth ,false);
-
-        doReturn(apiPropertiesAll).when(apiConfigProperties).getAPIProperties(any());
-        doReturn(apiPropertiesPlatinePil).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE));
-        doReturn(null).when(apiConfigProperties).getAPIProperties(eq(ApiConfigProperties.KNOWN_API.KNOWN_API_MESHUGGAH));
-
-        doReturn(CustomJWTHelper.getEncodedToken(List.of("ROLE_TOTO","ROLE_Administrateurs_BEATLES"))).when(keycloakService).getToken(eq(kcAuth));
-
-
-        Map<String,String>  details = restClientHelper.getTokenDetailsByAPI();
-
-        assertThat(details).containsEntry("KNOWN_API_PLATINE_PILOTAGE","API KNOWN_API_PLATINE_PILOTAGE is disabled in properties");
-        assertThat(details).containsEntry("KNOWN_API_MESHUGGAH","API KNOWN_API_MESHUGGAH is not configured in properties");
-        assertThat(details).containsEntry("KNOWN_API_REM","[\"ROLE_TOTO\",\"ROLE_Administrateurs_BEATLES\"]");
-
-    }
-
-
-    @Test
-    void getAPIConfigDetails_shouldNotThrow() {
-        APIProperties.AuthProperties kcAuth = new APIProperties.AuthProperties("https://test.test","realm", "client","xxx");
-        APIProperties apiPropertiesAll = new APIProperties("url-all",kcAuth ,true);
-        doReturn(apiPropertiesAll).when(apiConfigProperties).getAPIProperties(any());
-
-        JsonNode result = restClientHelper.getAPIConfigDetails();
-        assertEquals(JsonNodeType.ARRAY,result.getNodeType());
-        ArrayNode resultArray = (ArrayNode) result;
-        assertEquals(ApiConfigProperties.KNOWN_API.values().length,resultArray.size());
-    }
-
-    @Test
-    @DisplayName("Test that the retrieval of spring private field still works")
-    void extractClientResponseRequestDescriptionPrivateFiledUsingReflexion_shouldWork() throws IOException {
-        RestClient restClient = restClientHelper.getRestClient();
-        assertThat(restClient).isNotNull();
-
-        //Mock an error response
-        MockResponse mockResponse = new MockResponse()
-                .setResponseCode(HttpStatus.BAD_REQUEST.value())
-                .setBody("XXX");
-
-        initMockWebServer();
-        mockWebServer.enqueue(mockResponse);
-
-        //Call method under test
-        HttpClient4xxBPMNError exception = assertThrows(HttpClient4xxBPMNError.class , ()  ->restClient.get().uri(getDummyUriWithPort()).retrieve()
-                .body(String.class));
-
-        //Post call conditions (we get more or less the expected message with the original request)
-        //IF it is not the case, check that the spring private field has not changed or been renamed
-        String actualMessage = exception.getMessage();
-        assertThat(actualMessage)
-                .contains("GET")
-                .contains(getDummyUriWithPort())
-                .contains(String.valueOf(HttpStatus.BAD_REQUEST.value()));
-    }
-
-    @Test
-    @DisplayName("Test that containsCauseOfType find an existing cause")
-    void containsCauseOfType_shouldFindCauseIfExists() {
-        //Prepare
-        String rootMessage="TEST";
-        ArithmeticException exRoot=new ArithmeticException(rootMessage);
-        Exception exLvl1=new Exception("dummy",exRoot );
-        Exception ex = new Exception("dummy",exLvl1 );
-
-        //Call
-        boolean found = RestClientHelper.containsCauseOfType(ex, List.of(ArithmeticException.class));
-        //Check
-        assertTrue(found,"ArithmeticException should be found");
-
-        //Call
-        found = RestClientHelper.containsCauseOfType(exLvl1, List.of(ArithmeticException.class));
-        //Check
-        assertTrue(found,"ArithmeticException should be found");
-
-        //Call
-        found = RestClientHelper.containsCauseOfType(exRoot, List.of(ArithmeticException.class));
-        //Check
-        assertTrue(found,"ArithmeticException should be found");
-
-        //Call
-        found = RestClientHelper.containsCauseOfType(exRoot, List.of(RuntimeException.class));
-        //Check
-        assertTrue(found,"RuntimeException should be found");
-
-        //Call
-        found = RestClientHelper.containsCauseOfType(exRoot, List.of(IOException.class,RuntimeException.class));
-        //Check
-        assertTrue(found,"RuntimeException should be found");
-
-        //Call
-        found = RestClientHelper.containsCauseOfType(exRoot, List.of(IOException.class));
-        //Check (should not be found)
-        assertFalse(found,"IOException should not be found");
-    }
 
 }

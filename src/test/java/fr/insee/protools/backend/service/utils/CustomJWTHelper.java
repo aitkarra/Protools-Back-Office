@@ -53,7 +53,7 @@ public class CustomJWTHelper {
 
     }
 
-    private static String createSignature(String header, String payload) throws Exception {
+    public static String createSignature(String header, String payload) throws Exception {
         String data = header + "." + payload;
         Mac sha256Hmac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(StandardCharsets.UTF_8), ALGO);

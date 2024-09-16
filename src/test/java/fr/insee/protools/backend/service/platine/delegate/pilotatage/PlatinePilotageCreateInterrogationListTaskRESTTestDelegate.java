@@ -1,14 +1,10 @@
 package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
-import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
-import fr.insee.protools.backend.service.utils.TestWithContext;
-import fr.insee.protools.backend.utils.data.InterroExamples;
+import fr.insee.protools.backend.service.utils.delegate.TestDelegateWithContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -29,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class PlatinePilotageCreateInterrogationListTaskRESTTest extends TestWithContext {
+class PlatinePilotageCreateInterrogationListTaskRESTTestDelegate extends TestDelegateWithContext {
 
     @Mock
     PlatinePilotageService platinePilotageService;
@@ -65,12 +61,12 @@ class PlatinePilotageCreateInterrogationListTaskRESTTest extends TestWithContext
     }
 
     @Override
-    protected JavaDelegate getTaskUnderTest() {
+    public JavaDelegate getTaskUnderTest() {
         return task;
     }
 
     @Override
-    protected Map<String, Class> getVariablesAndTypes() {
+    public Map<String, Class> getVariablesAndTypes() {
        return Map.of(
                 VARNAME_CURRENT_PARTITION_ID,String.class,
                 VARNAME_REM_INTERRO_LIST,List.class);

@@ -58,7 +58,7 @@ public interface PaginationHelper {
             PageResponse<JsonNode> pageResponse = getService.apply(expectedPage, getServiceParams);
 
             //Verify that we got the correct page with not null content
-            if (pageResponse.getCurrentPage() != expectedPage) {
+            if (!pageResponse.getCurrentPage().equals(expectedPage)) {
                 throw new PageableAPIBPMNError(String.format("Error while reading interrogations from REM - expected page=%s got page=%s", expectedPage, pageResponse.getCurrentPage()));
             } else if (pageResponse.getContent() == null) {
                 throw new PageableAPIBPMNError("Error while reading interrogations from REM - content is null");

@@ -1,7 +1,6 @@
 package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
 import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import static fr.insee.protools.backend.service.context.ContextConstants.CTX_CAM
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class PlatinePilotageCreateContextTaskREST implements JavaDelegate, DelegateContextVerifier {
+public class PlatinePilotageCreateContextTaskREST implements JavaDelegate {
 
     private final ContextService protoolsContext;
     private final PlatinePilotageService platinePilotageService;
@@ -26,7 +25,7 @@ public class PlatinePilotageCreateContextTaskREST implements JavaDelegate, Deleg
         JsonNode contextRootNode = protoolsContext.getContextJsonNodeByProcessInstance(execution.getProcessInstanceId());
         String campainId = contextRootNode.path(CTX_CAMPAGNE_ID).asText();
 
-        checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
+        //No context used (only passed as json)
         platinePilotageService.postContext(campainId,contextRootNode);
 
         log.info("ProcessInstanceId={}  end",execution.getProcessInstanceId());

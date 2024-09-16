@@ -2,7 +2,7 @@ package fr.insee.protools.backend.service.platine.delegate.questionnaire;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.platine.service.PlatineQuestionnaireService;
-import fr.insee.protools.backend.service.utils.TestWithContext;
+import fr.insee.protools.backend.service.utils.delegate.TestDelegateWithContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.junit.jupiter.api.Test;
@@ -15,12 +15,12 @@ import java.util.Map;
 
 import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty;
 import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty_id;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class PlatineQuestionnaireCreateContextTaskRESTTest  extends TestWithContext {
+class PlatineQuestionnaireCreateContextTaskRESTTestDelegate extends TestDelegateWithContext {
 
     @Mock
     PlatineQuestionnaireService platineQuestionnaireService;
@@ -30,12 +30,12 @@ class PlatineQuestionnaireCreateContextTaskRESTTest  extends TestWithContext {
 
 
     @Override
-    protected JavaDelegate getTaskUnderTest() {
+    public JavaDelegate getTaskUnderTest() {
         return platineQuestionnaireTask;
     }
 
     @Override
-    protected Map<String, Class> getVariablesAndTypes() {
+    public Map<String, Class> getVariablesAndTypes() {
         return Map.of();
     }
 

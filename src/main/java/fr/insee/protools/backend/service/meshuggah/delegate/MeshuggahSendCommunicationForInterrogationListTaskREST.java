@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_COMMUNICATION_ID;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERRO_LIST;
 
 @Component
 @RequiredArgsConstructor

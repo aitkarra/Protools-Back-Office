@@ -1,42 +1,55 @@
 package fr.insee.protools.backend.service.platine.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import fr.insee.protools.backend.restclient.RestClientHelper;
+import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageCommunicationEventDto;
+import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageCommunicationEventType;
+import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
+import fr.insee.protools.backend.restclient.pagination.PageResponse;
+import fr.insee.protools.backend.service.utils.TestServiceWithRestClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.util.UriBuilder;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
+import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_QUESTIONNAIRE;
+import static fr.insee.protools.backend.utils.data.InterroExamples.generateEmptyInterro;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class PlatinePilotageServiceTest {
-
-    @Mock
-    RestClientHelper restClientHelper;
-    @Mock
-    private RestClient.RequestBodyUriSpec requestBodyUriSpec; // Mock post() call
-    @Mock
-    private RestClient.ResponseSpec responseSpec; // Mock retrieve() call
+class PlatinePilotageServiceTest extends TestServiceWithRestClient {
 
     @InjectMocks
     PlatinePilotageService service;
 
-    @Test
-    void postContext_should_call_correctURIAndBody(){
-        //Prepare
-        RestClient mockRestClient = mock(RestClient.class);
-        doReturn(mockRestClient).when(restClientHelper).getRestClient(any());
-        // Mock the chaining of RestClient calls
-        when(mockRestClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.body(any(Object.class))).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.retrieve()).thenReturn(responseSpec);
+    @Value("${fr.insee.protools.api.platine-pilotage.interrogation.page.size:5000}")
+    private int pageSizeGetInterro;
 
+    private static ObjectMapper objectMapper=new ObjectMapper();
+
+    @Test
+    void postContext_should_call_correctURIAndBody() {
+        //Prepare
         JsonNode contextNode = JsonNodeFactory.instance.objectNode();
 
         //Call method under test
@@ -44,9 +57,119 @@ class PlatinePilotageServiceTest {
 
         //Verifications
         // Then - Verify that the uri method was called with "/context"
+        verify(restClientHelper).getRestClient(KNOWN_API_PLATINE_PILOTAGE);
+        verify(restClient).post();
         verify(requestBodyUriSpec).uri("/context");
         // and with expected body
         verify(requestBodyUriSpec).body(contextNode);
     }
 
+
+    @Test
+    void postInterrogations_should_makeCorrectCall() {
+        //Prepare
+        List<JsonNode> interroList = IntStream.range(0, 100)
+                .mapToObj(i -> generateEmptyInterro().interro()) // Call your function and get the JsonNode
+                .collect(Collectors.toList());
+
+        //Call method under tests
+        service.postInterrogations("TOTO", interroList);
+
+        //Verify
+        verify(restClientHelper).getRestClient(KNOWN_API_PLATINE_PILOTAGE);
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri("/interrogations");
+        // and with expected body
+        verify(requestBodyUriSpec).body(interroList);
+    }
+
+    @Test
+    void postCommunicationEvents_should_makeCorrectCall() {
+        //Prepare
+        List<PlatinePilotageCommunicationEventDto> eventList = IntStream.range(0, 10)
+                .mapToObj(i ->
+                    PlatinePilotageCommunicationEventDto.builder()
+                            .interrogationId(UUID.randomUUID().toString())
+                            .state(PlatinePilotageCommunicationEventType.COMMUNICATION_STATE_SENT)
+                            .communcationId(UUID.randomUUID().toString()).build()
+                ) // Call your function and get the JsonNode
+                .collect(Collectors.toList());
+
+        //Call method under tests
+        service.postCommunicationEvents(eventList);
+
+        //Verify
+        verify(restClient).post();
+        verify(requestBodyUriSpec).uri("/interrogations/communication-events");
+        // and with expected body
+        verify(requestBodyUriSpec).body(eventList);
+    }
+
+
+    @Test
+    void getInterrogationToFollowUpPaginated_shouldMakeCorrectCalls() {
+        //Prepare
+        String partitionId="PartitionIDXX";
+        long page=69;
+        Optional<Boolean> isToFollowUp = Optional.of(Boolean.FALSE);
+
+        List<JsonNode> mockedResponse = List.of(objectMapper.createObjectNode().put("id",1).put("id","toto"));
+        mockGetPageableBodyResponse(mockedResponse);
+        //Call method under tests
+        PageResponse<JsonNode> response = service.getInterrogationToFollowUpPaginated(partitionId,page,isToFollowUp);
+
+        //Verify
+        verify(restClientHelper).getRestClient(KNOWN_API_PLATINE_PILOTAGE);
+        verify(restClient).get();
+
+        // Now let's manually build a URI using the captured function and a mock UriBuilder
+        ArgumentCaptor<Function<UriBuilder, URI>> uriCaptor = ArgumentCaptor.forClass(Function.class);
+        verify(requestHeadersUriSpec).uri(uriCaptor.capture());
+        UriBuilder mockUriBuilder = mock(UriBuilder.class);
+        when(mockUriBuilder.path(anyString())).thenReturn(mockUriBuilder);
+        when(mockUriBuilder.queryParam(anyString(), ArgumentMatchers.<Object>any())).thenReturn(mockUriBuilder);
+        when(mockUriBuilder.queryParamIfPresent(anyString(), ArgumentMatchers.<Optional<Object>>any())).thenReturn(mockUriBuilder);
+
+
+        when(mockUriBuilder.build()).thenReturn(URI.create("http://mockeduri"));
+
+        // Call the captured function with the mocked UriBuilder
+        uriCaptor.getValue().apply(mockUriBuilder);
+
+        // Verify that the correct path and query parameters were used
+        verify(mockUriBuilder).path("/interrogations");
+        verify(mockUriBuilder).queryParam("page", page);
+        verify(mockUriBuilder).queryParam("size", pageSizeGetInterro);
+        verify(mockUriBuilder).queryParam("partition_id", partitionId);
+        verify(mockUriBuilder).queryParamIfPresent(eq("follow-up"), eq(isToFollowUp));
+
+        assertEquals(mockedResponse, response.getContent(),"The response is not what was expected/mocked");
+    }
+
+
+    @Test
+    void getInterrogationToFollowUpPaginated_shouldCatch() {
+        //Prepare
+        String partitionId="PartitionIDYY";
+        long page=0;
+        Optional<Boolean> isToFollowUp = Optional.of(Boolean.TRUE);
+
+        mockMakeRetrieveThrow(HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value()));
+        //Call method under tests
+        assertThrows(HttpClient4xxBPMNError.class, () -> service.getInterrogationToFollowUpPaginated(partitionId,page,isToFollowUp));
+    }
+
+    @Test
+    void getInterrogationToFollowUpPaginated_shouldCatch_404() {
+        //Prepare
+        String partitionId="PartitionIDYY";
+        long page=0;
+        Optional<Boolean> isToFollowUp = Optional.of(Boolean.TRUE);
+
+        mockMakeRetrieveThrow(HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value()));
+        //Call method under tests
+        HttpClient4xxBPMNError exception = assertThrows(HttpClient4xxBPMNError.class, () -> service.getInterrogationToFollowUpPaginated(partitionId, page, isToFollowUp));
+        assertThat(exception.getMessage(), containsString("404"));
+
+    }
 }

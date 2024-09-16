@@ -3,6 +3,7 @@ package fr.insee.protools.backend.service.platine.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageCommunicationEventDto;
 import fr.insee.protools.backend.restclient.RestClientHelper;
+import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
 import fr.insee.protools.backend.restclient.pagination.PageResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static fr.insee.protools.backend.restclient.RestClientHelper.logJson;
+import static fr.insee.protools.backend.logging.LoggingHelper.logJson;
 import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
+import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_REM;
 
 @Service
 @Slf4j
@@ -25,21 +27,22 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 public class PlatinePilotageService {
 
     private final RestClientHelper restClientHelper;
+    private final ApiConfigProperties.KNOWN_API API= KNOWN_API_PLATINE_PILOTAGE;
 
     @Value("${fr.insee.protools.api.platine-pilotage.interrogation.page.size:5000}")
     private int pageSizeGetInterro;
 
-    public void postCommunicationEvent(List<PlatinePilotageCommunicationEventDto> platinePilotageCommunicationEventList) {
-        log.trace("postCommunicationEvent: ");
-        logJson("postCommunicationEvent ",platinePilotageCommunicationEventList,log, Level.TRACE);
+    public void postCommunicationEvents(List<PlatinePilotageCommunicationEventDto> platinePilotageCommunicationEventList) {
+        log.trace("postCommunicationEvents: ");
+        logJson("postCommunicationEvents ",platinePilotageCommunicationEventList,log, Level.TRACE);
 
-        var response = restClientHelper.getRestClient(KNOWN_API_PLATINE_PILOTAGE)
+        var response = restClientHelper.getRestClient(API)
                 .post()
                 .uri("/interrogations/communication-events")
                 .body(platinePilotageCommunicationEventList)
                 .retrieve()
                 .body(String.class);
-        log.trace("postCommunicationEvent: response={} ",response);
+        log.trace("postCommunicationEvents: response={} ",response);
     }
 
     public void postContext(String campaignId, JsonNode contextRootNode) {
@@ -56,8 +59,8 @@ public class PlatinePilotageService {
     public void postInterrogations(String campaignId, List<JsonNode> interrogations) {
         log.trace("postInterrogations: campaignId={}",campaignId);
         logJson("postInterrogations ",interrogations,log,Level.TRACE);
-        var response = restClientHelper.getRestClient(KNOWN_API_PLATINE_PILOTAGE)
-                .put()
+        var response = restClientHelper.getRestClient(API)
+                .post()
                 .uri("/interrogations")
                 .body(interrogations)
                 .retrieve()
@@ -66,22 +69,22 @@ public class PlatinePilotageService {
     }
 
 
-    public PageResponse<JsonNode> getInterrogationToFollowUpPaginated(Long partitionId, long page, Optional<Boolean> isToFollowUp) {
+    public PageResponse<JsonNode> getInterrogationToFollowUpPaginated(String partitionId, long page, Optional<Boolean> isToFollowUp) {
         log.debug("partitionId={} - page={} - pageSizeGetInterro={} - isToFollowUp={}",partitionId,page,pageSizeGetInterro,isToFollowUp);
         ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
         try {
-            PageResponse<JsonNode> response = restClientHelper.getRestClient(KNOWN_API_PLATINE_PILOTAGE)
+            PageResponse<JsonNode> response = restClientHelper.getRestClient(API)
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("interrogations")
+                            .path("/interrogations")
                             .queryParam("page", page)
                             .queryParam("size", pageSizeGetInterro)
                             .queryParam("partition_id", partitionId)
                             .queryParamIfPresent("follow-up", isToFollowUp)
-                            .build(partitionId))
+                            .build())
                     .retrieve()
                     .body(typeReference);
-            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, response.getContent().size());
+            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, (response==null)?0:response.getContent().size());
             return response;
         }
         catch (HttpClient4xxBPMNError e){

@@ -1,7 +1,7 @@
 {
   "id": "DEM2022X00",
   "label": "Enquête démo 2022 - séquence 1",
-  "contexte": "household",
+  "contexte": "menage",
   "metadonnees": {
     "annee": 2022,
     "periodicite": "X",

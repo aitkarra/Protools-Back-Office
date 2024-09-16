@@ -1,10 +1,11 @@
 package fr.insee.protools.backend.service.rem;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.protools.backend.dto.rem_tmp.InterrogationAccountDto;
 import fr.insee.protools.backend.restclient.RestClientHelper;
+import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
 import fr.insee.protools.backend.restclient.pagination.PageResponse;
-import fr.insee.protools.backend.dto.rem_tmp.InterrogationAccountDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @RequiredArgsConstructor
 public class RemService {
 
+    private final ApiConfigProperties.KNOWN_API API= KNOWN_API_REM;
     private final RestClientHelper restClientHelper;
     @Value("${fr.insee.protools.api.rem.interrogation.page.size:5000}")
     private int pageSizeGetInterro;
@@ -31,7 +33,7 @@ public class RemService {
         log.debug("partitionId={} - page={} - pageSizeGetInterro={} }",partitionId,page,pageSizeGetInterro);
         ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
         try {
-            PageResponse<JsonNode>   response = restClientHelper.getRestClient(KNOWN_API_REM)
+            PageResponse<JsonNode>   response = restClientHelper.getRestClient(API)
                         .get()
                         .uri(uriBuilder -> uriBuilder
                                 .path("interrogations")
@@ -57,13 +59,12 @@ public class RemService {
         }
     }
 
-    //V2
     public List<String> getInterrogationIdsWithoutAccountForPartition(String partitionId) {
         log.debug("getSampleSuIds - partitionId={} ",partitionId);
         ParameterizedTypeReference<List<InterrogationAccountDto>> typeReference = new ParameterizedTypeReference<List<InterrogationAccountDto>>() {};
 
         try {
-            List<InterrogationAccountDto> response = restClientHelper.getRestClient(KNOWN_API_REM)
+            List<InterrogationAccountDto> response = restClientHelper.getRestClient(API)
                     .get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/interrogations/ids")
@@ -105,8 +106,8 @@ public class RemService {
                         .build())
                 .toList();
 
-        var response = restClientHelper.getRestClient(KNOWN_API_REM)
-                .post()
+        var response = restClientHelper.getRestClient(API)
+                .patch()
                 .uri("/interrogations/account")
                 .body(remDto)
                 .retrieve()
@@ -121,7 +122,7 @@ public class RemService {
         }
 
         log.debug("putContactsPlatine - contactPlatineList.size={}", contactPlatineList);
-        var response = restClientHelper.getRestClient(KNOWN_API_REM)
+        var response = restClientHelper.getRestClient(API)
                 .put()
                 .uri("contacts-platine")
                 .body(contactPlatineList)
@@ -137,9 +138,9 @@ public class RemService {
         }
 
         log.debug("postRemiseEnCollecte - interroRemiseEnCollecteList.size={}", interroRemiseEnCollecteList);
-        var response = restClientHelper.getRestClient(KNOWN_API_REM)
+        var response = restClientHelper.getRestClient(API)
                 .put()
-                .uri("remise-en-collecte")
+                .uri("/remise-en-collecte")
                 .body(interroRemiseEnCollecteList)
                 .retrieve()
                 .body(String.class);
