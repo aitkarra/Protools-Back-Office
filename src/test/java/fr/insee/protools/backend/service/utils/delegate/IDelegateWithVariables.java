@@ -35,6 +35,17 @@ public interface IDelegateWithVariables {
     // extra mocked needed so that it works
     default void initExtraMocks(DelegateExecution execution) {}
 
+    default void initDefaultVariables(DelegateExecution execution) {
+        Map<String, Class> typeByVariable = getVariablesAndTypes();
+        typeByVariable
+                .keySet()
+                .forEach(variable -> {
+                    Class<?> clazz = typeByVariable.get(variable);
+                    var dummyValue = getDefaultValue(clazz);
+                    lenient().doReturn(dummyValue).when(execution).getVariable(eq(variable), eq(clazz));
+                    lenient().doReturn(dummyValue).when(execution).getVariableLocal(eq(variable), eq(clazz));
+                });
+    }
 
     @Test
     default void execute_should_work_when_params_notNull(){

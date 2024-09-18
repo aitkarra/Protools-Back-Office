@@ -1,11 +1,14 @@
 package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import ch.qos.logback.classic.Logger;
+
 import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageCommunicationEventDto;
 import fr.insee.protools.backend.exception.ProtoolsProcessFlowBPMNError;
 import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
 import fr.insee.protools.backend.service.utils.delegate.IDelegateWithVariables;
-import fr.insee.protools.backend.utils.data.InterroExamples;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -19,6 +22,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -54,33 +59,6 @@ public class PlatinePilotageCreateCommunicationEventTaskRESTTestDelegate impleme
                 VARNAME_CURRENT_PARTITION_ID, String.class,
                 VARNAME_COMMUNICATION_REQUEST_ID_FOR_INTERRO_ID_MAP, Map.class
         );
-    }
-
-    static Stream<Arguments> initExecuteParametersWarn() {
-        return Stream.of(
-                Arguments.of(List.of(InterroExamples.generateEmptyInterro().interro()), Map.of(), "differentComId")//The interro is unknown
-        );
-        /*
-        Logger fooLogger = (Logger) LoggerFactory.getLogger(PlatinePilotageCreateCommunicationEventTaskREST.class);
-        // create and start a ListAppender
-        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-        listAppender.start();
-                // call method under test
-        Foo foo = new Foo();
-        foo.doThat();
-
-        // JUnit assertions
-        List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("start", logsList.get(0)
-                                      .getMessage());
-        assertEquals(Level.INFO, logsList.get(0)
-                                         .getLevel());
-
-        assertEquals("finish", logsList.get(1)
-                                       .getMessage());
-        assertEquals(Level.INFO, logsList.get(1)
-                                         .getLevel());
-         */
     }
 
     static Stream<Arguments> initExecuteParametersOK() {
@@ -153,5 +131,35 @@ public class PlatinePilotageCreateCommunicationEventTaskRESTTestDelegate impleme
 
         //Execute method under test
         assertThrows(ProtoolsProcessFlowBPMNError.class, () -> task.execute(execution));
+    }
+
+    @Test
+    @DisplayName("Test execute method - should write a log and not call service when the communication Request Map is empty ")
+    public void execute_should_writeLog_and_notCallService_when_comReqByIdMapIsEmpty() {
+        //Prepare
+        DelegateExecution execution = createMockedExecution();
+        initDefaultVariables(execution);
+
+        // create and start a ListAppender to capture logs
+        Logger fooLogger = (Logger) LoggerFactory.getLogger(PlatinePilotageCreateCommunicationEventTaskREST.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        fooLogger.addAppender(listAppender);
+        listAppender.start();
+
+         //Execute method under test
+        task.execute(execution);
+
+        //Verify
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertThat(logsList.get(0).getFormattedMessage())
+                .contains("begin")
+                .contains(execution.getProcessInstanceId());
+
+        assertEquals(Level.INFO, logsList.get(1)
+                .getLevel());
+        assertThat(logsList.get(1).getFormattedMessage())
+                .contains("end")
+                .contains(execution.getProcessInstanceId())
+                .contains("Nothing to do");
     }
 }

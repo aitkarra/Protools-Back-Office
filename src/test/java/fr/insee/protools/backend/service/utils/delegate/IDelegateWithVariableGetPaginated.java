@@ -83,15 +83,4 @@ public interface IDelegateWithVariableGetPaginated extends IDelegateWithVariable
     PaginationHelper.IGetFromService getServiceMock();
     Object[] getServiceParams();
 
-    default void initDefaultVariables(DelegateExecution execution) {
-        Map<String, Class> typeByVariable = getVariablesAndTypes();
-        typeByVariable
-                .keySet()
-                .forEach(variable -> {
-                    Class<?> clazz = typeByVariable.get(variable);
-                    var dummyValue = getDefaultValue(clazz);
-                    lenient().doReturn(dummyValue).when(execution).getVariable(eq(variable), eq(clazz));
-                    lenient().doReturn(dummyValue).when(execution).getVariableLocal(eq(variable), eq(clazz));
-                });
-    }
 }
