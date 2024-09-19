@@ -1,28 +1,27 @@
 package fr.insee.protools.backend.service.sugoi_rem.delegate;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.dto.sugoi.Habilitation;
 import fr.insee.protools.backend.dto.sugoi.User;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.context.enums.CampaignContextEnum;
 import fr.insee.protools.backend.service.rem.RemService;
 import fr.insee.protools.backend.service.sugoi.SugoiService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import fr.insee.protools.backend.service.utils.password.PasswordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.EnumUtils;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_DIRECTORYACCESS_PWD_FOR_INTERRO_ID_MAP;
-import static fr.insee.protools.backend.service.context.ContextConstants.CTX_CAMPAGNE_CONTEXTE;
 
 @Slf4j
 @Component
@@ -72,22 +71,9 @@ public class SugoiREMCreateMissingAccountListTask implements JavaDelegate, Deleg
     }
 
     public static int getPasswordSize(ContexteProcessus context){
-        if(context!=null && context.getContexte()!=null && context.getContexte().equals(ContexteProcessus.Contexte.MENAGE)){
+        if(context.getContexte().equals(ContexteProcessus.Contexte.MENAGE)){
             return HOUSEHOLD_PASSWORD_SIZE;
         }
         return DEFAULT_PASSWORD_SIZE;
-    }
-
-    @Override
-    public Set<String> getContextErrors(ContexteProcessus contexteProcessus) {
-        if(contexteProcessus==null){
-            return Set.of("Context is null");
-        } else if (contexteProcessus.getContexte()==null) {
-            return Set.of("Contexte is missing");
-        }
-        else if (contexteProcessus.getId()==null) {
-            return Set.of("Context Id");
-        }
-        return Set.of();
     }
 }

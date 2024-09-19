@@ -166,14 +166,5 @@ class SugoiREMCreateMissingAccountListTaskTest extends TestDelegateWithContext {
         int pwdSize=task.getPasswordSize(schema);
         //Verify
         assertEquals(12,pwdSize,"Expected password size of 12 for entreprise");
-
-        //prepare
-        schema = new ObjectMapper().readValue(ctx_empty, ContexteProcessus.class);
-        //Call method under tests
-        pwdSize=task.getPasswordSize(schema);
-        //Verify
-        assertEquals(12,pwdSize,"Expected password size of 12 for undef");
     }
-
-
 }

@@ -6,6 +6,7 @@ import fr.insee.protools.backend.dto.sugoi.User;
 import fr.insee.protools.backend.restclient.RestClientHelper;
 import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
+import fr.insee.protools.backend.service.exception.SugoiServiceCallBPMNError;
 import fr.insee.protools.backend.service.exception.UsernameAlreadyExistsSugoiBPMNError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,12 @@ public class SugoiService {
     private String realm;
 
     public User postCreateUser(User userBody) {
+        if(userBody==null){
+            String msg="called  SUGOI postCreateUser with empty userBody";
+            log.error(msg);
+            throw new SugoiServiceCallBPMNError(msg);
+        }
+
         try {
             User userCreated = restClientHelper.getRestClient(API)
                     .post()
@@ -45,7 +52,7 @@ public class SugoiService {
         } catch (HttpClient4xxBPMNError e) {
             if (e.getHttpStatusCodeError().equals(HttpStatus.CONFLICT)) {
                 String msg =
-                        "Error 409/CONFLICT during SUGOI post create users userBody.username=" + ((userBody == null) ? "null" : userBody.getUsername())
+                        "Error 409/CONFLICT during SUGOI post create users userBody.username=" + userBody.getUsername()
                         + " (check that the username already exists in SUGOI) - msg=" + e.getMessage();
                 log.error(msg);
                 throw new UsernameAlreadyExistsSugoiBPMNError(msg);

@@ -2,6 +2,7 @@ package fr.insee.protools.backend.service.traiterXXXX;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.restclient.RestClientHelper;
+import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,12 +18,13 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 public class TraiterXXXService {
 
     private final RestClientHelper restClientHelper;
+    private final ApiConfigProperties.KNOWN_API API = KNOWN_API_TRAITERXXX;
 
     public List<JsonNode> getRemiseEnCollecteForPartition(String partitionId) {
         log.debug("getRemiseEnCollecteForPartition - partitionId={} ",partitionId);
         ParameterizedTypeReference<List<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
 
-        List<JsonNode> response = restClientHelper.getRestClient(KNOWN_API_TRAITERXXX)
+        List<JsonNode> response = restClientHelper.getRestClient(API)
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/remise-en-collecte")
@@ -36,7 +38,7 @@ public class TraiterXXXService {
 
     public void postContext(String campaignId,JsonNode contextRootNode) {
         log.trace("postContext: campaignId={}",campaignId);
-        var response = restClientHelper.getRestClient(KNOWN_API_TRAITERXXX)
+        var response = restClientHelper.getRestClient(API)
                 .post()
                 .uri("/context")
                 .body(contextRootNode)

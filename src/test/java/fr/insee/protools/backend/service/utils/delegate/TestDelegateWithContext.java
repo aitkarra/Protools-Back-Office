@@ -115,32 +115,4 @@ public abstract class TestDelegateWithContext implements IDelegateWithVariables{
             assertTrue(errors.isEmpty(),"We should not have any error in a valid contexte");
         }
     }
-
-    @Test
-    void getContextErrors_should_return_error_when_null_context() {
-        if(getTaskUnderTest() instanceof DelegateContextVerifier){
-            Set<String> errors=((DelegateContextVerifier) getTaskUnderTest()).getContextErrors(null);
-            assertEquals(1,errors.size(),"We should have 1 error with a null contexte");
-            assertTrue(errors.contains("Context is null"));
-        }
-    }
-    @Test
-    void getContextErrors_should_return_error_when_no_id() throws JsonProcessingException {
-        ContexteProcessus schema = objectMapper.readValue(minimalValidCtxt(), ContexteProcessus.class);
-        schema.setId(null);
-        if(getTaskUnderTest() instanceof DelegateContextVerifier){
-            Set<String> errors=((DelegateContextVerifier) getTaskUnderTest()).getContextErrors(schema);
-            assertTrue(errors.contains("Context Id"));
-        }
-    }
-
-    @Test
-    void getContextErrors_should_return_error_when_no_contexte() throws JsonProcessingException {
-        ContexteProcessus schema = objectMapper.readValue(minimalValidCtxt(), ContexteProcessus.class);
-        schema.setContexte(null);
-        if(getTaskUnderTest() instanceof DelegateContextVerifier){
-            Set<String> errors=((DelegateContextVerifier) getTaskUnderTest()).getContextErrors(schema);
-            assertTrue(errors.contains("Contexte is missing"));
-        }
-    }
 }

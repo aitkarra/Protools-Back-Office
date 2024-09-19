@@ -16,12 +16,6 @@ import java.util.Set;
 public interface DelegateContextVerifier {
 
     default Set<String> getContextErrors(ContexteProcessus context) {
-        if(context==null){
-            return Set.of("Context is null");
-        }
-        if(context.getId()==null){
-            return Set.of(computeMissingMessage("Context Id",this.getClass()));
-        }
         return Set.of();
     }
 

@@ -1,10 +1,12 @@
 package fr.insee.protools.backend.service.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import fr.insee.protools.backend.restclient.RestClientHelper;
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
 import fr.insee.protools.backend.restclient.pagination.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_TRAITERXXX;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

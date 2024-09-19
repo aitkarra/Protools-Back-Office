@@ -261,6 +261,9 @@ public class ContextServiceImpl implements ContextService {
         if(contexteProcessus.getId()==null){
             errors.add("id is missing");
         }
+        if(contexteProcessus.getMetadonnees()==null){
+            errors.add("metadonnees is missing");
+        }
 
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
         processDefinitionQuery.processDefinitionKey(processDefinitionKey);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.protools.backend.dto.sugoi.Habilitation;
 import fr.insee.protools.backend.dto.sugoi.User;
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
+import fr.insee.protools.backend.service.exception.SugoiServiceCallBPMNError;
 import fr.insee.protools.backend.service.exception.UsernameAlreadyExistsSugoiBPMNError;
 import fr.insee.protools.backend.service.utils.TestServiceWithRestClient;
 import org.junit.jupiter.api.Test;
@@ -66,6 +67,13 @@ class SugoiServiceTest extends TestServiceWithRestClient {
         // and with expected body
         verify(requestBodyUriSpec).body(createSugoiUserBody);
     }
+
+    @Test
+    void postCreateUser_should_throw_when_param_is_null(){
+        assertThrows(SugoiServiceCallBPMNError.class, () -> service.postCreateUser(null));
+    }
+
+
 
     @Test
     void postCreateUsers_shouldCatch() {

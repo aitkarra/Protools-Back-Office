@@ -24,13 +24,11 @@ public class TraiterXXXGetRemiseEnCollecteTaskREST  implements JavaDelegate, Del
     @Override
     public void execute(DelegateExecution execution) {
         String currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, String.class);
-        log.info("ProcessInstanceId={}  begin",execution.getProcessInstanceId());
-
+        log.info("ProcessInstanceId={} - currentPartitionId={} begin",execution.getProcessInstanceId(),currentPartitionId);
 
         List<JsonNode> interroRemiseEnCollecteList = service.getRemiseEnCollecteForPartition(currentPartitionId);
         execution.getParent().setVariableLocal(VARNAME_INTERRO_REMISE_EN_COLLECTE_LIST,interroRemiseEnCollecteList);
 
-        log.info("ProcessInstanceId={}  end",execution.getProcessInstanceId());
-
+        log.info("ProcessInstanceId={} - currentPartitionId={} - end",execution.getProcessInstanceId(),currentPartitionId);
     }
 }
