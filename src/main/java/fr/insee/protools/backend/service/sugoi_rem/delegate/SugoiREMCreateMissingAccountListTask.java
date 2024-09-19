@@ -44,9 +44,10 @@ public class SugoiREMCreateMissingAccountListTask implements JavaDelegate, Deleg
     @Override
     public void execute(DelegateExecution execution) {
         log.debug("ProcessInstanceId={} begin", execution.getProcessInstanceId());
-        var context = protoolsContext.getContextDtoByProcessInstance(execution.getProcessInstanceId());
-        String currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, String.class);
+        ContexteProcessus context = protoolsContext.getContextDtoByProcessInstance(execution.getProcessInstanceId());
         checkContextOrThrow(log,execution.getProcessInstanceId(), context);
+
+        String currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, String.class);
         List<String> interrogationIdsWithoutAccount = remService.getInterrogationIdsWithoutAccountForPartition(currentPartitionId);
 
         Map<String, String> userByInterroId = new LinkedHashMap<>(interrogationIdsWithoutAccount.size());
@@ -55,7 +56,7 @@ public class SugoiREMCreateMissingAccountListTask implements JavaDelegate, Deleg
         int passwordSize = getPasswordSize(context);
         for (String interrogationId : interrogationIdsWithoutAccount){
             //Create User
-            User createdUser = sugoiService.postCreateUsers(createSugoiUserBody);
+            User createdUser = sugoiService.postCreateUser(createSugoiUserBody);
             //init password
             String userPassword = passwordService.generatePassword(passwordSize);
             sugoiService.postInitPassword(createdUser.getUsername(), userPassword);
@@ -71,32 +72,22 @@ public class SugoiREMCreateMissingAccountListTask implements JavaDelegate, Deleg
     }
 
     public static int getPasswordSize(ContexteProcessus context){
-        if(context.getContexte().equals(ContexteProcessus.Contexte.MENAGE)){
+        if(context!=null && context.getContexte()!=null && context.getContexte().equals(ContexteProcessus.Contexte.MENAGE)){
             return HOUSEHOLD_PASSWORD_SIZE;
         }
         return DEFAULT_PASSWORD_SIZE;
     }
 
     @Override
-    public Set<String> getContextErrors(JsonNode contextRootNode) {
-        if(contextRootNode==null){
-            return Set.of("Context is missing");
+    public Set<String> getContextErrors(ContexteProcessus contexteProcessus) {
+        if(contexteProcessus==null){
+            return Set.of("Context is null");
+        } else if (contexteProcessus.getContexte()==null) {
+            return Set.of("Contexte is missing");
         }
-        Set<String> results=new HashSet<>();
-        Set<String> requiredNodes =
-                Set.of(
-                        //Global & Campaign
-                        CTX_CAMPAGNE_CONTEXTE
-                );
-
-        results.addAll(DelegateContextVerifier.computeMissingChildrenMessages(requiredNodes,contextRootNode,getClass()));
-
-        String contexte = contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText();
-        if(! EnumUtils.isValidEnumIgnoreCase(CampaignContextEnum.class, contexte)){
-            results.add(DelegateContextVerifier.computeIncorrectEnumMessage(CTX_CAMPAGNE_CONTEXTE,contexte, Arrays.toString(CampaignContextEnum.values()),getClass()));
+        else if (contexteProcessus.getId()==null) {
+            return Set.of("Context Id");
         }
-
-        return results;
+        return Set.of();
     }
-
 }

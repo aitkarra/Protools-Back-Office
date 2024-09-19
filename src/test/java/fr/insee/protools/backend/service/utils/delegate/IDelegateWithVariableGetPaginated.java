@@ -24,6 +24,14 @@ public interface IDelegateWithVariableGetPaginated extends IDelegateWithVariable
     void initReadValueMock(PageResponse pageResponse);
     String getOutListVariableName();
 
+
+    @Override
+    default void initExtraMocks(DelegateExecution execution) {
+        IDelegateWithVariables.super.initExtraMocks(execution);
+        PageResponse exepectedPageResponse = PageResponse.builder().currentPage(0).pageCount(1).content(List.of(objectMapper.createObjectNode().put("xx","yyy"))).build();
+        initReadValueMock(exepectedPageResponse);
+    }
+
     static Stream<Arguments> executeParamProvider() {
         return Stream.of(
                 Arguments.of(null, true),
@@ -79,8 +87,5 @@ public interface IDelegateWithVariableGetPaginated extends IDelegateWithVariable
             verify(execution,never()).setVariablesLocal(any());
         }
     }
-
-    PaginationHelper.IGetFromService getServiceMock();
-    Object[] getServiceParams();
 
 }

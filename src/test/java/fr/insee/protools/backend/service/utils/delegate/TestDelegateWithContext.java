@@ -1,9 +1,11 @@
 package fr.insee.protools.backend.service.utils.delegate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.protools.backend.ProtoolsTestUtils;
 import fr.insee.protools.backend.dto.ContexteProcessus;
+import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
 import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
 import lombok.SneakyThrows;
@@ -16,9 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty;
-import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty_id;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -35,18 +38,25 @@ public abstract class TestDelegateWithContext implements IDelegateWithVariables{
         reset(protoolsContext);
     }
 
+    protected abstract String minimalValidCtxt();
+
     @Test
     @Override
     public void execute_should_work_when_params_notNull() {
-        initContexteMockWithString(ctx_empty);
+        initContexteMockWithString(minimalValidCtxt());
         IDelegateWithVariables.super.execute_should_work_when_params_notNull();
     }
 
+    @Override
+    public void initExtraMocks(DelegateExecution execution) {
+        initContexteMockWithString(minimalValidCtxt());
+        IDelegateWithVariables.super.initExtraMocks(execution);
+    }
 
     @Override
     @Test
     public void execute_should_throw_FlowableIllegalArgumentException_when_variables_notDefined(){
-        initContexteMockWithString(ctx_empty);
+        initContexteMockWithString(minimalValidCtxt());
         IDelegateWithVariables.super.execute_should_throw_FlowableIllegalArgumentException_when_variables_notDefined();
     }
 
@@ -55,8 +65,8 @@ public abstract class TestDelegateWithContext implements IDelegateWithVariables{
         JsonNode contextRootNode = ProtoolsTestUtils.asJsonNode(contexteToLoad);
         ContexteProcessus schema = objectMapper.readValue(contexteToLoad, ContexteProcessus.class);
 
-        doReturn(contextRootNode).when(protoolsContext).getContextJsonNodeByProcessInstance(anyString());
-        doReturn(schema).when(protoolsContext).getContextDtoByProcessInstance(anyString());
+        lenient().doReturn(contextRootNode).when(protoolsContext).getContextJsonNodeByProcessInstance(anyString());
+        lenient().doReturn(schema).when(protoolsContext).getContextDtoByProcessInstance(anyString());
         return contextRootNode;
     }
 
@@ -65,8 +75,8 @@ public abstract class TestDelegateWithContext implements IDelegateWithVariables{
         JsonNode contextRootNode = new ObjectMapper().readTree(contexteAsString);
         ContexteProcessus schema = objectMapper.readValue(contexteAsString, ContexteProcessus.class);
 
-        doReturn(contextRootNode).when(protoolsContext).getContextJsonNodeByProcessInstance(anyString());
-        doReturn(schema).when(protoolsContext).getContextDtoByProcessInstance(anyString());
+        lenient().doReturn(contextRootNode).when(protoolsContext).getContextJsonNodeByProcessInstance(anyString());
+        lenient().doReturn(schema).when(protoolsContext).getContextDtoByProcessInstance(anyString());
         return contextRootNode;
     }
 
@@ -82,6 +92,55 @@ public abstract class TestDelegateWithContext implements IDelegateWithVariables{
         assertThrows(BadContexMissingBPMNError.class, () -> getTaskUnderTest().execute(execution));
     }
 
+    @Test
+    @DisplayName("execute should throw an error if the context is null")
+    void execute_should_throwError_when_null_context_2() {
+        if (getTaskUnderTest() instanceof DelegateContextVerifier) {
+            //Precondition
+            DelegateExecution execution = mock(DelegateExecution.class);
+            lenient().when(execution.getProcessInstanceId()).thenReturn(dumyId);
+            lenient().doReturn(null).when(protoolsContext).getContextDtoByProcessInstance(anyString());
+            lenient().doReturn(null).when(protoolsContext).getContextJsonNodeByProcessInstance(anyString());
 
+            assertThrows(BadContexMissingBPMNError.class, () -> getTaskUnderTest().execute(execution));
+        }
+    }
 
+    @Test
+    void getContextErrors_should_work_when_valid_contexte() throws JsonProcessingException {
+        ContexteProcessus schema = objectMapper.readValue(minimalValidCtxt(), ContexteProcessus.class);
+
+        if(getTaskUnderTest() instanceof DelegateContextVerifier){
+            Set<String> errors=((DelegateContextVerifier) getTaskUnderTest()).getContextErrors(schema);
+            assertTrue(errors.isEmpty(),"We should not have any error in a valid contexte");
+        }
+    }
+
+    @Test
+    void getContextErrors_should_return_error_when_null_context() {
+        if(getTaskUnderTest() instanceof DelegateContextVerifier){
+            Set<String> errors=((DelegateContextVerifier) getTaskUnderTest()).getContextErrors(null);
+            assertEquals(1,errors.size(),"We should have 1 error with a null contexte");
+            assertTrue(errors.contains("Context is null"));
+        }
+    }
+    @Test
+    void getContextErrors_should_return_error_when_no_id() throws JsonProcessingException {
+        ContexteProcessus schema = objectMapper.readValue(minimalValidCtxt(), ContexteProcessus.class);
+        schema.setId(null);
+        if(getTaskUnderTest() instanceof DelegateContextVerifier){
+            Set<String> errors=((DelegateContextVerifier) getTaskUnderTest()).getContextErrors(schema);
+            assertTrue(errors.contains("Context Id"));
+        }
+    }
+
+    @Test
+    void getContextErrors_should_return_error_when_no_contexte() throws JsonProcessingException {
+        ContexteProcessus schema = objectMapper.readValue(minimalValidCtxt(), ContexteProcessus.class);
+        schema.setContexte(null);
+        if(getTaskUnderTest() instanceof DelegateContextVerifier){
+            Set<String> errors=((DelegateContextVerifier) getTaskUnderTest()).getContextErrors(schema);
+            assertTrue(errors.contains("Contexte is missing"));
+        }
+    }
 }

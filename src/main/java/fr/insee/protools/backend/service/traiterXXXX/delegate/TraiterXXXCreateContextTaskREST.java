@@ -1,6 +1,7 @@
 package fr.insee.protools.backend.service.traiterXXXX.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
 import fr.insee.protools.backend.service.context.ContextService;
 import fr.insee.protools.backend.service.traiterXXXX.TraiterXXXService;
@@ -23,12 +24,13 @@ public class TraiterXXXCreateContextTaskREST  implements JavaDelegate, DelegateC
     public void execute(DelegateExecution execution) {
         log.info("ProcessInstanceId={}  begin",execution.getProcessInstanceId());
         JsonNode contextRootNode = protoolsContext.getContextJsonNodeByProcessInstance(execution.getProcessInstanceId());
-        String campainId = contextRootNode.path(CTX_CAMPAGNE_ID).asText();
+        ContexteProcessus contexteProcessus = protoolsContext.getContextDtoByProcessInstance(execution.getProcessInstanceId());
 
-        checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
+        checkContextOrThrow(log,execution.getProcessInstanceId(), contexteProcessus);
+        String campainId = contexteProcessus.getId().toString();
+
         service.postContext(campainId,contextRootNode);
 
         log.info("ProcessInstanceId={}  end",execution.getProcessInstanceId());
-
     }
 }

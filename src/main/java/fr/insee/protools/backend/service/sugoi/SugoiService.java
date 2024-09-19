@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.insee.protools.backend.dto.sugoi.User;
 import fr.insee.protools.backend.restclient.RestClientHelper;
+import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
 import fr.insee.protools.backend.service.exception.UsernameAlreadyExistsSugoiBPMNError;
 import lombok.RequiredArgsConstructor;
@@ -20,16 +21,18 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 public class SugoiService {
     //TODO:  a quel niveau configure on ça?
 
+    private final ApiConfigProperties.KNOWN_API API = KNOWN_API_SUGOI;
+
+
     static final String STORAGE = "default";
     private final RestClientHelper restClientHelper;
     private final ObjectMapper objectMapper;
     @Value("${fr.insee.protools.api.sugoi.dmz-account-creation-realm:questionnaire-particuliers}")
     private String realm;
 
-    public User postCreateUsers(User userBody) {
-        log.debug("postCreateUsers");
+    public User postCreateUser(User userBody) {
         try {
-            User userCreated = restClientHelper.getRestClient(KNOWN_API_SUGOI)
+            User userCreated = restClientHelper.getRestClient(API)
                     .post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/realms/{realm}/storages/{storage}/users")
@@ -52,12 +55,11 @@ public class SugoiService {
         }
     }
 
-
     public void postInitPassword(String userId, String password) {
         log.debug("postInitPassword - userId={} begin", userId);
         ObjectNode body = objectMapper.createObjectNode();
         body.put("password", password);
-        restClientHelper.getRestClient(KNOWN_API_SUGOI)
+        restClientHelper.getRestClient(API)
                 .post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/realms/{realm}/users/{id}/init-password")

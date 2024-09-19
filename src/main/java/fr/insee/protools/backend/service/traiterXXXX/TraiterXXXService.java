@@ -25,7 +25,7 @@ public class TraiterXXXService {
         List<JsonNode> response = restClientHelper.getRestClient(KNOWN_API_TRAITERXXX)
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("remise-en-collecte")
+                        .path("/remise-en-collecte")
                         .queryParam("partition_id", partitionId)
                         .build())
                 .retrieve()

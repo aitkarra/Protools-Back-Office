@@ -60,4 +60,9 @@ class PlatinePilotageCreateContextTaskRESTTestDelegate extends TestDelegateWithC
     public Map<String, Class> getVariablesAndTypes() {
         return Map.of();
     }
+
+    @Override
+    protected String minimalValidCtxt() {
+        return ctx_empty;
+    }
 }

@@ -84,7 +84,10 @@ public class PlatinePilotageService {
                             .build())
                     .retrieve()
                     .body(typeReference);
-            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, (response==null)?0:response.getContent().size());
+            if(response==null){
+                response=new PageResponse<>();
+            }
+            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, response.getContent().size());
             return response;
         }
         catch (HttpClient4xxBPMNError e){

@@ -46,7 +46,6 @@ public class PlatinePilotageCreateCommunicationEventTaskRESTTestDelegate impleme
     @InjectMocks
     PlatinePilotageCreateCommunicationEventTaskREST task;
 
-
     @Override
     public JavaDelegate getTaskUnderTest() {
         return task;
@@ -141,7 +140,7 @@ public class PlatinePilotageCreateCommunicationEventTaskRESTTestDelegate impleme
         initDefaultVariables(execution);
 
         // create and start a ListAppender to capture logs
-        Logger fooLogger = (Logger) LoggerFactory.getLogger(PlatinePilotageCreateCommunicationEventTaskREST.class);
+        Logger fooLogger = (Logger) LoggerFactory.getLogger(task.getClass());
         ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
         fooLogger.addAppender(listAppender);
         listAppender.start();
@@ -152,14 +151,13 @@ public class PlatinePilotageCreateCommunicationEventTaskRESTTestDelegate impleme
         //Verify
         List<ILoggingEvent> logsList = listAppender.list;
         assertThat(logsList.get(0).getFormattedMessage())
-                .contains("begin")
-                .contains(execution.getProcessInstanceId());
+                .contains("begin",execution.getProcessInstanceId());
 
         assertEquals(Level.INFO, logsList.get(1)
                 .getLevel());
         assertThat(logsList.get(1).getFormattedMessage())
-                .contains("end")
-                .contains(execution.getProcessInstanceId())
-                .contains("Nothing to do");
+                .contains("end",execution.getProcessInstanceId(),"Nothing to do");
+
+        verify(platinePilotageService,never()).postCommunicationEvents(any());
     }
 }

@@ -2,7 +2,6 @@ package fr.insee.protools.backend.service.utils.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import fr.insee.protools.backend.restclient.pagination.PageResponse;
 import fr.insee.protools.backend.service.exception.VariableClassCastException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -19,7 +18,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 
 public interface IDelegateWithVariables {
 
@@ -32,8 +32,8 @@ public interface IDelegateWithVariables {
     JavaDelegate getTaskUnderTest();
     Map<String,Class> getVariablesAndTypes();
 
-    // extra mocked needed so that it works
-    default void initExtraMocks(DelegateExecution execution) {}
+    // extra mocked needed to make some tests work
+    default void initExtraMocks(DelegateExecution execution) { }
 
     default void initDefaultVariables(DelegateExecution execution) {
         Map<String, Class> typeByVariable = getVariablesAndTypes();
@@ -102,6 +102,9 @@ public interface IDelegateWithVariables {
                     lenient().doReturn(dummyValue).when(execution).getVariable(eq(variable), eq(clazzOriginal));
                     lenient().doReturn(dummyValue).when(execution).getVariableLocal(eq(variable), eq(clazzOriginal));
                 });
+
+        initExtraMocks(execution);
+
         //Run the test
         //Verify
         assertThrows(VariableClassCastException.class, () -> getTaskUnderTest().execute(execution));
@@ -120,14 +123,16 @@ public interface IDelegateWithVariables {
 
         //Precondition
         DelegateExecution execution = mock(DelegateExecution.class);
-        lenient().when(execution.getProcessInstanceId()).thenReturn(dumyId);
-//
+
         String[] variables=getVariablesAndTypes().keySet().toArray(new String[0]);
         combinations(variables)
                 .forEach(variablesSubset -> {
                     ilogger.info("subset of initialized variables: "+variablesSubset);
                     //Initailize the mocked variables
                     Set<String> intializedVars=new HashSet<>();
+
+                    //Reinit
+                    lenient().when(execution.getProcessInstanceId()).thenReturn(dumyId);
 
                     //The one not defined ==> Throw
                     for (String variable :variablesSubset) {
@@ -157,8 +162,6 @@ public interface IDelegateWithVariables {
                     Mockito.reset(execution);
                 } );
     }
-
-
 
     default DelegateExecution createMockedExecution(){
         DelegateExecution execution = mock(DelegateExecution.class);

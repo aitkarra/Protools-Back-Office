@@ -17,7 +17,7 @@ public interface PaginationHelper {
     /**
      * Custom Treatment for the page
      *
-     * @return a Map with variables to update on the process instance (so we can make a single setVariablesLocal in getAndTreat)
+     * @return a Modifiable MAP with variables to update on the process instance (so we can make a single setVariablesLocal in getAndTreat)
      */
     Map<String, Object> treatPage(DelegateExecution execution, List<JsonNode> contentList);
 

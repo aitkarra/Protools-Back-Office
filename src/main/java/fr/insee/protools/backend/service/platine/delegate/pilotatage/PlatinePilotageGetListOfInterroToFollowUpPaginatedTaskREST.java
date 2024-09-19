@@ -46,7 +46,7 @@ public class PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskREST implemen
 
     @Override
     public Map<String, Object> treatPage(DelegateExecution execution, List<JsonNode> contentList) {
-        Map<String, Object> variables = new HashMap();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(VARNAME_REM_INTERRO_LIST, contentList);
         return variables;
     }

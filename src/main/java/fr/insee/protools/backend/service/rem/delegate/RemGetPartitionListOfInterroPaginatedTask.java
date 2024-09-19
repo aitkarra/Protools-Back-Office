@@ -13,6 +13,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,8 @@ public class RemGetPartitionListOfInterroPaginatedTask implements JavaDelegate, 
 
     @Override
     public Map<String, Object> treatPage(DelegateExecution execution, List<JsonNode> contentList) {
-        Map<String, Object> variables = Map.of(VARNAME_REM_INTERRO_LIST, contentList);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(VARNAME_REM_INTERRO_LIST, contentList);
         return variables;
     }
 }

@@ -229,7 +229,7 @@ public class ContextServiceImpl implements ContextService {
             JsonNode rootContext = defaultReader.readTree(content);
             ContexteProcessus contexte = jsonReadAndSchemaValidation(rootContext);
 
-            Set<String> contextErrors = isContextOKForBPMN(processDefinitionKey, rootContext);
+            Set<String> contextErrors = isContextOKForBPMN(processDefinitionKey, contexte);
             if (!contextErrors.isEmpty()) {
                 throw new BadContextIncorrectBPMNError(contextErrors.toString());
             }
@@ -251,13 +251,16 @@ public class ContextServiceImpl implements ContextService {
      * Check if protoolsContextRootNode allows every Task implementing {@link  fr.insee.protools.backend.service.DelegateContextVerifier#getContextErrors  DelegateContextVerifier}  interface to run correctly
      *
      * @param processDefinitionKey    The process (BPMN) identifier
-     * @param protoolsContextRootNode The context to check
+     * @param contexteProcessus The context to check
      * @return A list of the problems found
      * @throws FlowableObjectNotFoundException if no process definition (BPMN) matches processDefinitionKey
      */
-    public Set<String> isContextOKForBPMN(String processDefinitionKey, JsonNode protoolsContextRootNode) {
+    public Set<String> isContextOKForBPMN(String processDefinitionKey, ContexteProcessus contexteProcessus) {
         //At least, the campaign ID should be defined so we can write it on process variables to be used un groovy scripts
-        Set<String> errors = DelegateContextVerifier.computeMissingChildrenMessages(Set.of(CTX_CAMPAGNE_ID), protoolsContextRootNode, getClass());
+        Set<String> errors = new HashSet<>();
+        if(contexteProcessus.getId()==null){
+            errors.add("id is missing");
+        }
 
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
         processDefinitionQuery.processDefinitionKey(processDefinitionKey);
@@ -278,18 +281,18 @@ public class ContextServiceImpl implements ContextService {
 
         processModel.getFlowElements().stream()
                 .filter(flowElement -> (flowElement instanceof ServiceTask || flowElement instanceof SubProcess))
-                .forEach(flowElement -> errors.addAll(analyseProcess(flowElement, protoolsContextRootNode)));
+                .forEach(flowElement -> errors.addAll(analyseProcess(flowElement, contexteProcessus)));
         return errors;
     }
 
-    private Set<String> analyseProcess(FlowElement flowElement, JsonNode protoolsContextRootNode) {
+    private Set<String> analyseProcess(FlowElement flowElement, ContexteProcessus contexteProcessus) {
         if (flowElement instanceof ServiceTask serviceTask) {
             if (serviceTask.getImplementationType().equals("delegateExpression")) {
                 String delegateExpression = serviceTask.getImplementation().replace("${", "").replace("}", "");
                 try {
                     Object bean = springApplicationContext.getBean(delegateExpression);
                     if (bean instanceof DelegateContextVerifier beanDelegateCtxVerifier) {
-                        return beanDelegateCtxVerifier.getContextErrors(protoolsContextRootNode);
+                        return beanDelegateCtxVerifier.getContextErrors(contexteProcessus);
                     }
                 } catch (NoSuchBeanDefinitionException e) {
                 }
@@ -297,7 +300,7 @@ public class ContextServiceImpl implements ContextService {
         } else if (flowElement instanceof SubProcess subProcessFlowElement) {
             Set<String> errors = new HashSet<>();
             subProcessFlowElement.getFlowElements().stream()
-                    .forEach(subFlowElement -> errors.addAll(analyseProcess(subFlowElement, protoolsContextRootNode)));
+                    .forEach(subFlowElement -> errors.addAll(analyseProcess(subFlowElement, contexteProcessus)));
             return errors;
         }
         return Set.of();

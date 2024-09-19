@@ -15,10 +15,14 @@ import java.util.List;
 public class PageResponse<T> {
     @Builder.Default
     private List<T> content = new ArrayList<>();
-    private Integer currentPage;
-    private Integer pageSize;
-    private Long totalElements;
-    private Integer pageCount;
+    @Builder.Default
+    private Integer currentPage=0;
+    @Builder.Default
+    private Integer pageSize=5000;
+    @Builder.Default
+    private Long totalElements=0L;
+    @Builder.Default
+    private Integer pageCount=0;
 
     public Boolean isLastPage(){
         if(currentPage==null || pageCount==null){

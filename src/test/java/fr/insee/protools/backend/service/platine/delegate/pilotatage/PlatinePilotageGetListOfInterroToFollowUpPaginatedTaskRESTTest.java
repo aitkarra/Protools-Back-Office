@@ -39,11 +39,6 @@ class PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskRESTTest
     }
 
     @Override
-    public void initExtraMocks(DelegateExecution execution){
-        lenient().doReturn(PageResponse.builder().currentPage(0).content(List.of()).pageSize(10).build()).when(platinePilotageService).getInterrogationToFollowUpPaginated(anyString(), anyLong(),any());
-    }
-
-    @Override
     public Map<String, Class> getVariablesAndTypes() {
         return Map.of(
                 VARNAME_CURRENT_PARTITION_ID, String.class
@@ -55,15 +50,4 @@ class PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskRESTTest
         return VARNAME_REM_INTERRO_LIST;
     }
 
-    @Override
-    public PaginationHelper.IGetFromService getServiceMock() {
-        return spy(PaginationHelper.IGetFromService.class);
-    }
-
-    @Override
-    public Object[] getServiceParams() {
-        Object[] ret = new Object[1];
-        ret[0] = "Default_partition_id";
-        return ret;
-    }
 }

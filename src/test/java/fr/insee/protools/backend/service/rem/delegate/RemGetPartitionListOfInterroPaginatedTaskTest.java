@@ -16,6 +16,8 @@ import java.util.Map;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERRO_LIST;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class RemGetPartitionListOfInterroPaginatedTaskTest         implements IDelegateWithVariableGetPaginated {
@@ -38,22 +40,12 @@ class RemGetPartitionListOfInterroPaginatedTaskTest         implements IDelegate
     }
 
     @Override
-    public void initReadValueMock(PageResponse pageResponse) {
-
+    public void initReadValueMock(PageResponse expectedPageResponse) {
+        lenient().doReturn(expectedPageResponse).when(remService).getPartitionAllInterroPaginated(anyString(), anyLong());
     }
 
     @Override
     public String getOutListVariableName() {
         return VARNAME_REM_INTERRO_LIST;
-    }
-
-    @Override
-    public PaginationHelper.IGetFromService getServiceMock() {
-        return null;
-    }
-
-    @Override
-    public Object[] getServiceParams() {
-        return new Object[0];
     }
 }

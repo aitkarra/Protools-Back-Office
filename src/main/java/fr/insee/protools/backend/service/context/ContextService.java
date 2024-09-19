@@ -2,6 +2,7 @@ package fr.insee.protools.backend.service.context;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
+import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ContextService {
@@ -29,7 +30,7 @@ public interface ContextService {
      *
      * @param processInstanceId
      * @return the Json context of the process associated with process Instance
-     * @throws
+     * @throws BadContexMissingBPMNError
      */
     JsonNode getContextJsonNodeByProcessInstance(String processInstanceId);
 
@@ -38,7 +39,7 @@ public interface ContextService {
      *
      * @param processInstanceId
      * @return the Dto context of the process associated with process Instance
-     * @throws
+     * @throws BadContexMissingBPMNError
      */
     ContexteProcessus getContextDtoByProcessInstance(String processInstanceId);
 

@@ -56,4 +56,9 @@ class PlatineQuestionnaireCreateContextTaskRESTTestDelegate extends TestDelegate
         assertEquals(expectedContext,allValues.get(0),"Wrong context passed");
 
     }
+
+    @Override
+    protected String minimalValidCtxt() {
+        return ctx_empty;
+    }
 }

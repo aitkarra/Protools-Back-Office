@@ -2,6 +2,7 @@ package fr.insee.protools.backend.service.rem;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.rem_tmp.InterrogationAccountDto;
+import fr.insee.protools.backend.dto.rem_tmp.InterrogationIdentifiersDto;
 import fr.insee.protools.backend.restclient.RestClientHelper;
 import fr.insee.protools.backend.restclient.configuration.ApiConfigProperties;
 import fr.insee.protools.backend.restclient.exception.runtime.HttpClient4xxBPMNError;
@@ -24,35 +25,38 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @RequiredArgsConstructor
 public class RemService {
 
-    private final ApiConfigProperties.KNOWN_API API= KNOWN_API_REM;
+    private final ApiConfigProperties.KNOWN_API API = KNOWN_API_REM;
     private final RestClientHelper restClientHelper;
     @Value("${fr.insee.protools.api.rem.interrogation.page.size:5000}")
     private int pageSizeGetInterro;
 
     public PageResponse<JsonNode> getPartitionAllInterroPaginated(String partitionId, long page) {
-        log.debug("partitionId={} - page={} - pageSizeGetInterro={} }",partitionId,page,pageSizeGetInterro);
-        ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
+        log.debug("partitionId={} - page={} - pageSizeGetInterro={} }", partitionId, page, pageSizeGetInterro);
+        ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() {
+        };
         try {
-            PageResponse<JsonNode>   response = restClientHelper.getRestClient(API)
-                        .get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("interrogations")
-                                .queryParam("page", page)
-                                .queryParam("size", pageSizeGetInterro)
-                                .queryParam("partition_id", partitionId)
-                                .build())
-                        .retrieve()
-                        .body(typeReference);
-            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId,page,pageSizeGetInterro, response.getContent().size());
+            PageResponse<JsonNode> response = restClientHelper.getRestClient(API)
+                    .get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/interrogations")
+                            .queryParam("page", page)
+                            .queryParam("size", pageSizeGetInterro)
+                            .queryParam("partition_id", partitionId)
+                            .build())
+                    .retrieve()
+                    .body(typeReference);
+            if(response==null){
+                response=new PageResponse<>();
+            }
+            log.trace("partitionId={} - page={} - pageSizeGetInterro={} - response={} ", partitionId, page, pageSizeGetInterro, response.getContent().size());
             return response;
-        }
-        catch (HttpClient4xxBPMNError e){
-            if(e.getHttpStatusCodeError().equals(HttpStatus.NOT_FOUND)){
-                String msg=
-                        "Error 404/NOT_FOUND during get sample on REM with partitionId="+partitionId
-                                + " - msg="+e.getMessage();
+        } catch (HttpClient4xxBPMNError e) {
+            if (e.getHttpStatusCodeError().equals(HttpStatus.NOT_FOUND)) {
+                String msg =
+                        "Error 404/NOT_FOUND during get sample on REM with partitionId=" + partitionId
+                                + " - msg=" + e.getMessage();
                 log.error(msg);
-                throw new HttpClient4xxBPMNError(msg,e.getHttpStatusCodeError());
+                throw new HttpClient4xxBPMNError(msg, e.getHttpStatusCodeError());
             }
             //Currently no remediation so just rethrow
             throw e;
@@ -60,35 +64,35 @@ public class RemService {
     }
 
     public List<String> getInterrogationIdsWithoutAccountForPartition(String partitionId) {
-        log.debug("getSampleSuIds - partitionId={} ",partitionId);
-        ParameterizedTypeReference<List<InterrogationAccountDto>> typeReference = new ParameterizedTypeReference<List<InterrogationAccountDto>>() {};
+        log.debug("getSampleSuIds - partitionId={} ", partitionId);
+        ParameterizedTypeReference<List<InterrogationIdentifiersDto>> typeReference = new ParameterizedTypeReference<List<InterrogationIdentifiersDto>>() {
+        };
 
         try {
-            List<InterrogationAccountDto> response = restClientHelper.getRestClient(API)
+            List<InterrogationIdentifiersDto> response = restClientHelper.getRestClient(API)
                     .get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/interrogations/ids")
                             .queryParam("partition_id", partitionId)
-                            .queryParam("hasAccount",false)
+                            .queryParam("hasAccount", false)
                             .build())
                     .retrieve()
                     .body(typeReference);
 
             List<String> interrogationIdsWithoutAccount =
                     response.stream()
-                            .map(InterrogationAccountDto::getInterrogationId)
+                            .map(InterrogationIdentifiersDto::getInterrogationId)
                             .map(UUID::toString).toList();
 
             log.trace("partitionId={} - interrogationIdsWithoutAccount={} ", partitionId, interrogationIdsWithoutAccount);
             return interrogationIdsWithoutAccount;
-        }
-        catch (HttpClient4xxBPMNError e){
-            if(e.getHttpStatusCodeError().equals(HttpStatus.NOT_FOUND)){
-                String msg=
-                        "Error 404/NOT_FOUND during get lot interrogations ids on REM with partitionId="+partitionId
-                                + " - msg="+e.getMessage();
+        } catch (HttpClient4xxBPMNError e) {
+            if (e.getHttpStatusCodeError().equals(HttpStatus.NOT_FOUND)) {
+                String msg =
+                        "Error 404/NOT_FOUND during get lot interrogations ids on REM with partitionId=" + partitionId
+                                + " - msg=" + e.getMessage();
                 log.error(msg);
-                throw new HttpClient4xxBPMNError(msg,e.getHttpStatusCodeError());
+                throw new HttpClient4xxBPMNError(msg, e.getHttpStatusCodeError());
             }
             //Currently no remediation so just rethrow
             throw e;
@@ -124,7 +128,7 @@ public class RemService {
         log.debug("putContactsPlatine - contactPlatineList.size={}", contactPlatineList);
         var response = restClientHelper.getRestClient(API)
                 .put()
-                .uri("contacts-platine")
+                .uri("/contacts-platine")
                 .body(contactPlatineList)
                 .retrieve()
                 .body(String.class);
@@ -139,7 +143,7 @@ public class RemService {
 
         log.debug("postRemiseEnCollecte - interroRemiseEnCollecteList.size={}", interroRemiseEnCollecteList);
         var response = restClientHelper.getRestClient(API)
-                .put()
+                .post()
                 .uri("/remise-en-collecte")
                 .body(interroRemiseEnCollecteList)
                 .retrieve()

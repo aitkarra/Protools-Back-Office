@@ -71,4 +71,9 @@ class PlatineQuestionnaireCreateInterrogationListTaskRESTTestDelegate extends Te
                 VARNAME_CURRENT_PARTITION_ID,String.class,
                 VARNAME_REM_INTERRO_LIST,List.class);
     }
+
+    @Override
+    protected String minimalValidCtxt() {
+        return ctx_empty;
+    }
 }

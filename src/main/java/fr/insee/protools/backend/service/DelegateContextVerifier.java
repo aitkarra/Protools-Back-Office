@@ -2,6 +2,7 @@ package fr.insee.protools.backend.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
+import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
 import fr.insee.protools.backend.service.context.exception.BadContextIncorrectBPMNError;
 import org.slf4j.Logger;
 
@@ -14,10 +15,15 @@ import java.util.Set;
  */
 public interface DelegateContextVerifier {
 
-    default Set<String> getContextErrors(JsonNode contextRootNode) {return Set.of();}
-
-    default Set<String> getContextErrors(ContexteProcessus context) {return Set.of();}
-
+    default Set<String> getContextErrors(ContexteProcessus context) {
+        if(context==null){
+            return Set.of("Context is null");
+        }
+        if(context.getId()==null){
+            return Set.of(computeMissingMessage("Context Id",this.getClass()));
+        }
+        return Set.of();
+    }
 
     static String computeMissingMessage(String missingElement, Class<?> classUsingThisElement){
         return String.format("Class=%s : Missing Context element name=%s ", classUsingThisElement.getSimpleName(),missingElement);
@@ -33,35 +39,10 @@ public interface DelegateContextVerifier {
                 , value
                 ,enumValues);
     }
-    static Set<String> computeMissingChildrenMessages(Set<String> requiredChildren, JsonNode parentNode, Class<?> classUsingThisElement){
-        if(parentNode == null){
-            return new HashSet<>();
-        }
-        Set<String> missingNodes = new HashSet<>();
-        for (String child: requiredChildren  ) {
-            if(parentNode.get(child) == null){
-                missingNodes.add(computeMissingMessage(child,classUsingThisElement));
-            }
-        }
-        return missingNodes;
-    }
-
-    default void checkContextOrThrow(Logger log,String processInstanceId, JsonNode contextRootNode) {
-        if(contextRootNode==null)
-            throw new BadContextIncorrectBPMNError(String.format("ProcessInstanceId=%s - context is missing", processInstanceId));
-
-        var errors = getContextErrors(contextRootNode);
-        if(!errors.isEmpty()){
-            for (var msg: errors) {
-                log.error(msg);
-            }
-            throw new BadContextIncorrectBPMNError(String.format("ProcessInstanceId=%s - context is incorrect missingNodes=%s", processInstanceId,errors));
-        }
-    }
 
     default void checkContextOrThrow(Logger log,String processInstanceId, ContexteProcessus context) {
         if(context==null)
-            throw new BadContextIncorrectBPMNError(String.format("ProcessInstanceId=%s - context is missing", processInstanceId));
+            throw new BadContexMissingBPMNError(String.format("ProcessInstanceId=%s - context is missing", processInstanceId));
 
         var errors = getContextErrors(context);
         if(!errors.isEmpty()){
