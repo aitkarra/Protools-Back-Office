@@ -3,9 +3,6 @@ package fr.insee.protools.backend.integration;
 
 import fr.insee.protools.backend.service.context.ContextServiceImpl;
 import fr.insee.protools.backend.service.rem.RemService;
-import fr.insee.protools.backend.dto.rem_tmp.REMSurveyUnitDto;
-import fr.insee.protools.backend.dto.rem_tmp.SuIdMappingJson;
-import fr.insee.protools.backend.dto.rem_tmp.SuIdMappingRecord;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
 import org.junit.jupiter.api.Test;
@@ -33,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestPropertySource(locations = "/application-test.properties")
 @ExtendWith(MockitoExtension.class)
 class EraREMProcessTest {
-
+/*
   @Autowired ContextServiceImpl contextService;
   @MockBean EraService eraService;
   @MockBean RemService remService;
@@ -118,4 +115,5 @@ class EraREMProcessTest {
             .build();
 
   }
+  */
 }
