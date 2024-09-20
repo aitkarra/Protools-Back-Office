@@ -39,7 +39,7 @@ public class ListLong implements VariableType {
             try {
                 return Arrays.stream(valStr.split(","))
                         .map(Long::parseLong)
-                        .collect(Collectors.toList());
+                        .toList();
             } catch (NumberFormatException e) {
                 throw new FlowableIllegalArgumentException("The given variable value is not comma separated list of Long: '" + valStr+ "'", e);
             }

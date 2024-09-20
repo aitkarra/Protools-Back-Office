@@ -27,7 +27,7 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 public class PlatinePilotageService {
 
     private final RestClientHelper restClientHelper;
-    private final ApiConfigProperties.KNOWN_API API= KNOWN_API_PLATINE_PILOTAGE;
+    private static final ApiConfigProperties.KNOWN_API API= KNOWN_API_PLATINE_PILOTAGE;
 
     @Value("${fr.insee.protools.api.platine-pilotage.interrogation.page.size:5000}")
     private int pageSizeGetInterro;

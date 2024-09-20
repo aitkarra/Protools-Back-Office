@@ -25,7 +25,7 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @RequiredArgsConstructor
 public class RemService {
 
-    private final ApiConfigProperties.KNOWN_API API = KNOWN_API_REM;
+    private static final ApiConfigProperties.KNOWN_API API = KNOWN_API_REM;
     private final RestClientHelper restClientHelper;
     @Value("${fr.insee.protools.api.rem.interrogation.page.size:5000}")
     private int pageSizeGetInterro;

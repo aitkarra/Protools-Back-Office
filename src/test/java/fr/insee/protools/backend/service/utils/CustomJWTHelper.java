@@ -28,7 +28,7 @@ public class CustomJWTHelper {
         for (String role:roles){
             rolesNode.add(role);
         }
-        realmAccessNode.put("roles", rolesNode);
+        realmAccessNode.set("roles", rolesNode);
 
         Jwt kcToken = Jwt.withTokenValue("token").header("alg", ALGO).
                 claim("realm_access", realmAccessNode)
@@ -48,9 +48,7 @@ public class CustomJWTHelper {
         String signature = createSignature(encodedHeader, encodedPayload);
 
         // Concatenate header, payload, and signature to form the JWT
-        String signedToken = encodedHeader + "." + encodedPayload + "." + signature;
-        return signedToken;
-
+        return encodedHeader + "." + encodedPayload + "." + signature;
     }
 
     public static String createSignature(String header, String payload) throws Exception {

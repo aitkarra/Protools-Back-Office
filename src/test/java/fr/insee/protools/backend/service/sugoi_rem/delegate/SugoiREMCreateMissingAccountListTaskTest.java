@@ -81,7 +81,7 @@ class SugoiREMCreateMissingAccountListTaskTest extends TestDelegateWithContext {
         String contexts_as_string;
         if(context.equals("menage"))
         {
-            contexts_as_string=ctx_contexte_menage;
+            contexts_as_string= CTX_CONTEXTE_MENAGE;
             tmpexpectedPwdSize=8;
         }
         else if(context.equals("entreprise")){
@@ -145,13 +145,13 @@ class SugoiREMCreateMissingAccountListTaskTest extends TestDelegateWithContext {
 
     @Override
     protected String minimalValidCtxt() {
-        return ctx_contexte_menage;
+        return CTX_CONTEXTE_MENAGE;
     }
 
     @Test
     void getPasswordSize_should_return8_for_menage() throws JsonProcessingException {
         //prepare
-        ContexteProcessus schema = new ObjectMapper().readValue(ctx_contexte_menage, ContexteProcessus.class);
+        ContexteProcessus schema = new ObjectMapper().readValue(CTX_CONTEXTE_MENAGE, ContexteProcessus.class);
         //Call method under tests
         int pwdSize=task.getPasswordSize(schema);
         //Verify

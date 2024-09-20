@@ -46,7 +46,7 @@ public class PartitionCtxResolver {
     private final TemporalAmount maxSendCommunicationWindowHours = Duration.ofHours(24);;
 
     //Date in a far away future
-    private final static Instant farAwayInstant = LocalDate.parse("9999-12-31").atStartOfDay(ZoneId.of("Europe/Paris")).toInstant();
+    private static final Instant farAwayInstant = LocalDate.parse("9999-12-31").atStartOfDay(ZoneId.of("Europe/Paris")).toInstant();
 
 
     private Optional<Lot> getPartition(ExecutionEntity execution, String partitionId){

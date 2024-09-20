@@ -11,6 +11,7 @@ public class FlowableVariableUtils {
      * Throws Protools VariableClassCastException if the cast is not successful
      * Throws FlowableIllegalArgumentException if the variable is not found
      */
+    @SuppressWarnings("squid:S1192")
     public static <T> T getVariableOrThrow(DelegateExecution execution, String variableName, Class<T> variableClass ){
         T res;
         try{

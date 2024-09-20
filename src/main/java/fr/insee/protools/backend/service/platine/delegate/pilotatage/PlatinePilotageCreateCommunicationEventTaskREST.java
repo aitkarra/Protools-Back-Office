@@ -46,10 +46,6 @@ public class PlatinePilotageCreateCommunicationEventTaskREST implements JavaDele
             return;
         }
 
-
-         //TODO: put it at a single place ==> Maybe an helper to get the Id of an interro or of any json?
-        String jsonKeyId = "id";
-
         List<PlatinePilotageCommunicationEventDto> platinePilotageCommunicationEventList = communicationRequestIdByInterroIdMap.entrySet()
                 .stream()
                 .map(entry ->

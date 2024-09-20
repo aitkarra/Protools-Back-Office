@@ -18,8 +18,8 @@ import java.util.stream.IntStream;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERRO_LIST;
-import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty;
-import static fr.insee.protools.backend.utils.data.CtxExamples.ctx_empty_id;
+import static fr.insee.protools.backend.utils.data.CtxExamples.CTX_EMPTY;
+import static fr.insee.protools.backend.utils.data.CtxExamples.CTX_EMPTY_ID;
 import static fr.insee.protools.backend.utils.data.InterroExamples.generateEmptyInterro;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -36,7 +36,7 @@ class PlatinePilotageCreateInterrogationListTaskRESTTestDelegate extends TestDel
     @Test
     void execute_should_work_when_contextOKVarOK() {
         DelegateExecution execution = createMockedExecution();
-        JsonNode expectedContext = initContexteMockWithString(ctx_empty);
+        JsonNode expectedContext = initContexteMockWithString(CTX_EMPTY);
 
         //Process variables
         lenient().doReturn(String.valueOf(UUID.randomUUID())).when(execution).getVariable(VARNAME_CURRENT_PARTITION_ID, String.class);
@@ -53,7 +53,7 @@ class PlatinePilotageCreateInterrogationListTaskRESTTestDelegate extends TestDel
         final ArgumentCaptor<List<JsonNode> > listCaptor
                 = ArgumentCaptor.forClass((Class) List.class);
 
-        verify(platinePilotageService,times(1)).postInterrogations(eq(ctx_empty_id),listCaptor.capture());
+        verify(platinePilotageService,times(1)).postInterrogations(eq(CTX_EMPTY_ID),listCaptor.capture());
         List<List<JsonNode>> allValues = listCaptor.getAllValues();
         assertEquals(1, allValues.size(),"We should have exactly one value");
 
@@ -74,6 +74,6 @@ class PlatinePilotageCreateInterrogationListTaskRESTTestDelegate extends TestDel
 
     @Override
     protected String minimalValidCtxt() {
-        return ctx_empty;
+        return CTX_EMPTY;
     }
 }

@@ -1,8 +1,8 @@
-package fr.insee.protools.backend.service.traiterXXXX.delegate;
+package fr.insee.protools.backend.service.traiterxxxx.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.traiterXXXX.TraiterXXXService;
+import fr.insee.protools.backend.service.traiterxxxx.TraiterXXXService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

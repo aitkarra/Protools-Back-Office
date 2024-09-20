@@ -1,8 +1,8 @@
-package fr.insee.protools.backend.service.traiterXXXX.delegate;
+package fr.insee.protools.backend.service.traiterxxxx.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.protools.backend.service.traiterXXXX.TraiterXXXService;
+import fr.insee.protools.backend.service.traiterxxxx.TraiterXXXService;
 import fr.insee.protools.backend.service.utils.delegate.IDelegateWithVariables;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;

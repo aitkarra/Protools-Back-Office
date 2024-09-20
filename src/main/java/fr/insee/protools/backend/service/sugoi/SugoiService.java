@@ -20,10 +20,8 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @Slf4j
 @RequiredArgsConstructor
 public class SugoiService {
-    //TODO:  a quel niveau configure on ça?
 
-    private final ApiConfigProperties.KNOWN_API API = KNOWN_API_SUGOI;
-
+    private static final ApiConfigProperties.KNOWN_API API = KNOWN_API_SUGOI;
 
     static final String STORAGE = "default";
     private final RestClientHelper restClientHelper;

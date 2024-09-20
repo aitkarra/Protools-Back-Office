@@ -1,4 +1,4 @@
-package fr.insee.protools.backend.service.traiterXXXX;
+package fr.insee.protools.backend.service.traiterxxxx;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.restclient.RestClientHelper;
@@ -18,7 +18,7 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 public class TraiterXXXService {
 
     private final RestClientHelper restClientHelper;
-    private final ApiConfigProperties.KNOWN_API API = KNOWN_API_TRAITERXXX;
+    private static final ApiConfigProperties.KNOWN_API API = KNOWN_API_TRAITERXXX;
 
     public List<JsonNode> getRemiseEnCollecteForPartition(String partitionId) {
         log.debug("getRemiseEnCollecteForPartition - partitionId={} ",partitionId);

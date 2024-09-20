@@ -20,7 +20,7 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 public class PlatineQuestionnaireService {
 
     private final RestClientHelper restClientHelper;
-    private final ApiConfigProperties.KNOWN_API API= KNOWN_API_PLATINE_QUESTIONNAIRE;
+    private static final ApiConfigProperties.KNOWN_API API= KNOWN_API_PLATINE_QUESTIONNAIRE;
 
     public void postContext(String campaignId, JsonNode contextRootNode) {
         log.trace("postContext: campaignId={}",campaignId);

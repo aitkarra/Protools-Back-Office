@@ -50,11 +50,9 @@ import static org.mockito.Mockito.*;
 @FlowableTest
 class ContextServiceImplTest {
 
-    final static String ressourceFolder = ClassUtils.convertClassNameToResourcePath(ContextServiceImplTest.class.getPackageName());
-
+    static final String ressourceFolder = ClassUtils.convertClassNameToResourcePath(ContextServiceImplTest.class.getPackageName());
     static final ObjectReader objectReader = new ObjectMapper().registerModule(new JavaTimeModule()).reader(); // maybe with configs
-
-
+    
     @Spy
     @InjectMocks
     ContextServiceImpl contextService;
@@ -261,7 +259,6 @@ class ContextServiceImplTest {
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(ressourceFolder + "/minimal_valid_context.json");
         MockMultipartFile multipartFile = new MockMultipartFile("file.json", "file.json", "text/json", resourceAsStream.readAllBytes());
         initRuntimeServiceMock();
-        String processDefinitionId="Throwning_ID";
         doThrow(new FlowableObjectNotFoundException("msg")).when(runtimeService).startProcessInstanceByKey(any(),any(),anyMap());
         doReturn(new ContextServiceImpl.ContextPair("{}",null)).when(contextService).processContextFile(any(),any());
         //Call method under test
