@@ -68,6 +68,7 @@ public class KeycloakService {
         try {
             uri = new URI(uri).normalize().toString();
         } catch (URISyntaxException e) {
+            //Will probably never be reached if URL is tests before
             throw new KeycloakTokenConfigBPMNError(String.format("Auth is not correctly configured for [%s]",authProperties));
         }
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();

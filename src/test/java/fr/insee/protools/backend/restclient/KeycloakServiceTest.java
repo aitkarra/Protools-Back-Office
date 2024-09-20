@@ -102,7 +102,6 @@ class KeycloakServiceTest {
         assertThrows(KeycloakTokenConfigBPMNError.class , ()  -> keycloakService.getToken(kcAuthBlankSecret));
     }
 
-
     @Test
     @DisplayName("getToken should check if a token already exists for this AuthProperties and reuse the known token if it is not exipred")
     void getToken_should_refreshTokenWhenNeeded() throws IOException, KeycloakTokenConfigBPMNError, InterruptedException {

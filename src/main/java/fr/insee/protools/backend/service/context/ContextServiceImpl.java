@@ -4,20 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
 import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.context.exception.*;
+import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
+import fr.insee.protools.backend.service.context.exception.BadContextIOException;
+import fr.insee.protools.backend.service.context.exception.BadContextIncorrectBPMNError;
+import fr.insee.protools.backend.service.context.exception.BadContextNotJSONBPMNError;
 import fr.insee.protools.backend.service.exception.ProcessDefinitionNotFoundException;
 import fr.insee.protools.backend.service.exception.TaskNotFoundException;
-import fr.insee.protools.backend.service.utils.log.TimeLogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
@@ -37,20 +39,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CONTEXT;
-import static fr.insee.protools.backend.service.context.ContextConstants.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ContextServiceImpl implements ContextService {
 
-    private static final ObjectReader defaultReader = new ObjectMapper().reader(); // maybe with configs
+    private static final ObjectReader defaultReader = new ObjectMapper().registerModule(new JavaTimeModule()).reader(); // maybe with configs
     //Key : processInstanceID
     //Value: Pair <raw json of Context as String; Dto representing this json Context>
     private static final Map<String, ContextPair> contextCache = new ConcurrentHashMap<>();
@@ -63,44 +62,6 @@ public class ContextServiceImpl implements ContextService {
     private static final JsonSchema contextJsonSchema = JsonSchemaFactory
             .getInstance(SpecVersion.VersionFlag.V202012)
             .getSchema(ContextServiceImpl.class.getResourceAsStream(SCHEMA_VALIDATION_FILE));
-
-    //TODO : soit les json schema permettent de valider les dates, soit il faudra valider toutes les dates comme ça
-    public static Pair<Instant, Instant> getCollectionStartAndEndFromPartition(JsonNode partitionNode) {
-        String start = partitionNode.get(CTX_PARTITION_DATE_DEBUT_COLLECTE).asText();
-        String end = partitionNode.get(CTX_PARTITION_DATE_FIN_COLLECTE).asText();
-
-        if (start == null || end == null) {
-            throw new BadContextIncorrectBPMNError(String.format("%s and %s must be defined on every partition", CTX_PARTITION_DATE_DEBUT_COLLECTE, CTX_PARTITION_DATE_FIN_COLLECTE));
-        }
-
-        try {
-            Instant collectionStart = Instant.parse(start);
-            Instant collectionEnd = Instant.parse(end);
-            log.info("partition_id={} - CollectionStartDate={} - CollectionEndDate={}", partitionNode.path(CTX_PARTITION_ID), TimeLogUtils.format(collectionStart), TimeLogUtils.format(collectionEnd));
-            return Pair.of(collectionStart,
-                    collectionEnd);
-
-        } catch (DateTimeParseException e) {
-            throw new BadContextIncorrectBPMNError(String.format("%s or %s cannot be read as Instant : %s", CTX_PARTITION_DATE_DEBUT_COLLECTE, CTX_PARTITION_DATE_FIN_COLLECTE, e.getMessage()));
-        }
-    }
-
-    public static Instant getInstantFromPartition(JsonNode partitionNode, String subnode) throws BadContextDateTimeParseBPMNError {
-        JsonNode instantNode = partitionNode.get(subnode);
-        if (instantNode == null) {
-            throw new BadContextDateTimeParseBPMNError(String.format("node %s of partition %s does not exists", subnode, partitionNode.path(CTX_PARTITION_ID).asText()));
-        }
-        String valueTxt = partitionNode.path(subnode).asText();
-        if (valueTxt.isBlank()) {
-            throw new BadContextDateTimeParseBPMNError(String.format("node %s of partition %s is blank", subnode, partitionNode.path(CTX_PARTITION_ID).asText()));
-        }
-
-        try {
-            return Instant.parse(valueTxt);
-        } catch (DateTimeParseException e) {
-            throw new BadContextDateTimeParseBPMNError(String.format("node %s of partition %s having value [%s] cannot be parsed : %s", subnode, partitionNode.path(CTX_PARTITION_ID).asText(), valueTxt, e.getMessage()));
-        }
-    }
 
     @Override
     public void processContextFileAndCompleteTask(MultipartFile file, String taskId) {
@@ -195,7 +156,7 @@ public class ContextServiceImpl implements ContextService {
         return result;
     }
 
-    private ContexteProcessus jsonReadAndSchemaValidation(JsonNode rootContext) {
+    protected ContexteProcessus jsonReadAndSchemaValidation(JsonNode rootContext) {
         //Validate that the Json is valid regarding the json-schema
         Set<ValidationMessage> jsonValidationErrors = contextJsonSchema.validate(rootContext);
         if (!jsonValidationErrors.isEmpty()) {
@@ -213,7 +174,7 @@ public class ContextServiceImpl implements ContextService {
         }
     }
 
-    private ContextPair processContextFile(MultipartFile file, String processDefinitionKey) {
+    protected ContextPair processContextFile(MultipartFile file, String processDefinitionKey) {
         //Validate file name (JSON)
         var fileExtension = getFileExtension(file.getOriginalFilename());
         if (fileExtension.isEmpty()) {
@@ -309,6 +270,6 @@ public class ContextServiceImpl implements ContextService {
         return Set.of();
     }
 
-    private record ContextPair(String contextAsString, ContexteProcessus contextSchema) {
+    protected record ContextPair(String contextAsString, ContexteProcessus contextSchema) {
     }
 }

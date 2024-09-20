@@ -75,7 +75,7 @@ class SabianeQuestionnaireCreateContextTaskTest extends TestWithContext {
 
     /*@Test
     void initQuestionnaireModels_should_produce_correct_json(){
-        sabianeQuestTask.²
+        sabianeQuestTask.
     }*/
 
     @Test

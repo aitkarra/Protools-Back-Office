@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = PasswordServiceImpl.class)
 @TestPropertySource(properties = {
@@ -19,9 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "fr.insee.protools.password.create.withLowerCase = true",
         "fr.insee.protools.password.create.withSpecial = true",
 })
-class PasswordServiceTest {
+class PasswordServiceImplTest {
 
-    @Autowired private PasswordService passwordService;
+    @Autowired
+    private PasswordService passwordService;
 
     @Test
     void testGeneratePassword() {

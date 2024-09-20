@@ -140,6 +140,11 @@
             <version>1.5.1</version>
         </dependency>
 
+        <!-- to create Instant from json -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
 
 
     </dependencies>

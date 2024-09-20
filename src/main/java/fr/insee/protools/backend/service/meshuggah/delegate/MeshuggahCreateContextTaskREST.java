@@ -11,8 +11,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
-import static fr.insee.protools.backend.service.context.ContextConstants.CTX_CAMPAGNE_ID;
-
 @Slf4j
 @RequiredArgsConstructor
 @Component
