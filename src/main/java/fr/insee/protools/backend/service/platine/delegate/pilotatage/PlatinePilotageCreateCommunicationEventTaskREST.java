@@ -25,39 +25,36 @@ public class PlatinePilotageCreateCommunicationEventTaskREST implements JavaDele
 
     @Override
     public void execute(DelegateExecution execution) {
-        String currentCommunicationId= FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_COMMUNICATION_ID, String.class);
+        String currentCommunicationId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_COMMUNICATION_ID, String.class);
         String currentPartitionId = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_CURRENT_PARTITION_ID, String.class);
 
         log.info("ProcessInstanceId={}  currentPartitionId={} - currentCommunicationId{} - begin",
-                execution.getProcessInstanceId(),currentPartitionId, currentCommunicationId);
-        Map<String,String> communicationRequestIdByInterroIdMap = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_COMMUNICATION_REQUEST_ID_FOR_INTERRO_ID_MAP, Map.class);
+                execution.getProcessInstanceId(), currentPartitionId, currentCommunicationId);
+        Map<String, String> communicationRequestIdByInterroIdMap = FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_COMMUNICATION_REQUEST_ID_FOR_INTERRO_ID_MAP, Map.class);
 
-        if(currentCommunicationId.isBlank()){
+        if (currentCommunicationId.isBlank()) {
             log.error("ProcessInstanceId={}  currentPartitionId={} - currentCommunicationId{} : currentCommunicationId cannot be blank",
-                    execution.getProcessInstanceId(),currentPartitionId, currentCommunicationId);
+                    execution.getProcessInstanceId(), currentPartitionId, currentCommunicationId);
             throw new ProtoolsProcessFlowBPMNError("PlatinePilotageCreateCommunicationEventTaskREST: communicationId cannot be empty");
         }
 
         //If nothing to do ==> Directly return
-        if(communicationRequestIdByInterroIdMap.isEmpty()){
+        if (communicationRequestIdByInterroIdMap.isEmpty()) {
             log.info("ProcessInstanceId={}  currentPartitionId={} - currentCommunicationId{} - end : Nothing to do",
-                    execution.getProcessInstanceId(),currentPartitionId, currentCommunicationId);
+                    execution.getProcessInstanceId(), currentPartitionId, currentCommunicationId);
             return;
         }
 
         List<PlatinePilotageCommunicationEventDto> platinePilotageCommunicationEventList = communicationRequestIdByInterroIdMap.entrySet()
                 .stream()
                 .map(entry ->
-                        PlatinePilotageCommunicationEventDto.builder()
-                                .communcationId(currentCommunicationId)
-                                .communicationRequestId(entry.getValue())
-                                .interrogationId(entry.getKey()).state(COMMUNICATION_STATE_SENT).build())
+                        new PlatinePilotageCommunicationEventDto(entry.getKey(), currentCommunicationId, entry.getValue(), COMMUNICATION_STATE_SENT))
                 .toList();
 
         //Check ctx?
         platinePilotageService.postCommunicationEvents(platinePilotageCommunicationEventList);
 
-        log.info("ProcessInstanceId={}  end",execution.getProcessInstanceId());
+        log.info("ProcessInstanceId={}  end", execution.getProcessInstanceId());
 
     }
 }

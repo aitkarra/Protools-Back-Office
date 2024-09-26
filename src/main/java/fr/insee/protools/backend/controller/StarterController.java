@@ -3,7 +3,6 @@ package fr.insee.protools.backend.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.restclient.RestClientHelper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

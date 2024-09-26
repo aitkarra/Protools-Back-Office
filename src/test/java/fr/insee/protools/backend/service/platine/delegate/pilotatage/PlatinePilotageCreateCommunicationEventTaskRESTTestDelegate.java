@@ -103,15 +103,15 @@ public class PlatinePilotageCreateCommunicationEventTaskRESTTestDelegate impleme
         //check that we passed the correct items
         Set<String> requiredInterroIds = new HashSet<>(commIdByInterro.keySet());
         for (var comEventDto : actualArgument) {
-            String idInterro = comEventDto.getInterrogationId();
+            String idInterro = comEventDto.interrogationId();
             if (requiredInterroIds.contains(idInterro)) {
                 //ComRequestId is correct
                 String expectedCommId = commIdByInterro.get(idInterro);
-                String actualCommId = comEventDto.getCommunicationRequestId();
-                assertEquals(expectedCommId, actualCommId,
+                String actualCommReqId = comEventDto.communicationRequestId();
+                assertEquals(expectedCommId, actualCommReqId,
                         "Communcation Request ID is not the one expected for idInterro=" + idInterro + " - ");
 
-                assertEquals(communcationId,comEventDto.getCommuncationId());
+                assertEquals(communcationId,comEventDto.communicationId());
                 //CommId is
                 requiredInterroIds.remove(idInterro); //this id has correctly been sent
             }

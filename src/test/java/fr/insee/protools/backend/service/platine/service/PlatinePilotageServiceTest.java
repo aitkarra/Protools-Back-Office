@@ -83,10 +83,7 @@ class PlatinePilotageServiceTest extends TestServiceWithRestClient {
         //Prepare
         List<PlatinePilotageCommunicationEventDto> eventList = IntStream.range(0, 10)
                 .mapToObj(i ->
-                        PlatinePilotageCommunicationEventDto.builder()
-                                .interrogationId(UUID.randomUUID().toString())
-                                .state(PlatinePilotageCommunicationEventType.COMMUNICATION_STATE_SENT)
-                                .communcationId(UUID.randomUUID().toString()).build()
+                        new PlatinePilotageCommunicationEventDto(UUID.randomUUID().toString(),UUID.randomUUID().toString(),"comRequestId-xxx",PlatinePilotageCommunicationEventType.COMMUNICATION_STATE_SENT)
                 ) // Call your function and get the JsonNode
                 .collect(Collectors.toList());
 
