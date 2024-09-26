@@ -2,8 +2,8 @@ package fr.insee.protools.backend.service.platine.delegate.questionnaire;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
-import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.platine.service.PlatineQuestionnaireService;
+import fr.insee.protools.backend.service.context.IContextService;
+import fr.insee.protools.backend.service.platine.service.IPlatineQuestionnaireService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VA
 @Slf4j
 public class PlatineQuestionnaireCreateInterrogationListTaskREST implements JavaDelegate {
 
-    private final PlatineQuestionnaireService platineQuestionnaireService;
-    private final ContextService protoolsContext;
+    private final IPlatineQuestionnaireService platineQuestionnaireService;
+    private final IContextService protoolsContext;
 
     @Override
     public void execute(DelegateExecution execution) {

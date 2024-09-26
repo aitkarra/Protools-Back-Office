@@ -2,7 +2,7 @@ package fr.insee.protools.backend.service.traiterxxxx.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.protools.backend.service.traiterxxxx.TraiterXXXService;
+import fr.insee.protools.backend.service.traiterxxxx.TraiterXXXServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.IDelegateWithVariables;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -28,7 +28,7 @@ class TraiterXXXGetRemiseEnCollecteTaskRESTTest implements IDelegateWithVariable
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
-    TraiterXXXService service;
+    TraiterXXXServiceImpl service;
 
     @InjectMocks
     TraiterXXXGetRemiseEnCollecteTaskREST task;

@@ -1,7 +1,7 @@
 package fr.insee.protools.backend.service.rem.delegate;
 
 import fr.insee.protools.backend.restclient.pagination.PageResponse;
-import fr.insee.protools.backend.service.rem.RemService;
+import fr.insee.protools.backend.service.rem.RemServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.IDelegateWithVariableGetPaginated;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.lenient;
 class RemGetPartitionListOfInterroPaginatedTaskTest implements IDelegateWithVariableGetPaginated {
 
     @Mock
-    RemService remService;
+    RemServiceImpl remService;
     @InjectMocks
     RemGetPartitionListOfInterroPaginatedTask task;
 

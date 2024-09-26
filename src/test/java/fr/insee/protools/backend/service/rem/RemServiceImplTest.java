@@ -20,7 +20,6 @@ import org.springframework.web.util.UriBuilder;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -34,10 +33,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class RemServiceTest extends TestServiceWithRestClient {
+class RemServiceImplTest extends TestServiceWithRestClient {
     static ObjectMapper objectMapper = new ObjectMapper();
     @InjectMocks
-    RemService service;
+    RemServiceImpl service;
 
     @Value("${fr.insee.protools.api.rem.interrogation.page.size:5000}")
     private int pageSizeGetInterro;

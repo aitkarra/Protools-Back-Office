@@ -2,8 +2,8 @@ package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
-import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
+import fr.insee.protools.backend.service.context.IContextService;
+import fr.insee.protools.backend.service.platine.service.IPlatinePilotageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlatinePilotageCreateContextTaskREST implements JavaDelegate {
 
-    private final ContextService protoolsContext;
-    private final PlatinePilotageService platinePilotageService;
+    private final IContextService protoolsContext;
+    private final IPlatinePilotageService platinePilotageService;
 
     @Override
     public void execute(DelegateExecution execution) {

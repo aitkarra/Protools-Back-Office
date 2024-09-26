@@ -19,12 +19,11 @@ import java.util.Optional;
 
 import static fr.insee.protools.backend.logging.LoggingHelper.logJson;
 import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
-import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_REM;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PlatinePilotageService {
+public class PlatinePilotageServiceImpl implements IPlatinePilotageService{
 
     private final RestClientHelper restClientHelper;
     private static final ApiConfigProperties.KNOWN_API API= KNOWN_API_PLATINE_PILOTAGE;
@@ -32,6 +31,7 @@ public class PlatinePilotageService {
     @Value("${fr.insee.protools.api.platine-pilotage.interrogation.page.size:5000}")
     private int pageSizeGetInterro;
 
+    @Override
     public void postCommunicationEvents(List<PlatinePilotageCommunicationEventDto> platinePilotageCommunicationEventList) {
         log.trace("postCommunicationEvents: ");
         logJson("postCommunicationEvents ",platinePilotageCommunicationEventList,log, Level.TRACE);
@@ -45,6 +45,7 @@ public class PlatinePilotageService {
         log.trace("postCommunicationEvents: response={} ",response);
     }
 
+    @Override
     public void postContext(String campaignId, JsonNode contextRootNode) {
         log.trace("postContext: campaignId={}",campaignId);
         var response = restClientHelper.getRestClient(KNOWN_API_PLATINE_PILOTAGE)
@@ -56,6 +57,7 @@ public class PlatinePilotageService {
         log.trace("postContext: campaignId={} - response={} ",campaignId,response);
     }
 
+    @Override
     public void postInterrogations(String campaignId, List<JsonNode> interrogations) {
         log.trace("postInterrogations: campaignId={}",campaignId);
         logJson("postInterrogations ",interrogations,log,Level.TRACE);
@@ -68,7 +70,7 @@ public class PlatinePilotageService {
         log.trace("postInterrogations: campaignId={} - response={} ",campaignId,response);
     }
 
-
+    @Override
     public PageResponse<JsonNode> getInterrogationToFollowUpPaginated(String partitionId, long page, Optional<Boolean> isToFollowUp) {
         log.debug("partitionId={} - page={} - pageSizeGetInterro={} - isToFollowUp={}",partitionId,page,pageSizeGetInterro,isToFollowUp);
         ParameterizedTypeReference<PageResponse<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };

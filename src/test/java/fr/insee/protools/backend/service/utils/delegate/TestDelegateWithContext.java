@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.protools.backend.ProtoolsTestUtils;
 import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.context.ContextService;
+import fr.insee.protools.backend.service.context.IContextService;
 import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 @Slf4j
 public abstract class TestDelegateWithContext implements IDelegateWithVariables{
 
-    @Spy protected ContextService protoolsContext;
+    @Spy protected IContextService protoolsContext;
 
     private ObjectMapper objectMapper=new ObjectMapper();
 

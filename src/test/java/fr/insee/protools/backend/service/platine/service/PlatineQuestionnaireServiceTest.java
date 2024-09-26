@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_QUESTIONNAIRE;
-import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_REM;
 import static fr.insee.protools.backend.utils.data.InterroExamples.generateEmptyInterro;
 import static org.mockito.Mockito.verify;
 
@@ -21,7 +20,7 @@ import static org.mockito.Mockito.verify;
 class PlatineQuestionnaireServiceTest extends TestServiceWithRestClient {
 
     @InjectMocks
-    PlatineQuestionnaireService service;
+    PlatineQuestionnaireServiceImpl service;
 
     @Test
     void postContext_should_call_correctURIAndBody(){

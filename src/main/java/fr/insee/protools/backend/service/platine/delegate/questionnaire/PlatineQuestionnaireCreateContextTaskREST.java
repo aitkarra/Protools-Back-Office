@@ -2,8 +2,8 @@ package fr.insee.protools.backend.service.platine.delegate.questionnaire;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
-import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.platine.service.PlatineQuestionnaireService;
+import fr.insee.protools.backend.service.context.IContextService;
+import fr.insee.protools.backend.service.platine.service.IPlatineQuestionnaireService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlatineQuestionnaireCreateContextTaskREST implements JavaDelegate {
 
-    private final ContextService protoolsContext;
-    private final PlatineQuestionnaireService platineQuestionnaireService;
+    private final IContextService protoolsContext;
+    private final IPlatineQuestionnaireService platineQuestionnaireService;
 
     @Override
     public void execute(DelegateExecution execution) {

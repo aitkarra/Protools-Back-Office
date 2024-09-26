@@ -15,11 +15,12 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TraiterXXXService {
+public class TraiterXXXServiceImpl implements ITraiterXXXService{
 
     private final RestClientHelper restClientHelper;
     private static final ApiConfigProperties.KNOWN_API API = KNOWN_API_TRAITERXXX;
 
+    @Override
     public List<JsonNode> getRemiseEnCollecteForPartition(String partitionId) {
         log.debug("getRemiseEnCollecteForPartition - partitionId={} ",partitionId);
         ParameterizedTypeReference<List<JsonNode>> typeReference = new ParameterizedTypeReference<>() { };
@@ -36,6 +37,7 @@ public class TraiterXXXService {
         return response;
     }
 
+    @Override
     public void postContext(String campaignId,JsonNode contextRootNode) {
         log.trace("postContext: campaignId={}",campaignId);
         var response = restClientHelper.getRestClient(API)

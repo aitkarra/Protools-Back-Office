@@ -11,17 +11,17 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static fr.insee.protools.backend.logging.LoggingHelper.logJson;
-import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_PILOTAGE;
 import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_PLATINE_QUESTIONNAIRE;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PlatineQuestionnaireService {
+public class PlatineQuestionnaireServiceImpl implements IPlatineQuestionnaireService{
 
     private final RestClientHelper restClientHelper;
     private static final ApiConfigProperties.KNOWN_API API= KNOWN_API_PLATINE_QUESTIONNAIRE;
 
+    @Override
     public void postContext(String campaignId, JsonNode contextRootNode) {
         log.trace("postContext: campaignId={}",campaignId);
         var response = restClientHelper.getRestClient(API)
@@ -33,6 +33,7 @@ public class PlatineQuestionnaireService {
         log.trace("postContext: campaignId={} - response={} ",campaignId,response);
     }
 
+    @Override
     public void postInterrogations(String campaignId, List<JsonNode> interrogations) {
         log.trace("postInterrogations: campaignId={}",campaignId);
         logJson("putQuestionings ",interrogations,log,Level.TRACE);

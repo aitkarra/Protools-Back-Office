@@ -2,8 +2,8 @@ package fr.insee.protools.backend.service.meshuggah.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.ContexteProcessus;
-import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.meshuggah.MeshuggahService;
+import fr.insee.protools.backend.service.context.IContextService;
+import fr.insee.protools.backend.service.meshuggah.IMeshuggahService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VA
 @Slf4j
 public class MeshuggahSendCommunicationForInterrogationListTaskREST implements JavaDelegate {
 
-    private final MeshuggahService meshuggahService;
-    private final ContextService protoolsContext;
+    private final IMeshuggahService meshuggahService;
+    private final IContextService protoolsContext;
 
     @Override
     public void execute(DelegateExecution execution) {

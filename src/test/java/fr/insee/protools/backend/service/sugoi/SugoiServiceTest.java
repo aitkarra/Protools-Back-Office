@@ -22,7 +22,7 @@ import org.springframework.web.util.UriBuilder;
 import java.util.List;
 
 import static fr.insee.protools.backend.restclient.configuration.ApiConfigProperties.KNOWN_API.KNOWN_API_SUGOI;
-import static fr.insee.protools.backend.service.sugoi.SugoiService.STORAGE;
+import static fr.insee.protools.backend.service.sugoi.SugoiServiceImpl.STORAGE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +38,7 @@ class SugoiServiceTest extends TestServiceWithRestClient {
 
 
     @InjectMocks
-    SugoiService service;
+    SugoiServiceImpl service;
 
     @Value("${fr.insee.protools.api.sugoi.dmz-account-creation-realm:questionnaire-particuliers}")
     private String realm;

@@ -2,7 +2,7 @@ package fr.insee.protools.backend.service.context.resolvers;
 
 import fr.insee.protools.backend.dto.Communication;
 import fr.insee.protools.backend.dto.Lot;
-import fr.insee.protools.backend.service.context.ContextService;
+import fr.insee.protools.backend.service.context.IContextService;
 import fr.insee.protools.backend.service.exception.IncoherentBPMNContextError;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import fr.insee.protools.backend.service.utils.log.TimeLogUtils;
@@ -40,7 +40,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 @Slf4j
 public class PartitionCtxResolver {
 
-    private final ContextService protoolsContext;
+    private final IContextService protoolsContext;
 
     //TODO: à faire valider par le métier
     private final TemporalAmount maxSendCommunicationWindowHours = Duration.ofHours(24);;

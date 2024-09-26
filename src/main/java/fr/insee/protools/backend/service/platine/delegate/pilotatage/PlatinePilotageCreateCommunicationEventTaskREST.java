@@ -1,9 +1,8 @@
 package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageCommunicationEventDto;
 import fr.insee.protools.backend.exception.ProtoolsProcessFlowBPMNError;
-import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
+import fr.insee.protools.backend.service.platine.service.IPlatinePilotageService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 @Component
 public class PlatinePilotageCreateCommunicationEventTaskREST implements JavaDelegate {
 
-    private final PlatinePilotageService platinePilotageService;
+    private final IPlatinePilotageService platinePilotageService;
 
     @Override
     public void execute(DelegateExecution execution) {

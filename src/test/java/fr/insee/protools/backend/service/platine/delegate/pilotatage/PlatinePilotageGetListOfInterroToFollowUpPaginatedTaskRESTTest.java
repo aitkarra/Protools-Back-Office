@@ -1,17 +1,14 @@
 package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
 import fr.insee.protools.backend.restclient.pagination.PageResponse;
-import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
+import fr.insee.protools.backend.service.platine.service.PlatinePilotageServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.IDelegateWithVariableGetPaginated;
-import fr.insee.protools.backend.service.utils.delegate.PaginationHelper;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Map;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
@@ -24,7 +21,7 @@ class PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskRESTTest
 
 
     @Mock
-    PlatinePilotageService platinePilotageService;
+    PlatinePilotageServiceImpl platinePilotageService;
     @InjectMocks
     PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskREST task;
 

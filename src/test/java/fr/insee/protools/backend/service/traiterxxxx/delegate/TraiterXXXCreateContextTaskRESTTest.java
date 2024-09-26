@@ -1,7 +1,7 @@
 package fr.insee.protools.backend.service.traiterxxxx.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.service.traiterxxxx.TraiterXXXService;
+import fr.insee.protools.backend.service.traiterxxxx.TraiterXXXServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.TestDelegateWithContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 public class TraiterXXXCreateContextTaskRESTTest extends TestDelegateWithContext {
 
     @Mock
-    TraiterXXXService traiterService;
+    TraiterXXXServiceImpl traiterService;
 
     @InjectMocks
     TraiterXXXCreateContextTaskREST traiterCreateContextTask;

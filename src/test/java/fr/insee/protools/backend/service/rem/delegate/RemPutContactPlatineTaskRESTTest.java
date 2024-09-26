@@ -6,9 +6,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insee.protools.backend.exception.ProtoolsProcessFlowBPMNError;
-import fr.insee.protools.backend.service.platine.delegate.pilotatage.PlatinePilotageCreateCommunicationEventTaskREST;
-import fr.insee.protools.backend.service.rem.RemService;
+import fr.insee.protools.backend.service.rem.RemServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.IDelegateWithVariables;
 import org.assertj.core.api.Assertions;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -41,7 +39,7 @@ class RemPutContactPlatineTaskRESTTest implements IDelegateWithVariables {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
     @Mock
-    RemService remService;
+    RemServiceImpl remService;
     @InjectMocks
     RemPutContactPlatineTaskREST task;
 

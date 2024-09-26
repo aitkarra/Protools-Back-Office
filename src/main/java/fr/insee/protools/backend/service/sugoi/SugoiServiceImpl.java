@@ -19,7 +19,7 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SugoiService {
+public class SugoiServiceImpl implements ISugoiService{
 
     private static final ApiConfigProperties.KNOWN_API API = KNOWN_API_SUGOI;
 
@@ -29,6 +29,7 @@ public class SugoiService {
     @Value("${fr.insee.protools.api.sugoi.dmz-account-creation-realm:questionnaire-particuliers}")
     private String realm;
 
+    @Override
     public User postCreateUser(User userBody) {
         if(userBody==null){
             String msg="called  SUGOI postCreateUser with empty userBody";
@@ -60,6 +61,7 @@ public class SugoiService {
         }
     }
 
+    @Override
     public void postInitPassword(String userId, String password) {
         log.debug("postInitPassword - userId={} begin", userId);
         ObjectNode body = objectMapper.createObjectNode();

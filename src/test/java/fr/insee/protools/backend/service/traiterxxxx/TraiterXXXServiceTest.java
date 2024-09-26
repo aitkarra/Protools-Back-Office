@@ -24,7 +24,7 @@ class TraiterXXXServiceTest extends TestServiceWithRestClient {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
-    TraiterXXXService service;
+    TraiterXXXServiceImpl service;
 
     @Test
     void postContext_should_call_correctURIAndBody() {

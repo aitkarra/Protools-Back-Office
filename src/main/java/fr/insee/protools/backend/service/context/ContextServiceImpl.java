@@ -47,7 +47,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VA
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ContextServiceImpl implements ContextService {
+public class ContextServiceImpl implements IContextService {
 
     private static final ObjectReader defaultReader = new ObjectMapper().registerModule(new JavaTimeModule()).reader(); // maybe with configs
     //Key : processInstanceID

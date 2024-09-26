@@ -2,7 +2,7 @@ package fr.insee.protools.backend.service.rem.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.rem.RemService;
+import fr.insee.protools.backend.service.rem.IRemService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VA
 @RequiredArgsConstructor
 public class RemPostResmiseEnCollecteTaskREST implements JavaDelegate, DelegateContextVerifier {
 
-    RemService remService;
+    IRemService remService;
 
     @Override
     public void execute(DelegateExecution execution) {

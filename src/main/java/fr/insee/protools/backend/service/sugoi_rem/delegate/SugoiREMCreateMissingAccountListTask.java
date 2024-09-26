@@ -4,9 +4,9 @@ import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.dto.sugoi.Habilitation;
 import fr.insee.protools.backend.dto.sugoi.User;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.rem.RemService;
-import fr.insee.protools.backend.service.sugoi.SugoiService;
+import fr.insee.protools.backend.service.context.IContextService;
+import fr.insee.protools.backend.service.rem.RemServiceImpl;
+import fr.insee.protools.backend.service.sugoi.ISugoiService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import fr.insee.protools.backend.service.utils.password.PasswordService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CURRENT_PARTITION_ID;
 import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_DIRECTORYACCESS_PWD_FOR_INTERRO_ID_MAP;
@@ -31,11 +30,11 @@ public class SugoiREMCreateMissingAccountListTask implements JavaDelegate, Deleg
     protected static final Habilitation PLATINE_HABILITATION = new Habilitation("platine", "repondant", null);
     protected static final User createSugoiUserBody = User.builder().habilitations(List.of(PLATINE_HABILITATION)).build();
 
-    private final SugoiService sugoiService;
-    private final RemService remService;
+    private final ISugoiService sugoiService;
+    private final RemServiceImpl remService;
 
     private final PasswordService passwordService;
-    private final ContextService protoolsContext;
+    private final IContextService protoolsContext;
 
     public static final int HOUSEHOLD_PASSWORD_SIZE=8;
     public static final int DEFAULT_PASSWORD_SIZE=12;

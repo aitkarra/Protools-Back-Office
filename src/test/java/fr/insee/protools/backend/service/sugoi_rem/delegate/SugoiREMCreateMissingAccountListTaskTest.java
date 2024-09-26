@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.dto.sugoi.Habilitation;
 import fr.insee.protools.backend.dto.sugoi.User;
-import fr.insee.protools.backend.service.rem.RemService;
-import fr.insee.protools.backend.service.sugoi.SugoiService;
+import fr.insee.protools.backend.service.rem.RemServiceImpl;
+import fr.insee.protools.backend.service.sugoi.SugoiServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.TestDelegateWithContext;
 import fr.insee.protools.backend.service.utils.password.PasswordService;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -39,10 +39,10 @@ import static org.mockito.Mockito.*;
 class SugoiREMCreateMissingAccountListTaskTest extends TestDelegateWithContext {
 
     @Mock
-    RemService remService;
+    RemServiceImpl remService;
 
     @Mock
-    SugoiService sugoiService;
+    SugoiServiceImpl sugoiService;
 
     @Mock
     PasswordService passwordService;

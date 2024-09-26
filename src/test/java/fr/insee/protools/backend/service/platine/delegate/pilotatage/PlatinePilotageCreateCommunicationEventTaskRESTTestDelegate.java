@@ -7,7 +7,7 @@ import ch.qos.logback.classic.Logger;
 
 import fr.insee.protools.backend.dto.platine.pilotage.PlatinePilotageCommunicationEventDto;
 import fr.insee.protools.backend.exception.ProtoolsProcessFlowBPMNError;
-import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
+import fr.insee.protools.backend.service.platine.service.PlatinePilotageServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.IDelegateWithVariables;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
 public class PlatinePilotageCreateCommunicationEventTaskRESTTestDelegate implements IDelegateWithVariables {
 
     @Mock
-    PlatinePilotageService platinePilotageService;
+    PlatinePilotageServiceImpl platinePilotageService;
 
     @InjectMocks
     PlatinePilotageCreateCommunicationEventTaskREST task;

@@ -14,10 +14,11 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MeshuggahService {
+public class MeshuggahServiceImpl implements IMeshuggahService{
 
     private final RestClientHelper restClientHelper;
 
+    @Override
     public void postContext(String campaignId, JsonNode contextRootNode) {
         log.trace("postContext: campaignId={}",campaignId);
         var response = restClientHelper.getRestClient(KNOWN_API_MESHUGGAH)
@@ -29,6 +30,7 @@ public class MeshuggahService {
         log.trace("postContext: campaignId={} - response={} ",campaignId,response);
     }
 
+    @Override
     public void postCommunicationRequest(String campaignId, String communicationId, List<JsonNode> list) {
         log.trace("postCommunicationRequest: campaignId={} - communicationId={}",campaignId,communicationId);
         var response = restClientHelper.getRestClient(KNOWN_API_MESHUGGAH)

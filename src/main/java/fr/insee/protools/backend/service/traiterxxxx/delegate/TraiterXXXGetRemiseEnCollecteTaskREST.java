@@ -2,7 +2,7 @@ package fr.insee.protools.backend.service.traiterxxxx.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.traiterxxxx.TraiterXXXService;
+import fr.insee.protools.backend.service.traiterxxxx.ITraiterXXXService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VA
 @RequiredArgsConstructor
 @Component
 public class TraiterXXXGetRemiseEnCollecteTaskREST  implements JavaDelegate, DelegateContextVerifier {
-    private final TraiterXXXService service;
+    private final ITraiterXXXService service;
 
     @Override
     public void execute(DelegateExecution execution) {

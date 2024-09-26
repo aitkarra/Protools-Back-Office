@@ -1,7 +1,7 @@
 package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
+import fr.insee.protools.backend.service.platine.service.PlatinePilotageServiceImpl;
 import fr.insee.protools.backend.service.utils.delegate.TestDelegateWithContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 class PlatinePilotageCreateInterrogationListTaskRESTTestDelegate extends TestDelegateWithContext {
 
     @Mock
-    PlatinePilotageService platinePilotageService;
+    PlatinePilotageServiceImpl platinePilotageService;
 
     @InjectMocks
     PlatinePilotageCreateInterrogationListTaskREST task;

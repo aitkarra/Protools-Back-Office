@@ -5,7 +5,7 @@ import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface ContextService {
+public interface IContextService {
     /**
      * Process the uploaded file and store it's content in VARIABLE_NAME_SERIALIZED_CONTEXT_FILE engine variable.
      * If ok pass the task referenced by *taskId* to completed

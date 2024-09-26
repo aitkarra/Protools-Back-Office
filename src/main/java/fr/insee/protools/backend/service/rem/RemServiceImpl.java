@@ -23,7 +23,7 @@ import static fr.insee.protools.backend.restclient.configuration.ApiConfigProper
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RemService {
+public class RemServiceImpl implements IRemService{
 
     private static final ApiConfigProperties.KNOWN_API API = KNOWN_API_REM;
     private final RestClientHelper restClientHelper;

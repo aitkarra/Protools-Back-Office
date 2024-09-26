@@ -38,7 +38,7 @@ class PlatinePilotageServiceTest extends TestServiceWithRestClient {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
-    PlatinePilotageService service;
+    PlatinePilotageServiceImpl service;
     @Value("${fr.insee.protools.api.platine-pilotage.interrogation.page.size:5000}")
     private int pageSizeGetInterro;
 

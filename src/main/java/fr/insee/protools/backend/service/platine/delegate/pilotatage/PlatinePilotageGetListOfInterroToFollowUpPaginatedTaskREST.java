@@ -3,7 +3,7 @@ package fr.insee.protools.backend.service.platine.delegate.pilotatage;
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.insee.protools.backend.restclient.pagination.PageResponse;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.platine.service.PlatinePilotageService;
+import fr.insee.protools.backend.service.platine.service.IPlatinePilotageService;
 import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import fr.insee.protools.backend.service.utils.delegate.PaginationHelper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
 @RequiredArgsConstructor
 public class PlatinePilotageGetListOfInterroToFollowUpPaginatedTaskREST implements JavaDelegate, DelegateContextVerifier, PaginationHelper {
 
-    private final PlatinePilotageService pilotageService;
+    private final IPlatinePilotageService pilotageService;
 
     protected PageResponse readFunction(Integer pageToRead, Object... objects) {
         String partitionId = (String) objects[0];
