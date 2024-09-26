@@ -1,6 +1,5 @@
 package fr.insee.protools.backend;
 
-import fr.insee.protools.backend.configuration.PropertiesLogger;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springdoc.core.utils.SpringDocUtils;
@@ -15,8 +14,7 @@ import org.springframework.context.event.EventListener;
                 configureApplicationBuilder(new SpringApplicationBuilder()).build().run(args);        }
 
         public static SpringApplicationBuilder configureApplicationBuilder(SpringApplicationBuilder springApplicationBuilder){
-                return springApplicationBuilder.sources(StarterApplication.class)
-                    .listeners(new PropertiesLogger());
+                return springApplicationBuilder.sources(StarterApplication.class);
         }
 
         @EventListener(ApplicationReadyEvent.class)

@@ -11,12 +11,11 @@ grant_type=client_credentials&client_id={{client_id}}&client_secret={{client_sec
   client.global.set("auth_token", response.body.access_token);
   client.log("TOKEN = "+client.global.get("auth_token"));
   client.log("RESPONSE = "+client.global);
-  client.global.set("CAMPAGNE_ID", "AAC2023A00");
-  client.global.set("PARTITION_ID1", "55");
-    client.global.set("PARTITION_ID2", "55");
-  client.global.set("SU_ID1", "55P450104");
-    client.global.set("SU_ID2", "55P450105");
-
+  client.global.set("CAMPAGNE_ID", "AAN2022X02");
+  client.global.set("PARTITION_ID1", "59901");
+    client.global.set("PARTITION_ID2", "59902");
+  client.global.set("SU_ID", "MBG0003");
+  client.global.set("SOURCE_ID", "MBG");
 %}
 
 ### suppression campagne dans questionnaire
@@ -30,12 +29,10 @@ accept: */*
 Authorization: Bearer {{auth_token}}
 
 
-### Suppression SU1 dans pilotage
-DELETE https://api.collecte-enqueteurs.enquetes.recette2.insee.fr/api/survey-unit/{{SU_ID1}}
+### Suppression SU dans questionnaire
+DELETE https://api.collecte-enqueteurs.enquetes.recette2.insee.fr/api/survey-units/{{SU_ID}}
 accept: */*
 Authorization: Bearer {{auth_token}}
 
-### Suppression SU2 dans pilotage
-DELETE https://api.collecte-enqueteurs.enquetes.recette2.insee.fr/api/survey-unit/{{SU_ID2}}
-accept: */*
-Authorization: Bearer {{auth_token}}
+
+

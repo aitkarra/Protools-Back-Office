@@ -1,12 +1,12 @@
 package fr.insee.protools.backend.flowable.types;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class ListLong implements VariableType {
@@ -39,7 +39,7 @@ public class ListLong implements VariableType {
             try {
                 return Arrays.stream(valStr.split(","))
                         .map(Long::parseLong)
-                        .collect(Collectors.toList());
+                        .toList();
             } catch (NumberFormatException e) {
                 throw new FlowableIllegalArgumentException("The given variable value is not comma separated list of Long: '" + valStr+ "'", e);
             }

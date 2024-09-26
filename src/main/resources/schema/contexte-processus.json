@@ -1,0 +1,1094 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "Contexte de processus",
+  "description": "Le contexte d'un processus",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Identifiant de la campagne",
+      "type": "string",
+      "format": "uuid"
+    },
+    "labelCourt": {
+      "description": "Nom technique de la campagne. Ex: PRO2024X03",
+      "type": "string"
+    },
+    "label": {
+      "description": "Intitulé de la campagne",
+      "type": "string"
+    },
+    "contexte": {
+      "description": "Indique s'il s'agit d'une campagne ménage ou entreprise",
+      "type": "string",
+      "enum": [
+        "menage",
+        "entreprise"
+      ]
+    },
+    "metadonnees": {
+      "type": "object",
+      "properties": {
+        "serieId": {
+          "description": "Identifiant métier de la série.",
+          "type": "string"
+        },
+        "serieLabelCourt": {
+          "type": "string"
+        },
+        "serieLabelLong": {
+          "type": "string"
+        },
+        "periodicite": {
+          "description": "Fréquence de la collecte (code). X: pluriannuelle; A: annuelle ; S: semestrielle ; T: trimestrielle; B: bi-mensuelle; M: mensuelle",
+          "enum": [
+            "X",
+            "A",
+            "S",
+            "T",
+            "B",
+            "M"
+          ],
+          "type": "string"
+        },
+        "periode": {
+          "$ref": "#/$defs/periode"
+        },
+        "annee": {
+          "description": "Année de la campagne",
+          "$ref": "#/$defs/annee4digit"
+        },
+        "operationId": {
+          "description": "Identifiant de l'opération statistique",
+          "type": "string"
+        },
+        "operationLabelCourt": {
+          "description": "Label court de l'opération",
+          "type": "string"
+        },
+        "operationLabelLong": {
+          "description": "Label long de l'opération",
+          "type": "string"
+        },
+        "objectifsCourts": {
+          "description": "Objectifs de l'enquête (court)",
+          "type": "string"
+        },
+        "objectifsLongs": {
+          "description": "Objectifs de l'enquête (long)",
+          "type": "string"
+        },
+        "cnisUrl": {
+          "description": "URL de l'enquête sur le site du CNIS (Conseil national de l'information statistique)",
+          "type": "string"
+        },
+        "diffusionUrl": {
+          "description": "URL d'information de diffusion sur l'enquête",
+          "type": "string"
+        },
+        "noticeUrl": {
+          "description": "URL de la notice de l'enquête",
+          "type": "string"
+        },
+        "specimenUrl": {
+          "description": "URL du specimen de l'enquête",
+          "type": "string"
+        },
+        "numeroVisa": {
+          "description": "Numéro de VISA de l'enquête",
+          "type": "string"
+        },
+        "anneeVisa": {
+          "description": "Année du VISA",
+          "type": "string"
+        },
+        "caractereObligatoire": {
+          "description": "Caractère obligatoire de l'enquête",
+          "type": "boolean"
+        },
+        "interetGeneral": {
+          "description": "L'enquête est elle d'intêret général",
+          "type": "boolean"
+        },
+        "qualiteStatistique": {
+          "description": "Obtention du caractère de qualité statistique de l'enquête",
+          "type": "boolean"
+        },
+        "testNonLabellise": {
+          "description": "Enquête non labellisée",
+          "type": "boolean"
+        },
+        "parutionJo": {
+          "description": "Publication du visa Cnis au journal officiel",
+          "type": "boolean"
+        },
+        "dateParutionJo": {
+          "description": "Date de publication au journal officiel, apparaissant sur les courriers/mails envoyés aux enquêtés",
+          "type": "string",
+          "format": "date"
+        },
+        "portailMesEnquetesOperation": {
+          "description": "Présence ou non d'un portail Mes enquêtes pour la réponse à une enquête web",
+          "type": "boolean"
+        },
+        "proprietaireId": {
+          "description": "Identifiant du propriétaire de l'enquête",
+          "type": "string"
+        },
+        "proprietaireLabel": {
+          "description": "Nom du propriétaire de l'enquête",
+          "type": "string"
+        },
+        "imageLogos": {
+          "description": "Logo de l'entête des courriers envoyés aux enquêtés",
+          "type": "string"
+        },
+        "ministereTutelle": {
+          "description": "Ministère de tutelle pour cette enquête",
+          "type": "string"
+        },
+        "commanditaire": {
+          "description": "Le ou les  organisme(s) en charge de l’enquête statistique affiché(s) sur les courriers envoyés aux enquêtés.",
+          "type": "string"
+        },
+        "responsableOperationnel": {
+          "description": "Responsable opérationnel en charge du traitement pour l’exercice des droits",
+          "type": "string"
+        },
+        "mailResponsableOperationnel": {
+          "description": "Mail du responsable opérationnel du traitement pour l’exercice des droits",
+          "type": "string"
+        },
+        "responsableTraitement": {
+          "description": "Nom du responsable du traitement",
+          "type": "string"
+        },
+        "responsableTraitementIdenti": {
+          "description": "Nom court du responsable du traitement",
+          "type": "string"
+        },
+        "responsableTraitementIdentiFem": {
+          "description": "Genre féminin du responsable du traitement",
+          "type": "boolean"
+        },
+        "urlResponsableTraitement": {
+          "description": "Url du site du responsable du traitement",
+          "type": "string"
+        },
+        "prestataire": {
+          "description": "Présence d'un prestataire pour réaliser l'enquête",
+          "type": "boolean"
+        },
+        "nomPrestataire": {
+          "description": "Nom du prestataire",
+          "type": "string"
+        },
+        "urlPrestataire": {
+          "description": "URL du prestataire",
+          "type": "string"
+        },
+        "logoPartenaire": {
+          "description": "Logo du partenaire de l'Insee participant à l'enquête, affiché dans les mails envoyés aux enquêtés",
+          "type": "string"
+        },
+        "serviceCollecteurSignataireFonction": {
+          "description": "Fonction du signataire des communications",
+          "type": "string"
+        },
+        "serviceCollecteurSignataireNom": {
+          "description": "Prénom et nom du signataire des communications",
+          "type": "string"
+        },
+        "imageLogoSignataire": {
+          "description": "Logo affiché dans les courriers envoyés aux enquêtés, à côté du signataire du courrier",
+          "type": "string"
+        },
+        "assistanceTel": {
+          "description": "Numéro de téléphone pour l'assistance, affiché sur les courriers",
+          "type": "string"
+        },
+        "assistanceMail": {
+          "description": "Assistance par internet, affiché dans la rubrique Nous contacter des courriers",
+          "type": "string"
+        },
+        "assistanceAdresseL1": {
+          "description": "Ligne 1 de l'adresse postale de l'assistance, affiché sur les courriers",
+          "type": "string"
+        },
+        "assistanceAdresseL2": {
+          "description": "Ligne 2 de l'adresse postale de l'assistance, affiché sur les courriers",
+          "type": "string"
+        },
+        "assistanceAdresseL3": {
+          "description": "Ligne 3 de l'adresse postale de l'assistance, affiché sur les courriers",
+          "type": "string"
+        },
+        "assistanceAdresseL4": {
+          "description": "Ligne 4 de l'adresse postale de l'assistance, affiché sur les courriers",
+          "type": "string"
+        },
+        "assistanceAdresseL5": {
+          "description": "Ligne 5 de l'adresse postale de l'assistance, affiché sur les courriers",
+          "type": "string"
+        },
+        "adresseRetourQL1": {
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 1",
+          "type": "string"
+        },
+        "adresseRetourQL2": {
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 2",
+          "type": "string"
+        },
+        "adresseRetourQL3": {
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 3",
+          "type": "string"
+        },
+        "adresseRetourQL4": {
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 4",
+          "type": "string"
+        },
+        "adresseRetourQL5": {
+          "description": "XAdresse du site en charge de la numérisation des questionnaires papier – ligne 5",
+          "type": "string"
+        },
+        "adresseRetourQL6": {
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 6",
+          "type": "string"
+        },
+        "adresseRetourQL7": {
+          "description": "Adresse du site en charge de la numérisation des questionnaires papier – ligne 7",
+          "type": "string"
+        },
+        "representantLegal": {
+          "description": "Mention des représentants légaux dans les courriers",
+          "type": "boolean"
+        },
+        "mineur": {
+          "description": "Présence de mineurs parmi les personnes échantillonnées",
+          "type": "boolean"
+        },
+        "mineurDroit": {
+          "description": "Phrase à ajouter dans le cartouche en cas de présence de mineurs parmi les personnes échantillonnées",
+          "type": "string"
+        },
+        "dpd": {
+          "description:": "Mention du délégué à la protection des données dans les courriers et mails envoyés aux enquêtés",
+          "type": "boolean"
+        },
+        "mailDPD": {
+          "description:": "Mail du délégué à la protection des données du Ministère de tutelle pour l’exercice des droits",
+          "type": "string"
+        },
+        "appariement": {
+          "description": "Données obtenues par appariement ou non, et précisés dans les courriers",
+          "type": "boolean"
+        },
+        "sourceAdmin": {
+          "description": "Données administratives utilisées pour les appariements, affichées dans les courriers en cas d'appariement",
+          "type": "string"
+        },
+        "archivage": {
+          "description": "Archivage ou non des données",
+          "type": "boolean"
+        },
+        "dureeConservation": {
+          "description": "Durée de conservation des données indiquée dans le document de conformité RGPD, affichée sur les courriers aux enquêtés ",
+          "type": "string"
+        },
+        "dureeConservationIdenti": {
+          "description": "Durée de conservation des données d’identification (affichée sur les courriers)",
+          "type": "string"
+        },
+        "urlEnquete": {
+          "description": "Url de l’enquête",
+          "type": "string"
+        },
+        "incitationARepondre": {
+          "description": "Phrase sur les courriers pour inciter l’enquêté à répondre à l’enquête",
+          "type": "string"
+        },
+        "mailBoiteRetour": {
+          "description": "Boîte fonctionnelle qui accueille les échecs de remise de mail par SPOC",
+          "type": "string"
+        },
+        "themeMieuxConnaitreMail": {
+          "description": "Texte affiché dans le bandeau du mail après le Mieux Connaître",
+          "type": "string"
+        },
+        "ville": {
+          "description": "Ville de rédaction du courrier",
+          "type": "string"
+        },
+        "complementOpportunite": {
+          "description": "Précisions sur l’opportunité de l’enquête dans le cadre légal",
+          "type": "string"
+        },
+        "paragrapheDonneesPersonnelles": {
+          "description": "Affichage ou non d’un paragraphe sur les données personnelles dans les courriers",
+          "type": "boolean"
+        },
+        "messageOffline": {
+          "description": "Message affiché sur le portail de promotion de l'enquête lorsqu'elle est terminée",
+          "type": "string"
+        },
+        "messageInfoOffline": {
+          "description": "Message supplémentaire affiché sur le portail de promotion de l'enquête lorsqu'elle est terminée",
+          "type": "string"
+        },
+        "configurationVerificationMail": {
+          "description": "Demande de confirmation du mail de l’enquêté à la connexion",
+          "type": "boolean"
+        },
+        "imageResultat": {
+          "description": "Image de la rubrique Quelques résultats du portail de promotion de l’enquête",
+          "type": "string"
+        },
+        "paragrapheResultat": {
+          "description": "Texte de la rubrique Quelques résultats du portail de promotion de l’enquête",
+          "type": "string"
+        },
+        "urlInformationEnquete": {
+          "description": "Url de la page d’information sur l’enquête",
+          "type": "string"
+        },
+        "dureeConservationDonneesConnexion": {
+          "description": "Durée de conservation des données de connexion, mentionné sur le portail de promotion de l'enquête",
+          "type": "string"
+        },
+        "urlAQuoiServentVosReponses": {
+          "description": "Url affiché dans la rubrique « a quoi servent vos réponses » du portail de promotion Platine",
+          "type": "string"
+        },
+        "texteUrlAQuoiServentVosReponses": {
+          "description": "Texte de l'url affiché dans la rubrique « a quoi servent vos réponses » du portail de promotion Platine",
+          "type": "string"
+        },
+        "paragrapheAQuoiServentVosReponses": {
+          "description": "Paragraphe affiché dans la rubrique « a quoi servent vos réponses » du portail de promotion Platine",
+          "type": "string"
+        },
+        "frequenceExtraction": {
+          "description": "Fréquence d'extraction des données -- Visiblement une expression de type cron ; préciser le format",
+          "type": "string"
+        },
+        "cheminLivraisonDonnees": {
+          "description": "Pour préciser l'endroit où sont transmises les données -- A preciser format",
+          "type": "string"
+        },
+        "chiffrement": {
+          "description": "Chiffrement des données -- A préciser le format",
+          "type": "string"
+        },
+        "livraisonDifferentielle": {
+          "description": "Livraison différentielle des données",
+          "type": "boolean"
+        },
+        "formatLivraisonDonnees": {
+          "description": "Format de livraison des données par le produit traiter",
+          "type": "string"
+        },
+        "mailBoiteFonctionnelle": {
+          "description": "Boite fonctionnelle en charge de l’enquête",
+          "type": "string"
+        },
+        "referents": {
+          "description": "Référents de l'enquête, affiché dans Sabiane Gestion - peuvent être principaux (sinon considérés comme secondaires)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "nom": {
+                "type": "string"
+              },
+              "prenom": {
+                "type": "string"
+              },
+              "telephone": {
+                "type": "string"
+              },
+              "principal": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "champGeographiqueEnquete": {
+          "description": "Champ géographique de l'enquête. Ex: France entière",
+          "type": "string"
+        },
+        "champStatistiqueEnquete": {
+          "description": "Champ statistique de l'enquête. Ex: Tous les majeurs du ménage",
+          "type": "string"
+        },
+        "urlLoiStatistique": {
+          "description": "URL légifrance de la loi relative aux statistiques (loi de 1951)",
+          "type": "string"
+        },
+        "urlLoiRGPD": {
+          "description": "URL du règlement européen relatif au RGPD",
+          "type": "string"
+        },
+        "urlLoiInformatique": {
+          "description": "URL légifrance de la loi relative à l'informatique, aux fichiers et aux libertés",
+          "type": "string"
+        }
+      }
+    },
+    "lots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Identifiant technique du lot",
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "description": "Description courte du lot",
+            "type": "string"
+          },
+          "lotsEnLien": {
+            "description": "Lots précédents et suivants pour les remises en collecte",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "Identifiant technique du lot lié",
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "lien": {
+                  "description": "Lien entre le lot lié et le lot décrit. Ex: precedent ==> le lot en lien precede le lot actuel",
+                  "type": "string",
+                  "enum": [
+                    "precedent",
+                    "suivant"
+                  ]
+                },
+                "regleRemiseCollecte": {
+                  "description": "Règle de remise en collecte entre le lot décrit et le lot lié -- A PRECISER LE FORMAT",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "typeEchantillon": {
+            "description": "Type d'échantillon ",
+            "enum": [
+              "logement",
+              "individu"
+            ]
+          },
+          "modesCollecte": {
+            "description": "Modes de collecte de l'échantillon CAPI=XXX...",
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/modesDeCollecte"
+            }
+          },
+          "dateDebutVisibiliteGestionnaire": {
+            "description": "Date de visibilité du lot dans XXX pour XXX",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateDebutVisibiliteEnqueteur": {
+            "description": "Date de visibilité du lot dans Sabiane pour les enquêteurs XXX",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateDebutReperage": {
+            "description": "XXX",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateDebutCollecte": {
+            "description": "Date de début de la collecte",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateFinCollecte": {
+            "description": "Date de fin de la collecte",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateFinTraitementGestionnaire": {
+            "description": "XXX",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateFinTraitementReprise": {
+            "description": "XXX",
+            "type": "string",
+            "format": "date-time"
+          },
+          "dateRetour": {
+            "description": "XXX",
+            "type": "string",
+            "format": "date-time"
+          },
+          "questionnairesModeles": {
+            "description": "XXX Liste des identifiants des modèles de questionnaires possibles pour les interrogations de ce lot. Ils doivent tous être décrits dans questionnairesModeles",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "moduleCommentaire": {
+            "description": "XXX",
+            "type": "boolean"
+          },
+          "svi": {
+            "description": "XXX",
+            "type": "boolean"
+          },
+          "codeEnquete": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "rangInterrogation": {
+            "description": "XXX",
+            "type": "string",
+            "enum": [
+              "entrant",
+              "intermediaire",
+              "sortant"
+            ]
+          },
+          "reperage": {
+            "description": "XXX",
+            "type": "string",
+            "enum": [
+              "aucun",
+              "faf_logement",
+              "faf_individu",
+              "telephone"
+            ]
+          },
+          "essaisContact": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "bilanContact": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "sitesGestion": {
+            "description": "XXX: Sites de gestion opale XXX. doit on mettre un minItems?? potentiellement oui si sitesGestion n'est pas obligatoire",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "idSite": {
+                  "description": "XXX: Identifiant du site de gestion opale",
+                  "type": "string"
+                },
+                "assistanceMail": {
+                  "description": "Adresse de contact pour l'assistance",
+                  "type": "string"
+                },
+                "assistanceTel": {
+                  "description": "Numéro de téléphone de contact pour l'assitance",
+                  "type": "string"
+                },
+                "envoiCourrier": {
+                  "description": "XXX",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "idSite"
+              ]
+            }
+          },
+          "dureeQuestionnaire": {
+            "description": "Indication sur la durée du questionnaire",
+            "type": "string"
+          },
+          "pasAccesInternet": {
+            "description": "XXX",
+            "type": "boolean"
+          },
+          "numeroSequence": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "themeSequence": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "documentsPourRepondre": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "partieDeroulementEnquete": {
+            "description": "XXX",
+            "type": "boolean"
+          },
+          "deroulementEnquete": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "imageDeroulementEnquete": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "periodePrecedenteInterrogation": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "relanceNonRepondantsWeb": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "utilisationInfo": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "utilisationInfoExemple": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "postEnquete": {
+            "description": "XXX",
+            "type": "boolean"
+          },
+          "postEnqueteParagraphe": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "rapprochement": {
+            "description": "XXX",
+            "type": "boolean"
+          },
+          "courrierConsigneWeb1": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "courrierConsigneWeb2": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "imageCommentRepondre": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "imageCommentRepondreSansMDP": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "imageRepondreInternet": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "papierNombre": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "papierConsigne": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "papierNombreQuest": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "consigne1": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "consigne2": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "consigne3": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "imageQrCode": {
+            "description": "XXX",
+            "type": "string"
+          },
+          "repriseManuelle": {
+            "description": "XXX",
+            "type": "boolean"
+          },
+          "quiRepondPageDeGarde1": {
+            "description": "XXX: Qui répond pour sabiane",
+            "type": "string"
+          },
+          "quiRepondPageDeGarde2": {
+            "description": "XXX: Qui répond pour sabiane",
+            "type": "string"
+          },
+          "quiRepondPageDeGarde3": {
+            "description": "XXX: Qui répond pour sabiane",
+            "type": "string"
+          },
+          "quiRepondCommunication": {
+            "description": "XXX: ",
+            "type": "string"
+          },
+          "quiRepondCommunication1": {
+            "description": "XXX: ",
+            "type": "string"
+          },
+          "quiRepondCommunication2": {
+            "description": "XXX: ",
+            "type": "string"
+          },
+          "quiRepondCommunication3": {
+            "description": "XXX: ",
+            "type": "string"
+          },
+          "relanceQuiSollicite": {
+            "description": "XXX: ",
+            "type": "string"
+          },
+          "communications": {
+            "description": "Configuration des communications du lot",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "Identifiant technique de la communication",
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "label": {
+                  "description": "Label pour la communication",
+                  "type": "string"
+                },
+                "echeance": {
+                  "description": "Horodatage de l'échéance d'envoi de la communication",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "moyenCommunication": {
+                  "description": "Moyen de communication à utiliser",
+                  "type": "string",
+                  "enum": [
+                    "courrier",
+                    "mail"
+                  ]
+                },
+                "typeCommunication": {
+                  "description": "Type de communication. XXX: ya il autre chose qu'ouverture et relance???",
+                  "type": "string",
+                  "enum": [
+                    "ouverture",
+                    "relance"
+                  ]
+                },
+                "modeleCommunication": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "questionnairePapier": {
+                  "description": "XXX:",
+                  "type": "boolean"
+                },
+                "objetMail": {
+                  "description": "XXX: Pour une communication par mail : Objet du mail",
+                  "type": "string"
+                },
+                "dateEdition": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "moisEditionOuverture": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "moisEditionOuvertureTelephone": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "relanceLibreParagraphe1": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "relanceLibreParagraphe2": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "relanceLibreParagraphe3": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "relanceLibreParagraphe4": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "complementConnexion": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "typeQuestionnaire": {
+                  "description": "XXX: Chaine affichée sur les courriers",
+                  "type": "string"
+                },
+                "idOperationEditique": {
+                  "description": "XXX: (ca semble important ce truc)",
+                  "type": "string"
+                },
+                "partieNomFichierLibreZip": {
+                  "description": "XXX:",
+                  "type": "string"
+                },
+                "bat": {
+                  "description": "XXX:",
+                  "type": "boolean"
+                },
+                "rnvp": {
+                  "description": "XXX: Restructuration, normalisation et validation postale",
+                  "type": "boolean"
+                },
+                "accuseReception": {
+                  "description": "Indique si l'envoi se fait avec accusé de réception",
+                  "type": "boolean"
+                },
+                "introMail": {
+                  "description": "XXX:",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "moyenCommunication",
+                "typeCommunication"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "typeEchantillon",
+          "modesCollecte"
+        ]
+      }
+    },
+    "questionnairesModeles": {
+      "description": "Tous les modèles de questionnaires dont les id sont référencés dans les lots de ce contexte sont décrits ici",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Identifiant du modèle de questionnaire",
+            "type": "string"
+          },
+          "modeCollecte": {
+            "description": "Mode de collecte de l'échantillon CAPI=XXX...",
+            "$ref": "#/$defs/modesDeCollecte"
+          },
+          "url": {
+            "description": "URL permettant d'accéder au modèle de questionnaire",
+            "type": "string"
+          },
+          "label": {
+            "description": "Un label pour le modèle",
+            "type": "string"
+          },
+          "nomenclatureReferencees": {
+            "description": "Liste des identifiants des nomenclatures référencées par le modèle de questionnaire",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "modeCollecte",
+        "url",
+        "nomenclaturesReferencees"
+      ]
+    },
+    "nomenclatures": {
+      "description": "Toutes les nommenclatures référencées par au moins un modèle de questionnaire sont décrites ici",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Identifiant de la nomenclature",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL permettant d'accéder à la nommenclature",
+            "type": "string"
+          },
+          "label": {
+            "description": "Un label pour la nomenclature",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "id",
+    "labelCourt",
+    "metadonnees",
+    "lots"
+  ],
+  "$defs": {
+    "annee4digit": {
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 9999
+    },
+    "modesDeCollecte": {
+      "type": "string",
+      "enum": [
+        "CATI",
+        "CAPI",
+        "CAWI",
+        "PAPI"
+      ]
+    },
+    "periode": {
+      "description": "Période de l'enquête. A00: annuelle; X00-X99: pluriannuelle; S01-02: 1er et 2nd semestre; T1-4: 1er-4e trimestre; M01-M12: Mois de l'année; B01-B06: Bimestre dans l'année  ",
+      "type": "string",
+      "enum": [
+        "A00",
+        "X00",
+        "X01",
+        "X02",
+        "X03",
+        "X04",
+        "X05",
+        "X06",
+        "X07",
+        "X08",
+        "X09",
+        "X10",
+        "X11",
+        "X12",
+        "X13",
+        "X14",
+        "X15",
+        "X16",
+        "X17",
+        "X18",
+        "X19",
+        "X20",
+        "X21",
+        "X22",
+        "X23",
+        "X24",
+        "X25",
+        "X26",
+        "X27",
+        "X28",
+        "X29",
+        "X30",
+        "X31",
+        "X32",
+        "X33",
+        "X34",
+        "X35",
+        "X36",
+        "X37",
+        "X38",
+        "X39",
+        "X40",
+        "X41",
+        "X42",
+        "X43",
+        "X44",
+        "X45",
+        "X46",
+        "X47",
+        "X48",
+        "X49",
+        "X50",
+        "X51",
+        "X52",
+        "X53",
+        "X54",
+        "X55",
+        "X56",
+        "X57",
+        "X58",
+        "X59",
+        "X60",
+        "X61",
+        "X62",
+        "X63",
+        "X64",
+        "X65",
+        "X66",
+        "X67",
+        "X68",
+        "X69",
+        "X70",
+        "X71",
+        "X72",
+        "X73",
+        "X74",
+        "X75",
+        "X76",
+        "X77",
+        "X78",
+        "X79",
+        "X80",
+        "X81",
+        "X82",
+        "X83",
+        "X84",
+        "X85",
+        "X86",
+        "X87",
+        "X88",
+        "X89",
+        "X90",
+        "X91",
+        "X92",
+        "X93",
+        "X94",
+        "X95",
+        "X96",
+        "X97",
+        "X98",
+        "X99",
+        "S01",
+        "S02",
+        "T01",
+        "T02",
+        "T03",
+        "T04",
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05",
+        "M06",
+        "M07",
+        "M08",
+        "M09",
+        "M10",
+        "M11",
+        "M12",
+        "B01",
+        "B02",
+        "B03",
+        "B04",
+        "B05",
+        "B06"
+      ]
+    }
+  }
+}

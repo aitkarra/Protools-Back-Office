@@ -8,9 +8,9 @@ import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.customizers.OperationCustomizer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +19,10 @@ import java.util.Optional;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class SpringDocConfiguration {
 
-  @Autowired
   private InseeSpringdocProperties springdocProperties;
-
-  @Autowired(required = false)
   private Optional<BuildProperties> buildProperties;
 
 
@@ -86,7 +84,12 @@ public class SpringDocConfiguration {
             .info(
                 new Info()
                     .title(buildProperties.map(BuildProperties::getName).orElse("n.a"))
-                    .description(springdocProperties.getDescription())
+                    .description(
+                            String.format("`Application version : %s`\n\n%s",
+                                    buildProperties.map(BuildProperties::getVersion).orElse("n.a"),
+                                    springdocProperties.getDescription()
+                            )
+                    )
                     .version(buildProperties.map(BuildProperties::getVersion).orElse("n.a"))
                     /*.license(
                         new License()

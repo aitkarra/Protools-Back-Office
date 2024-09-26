@@ -5,22 +5,23 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
+        <version>3.3.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>fr.insee.sndil.protools</groupId>
     <artifactId>protools-protlsbo</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
     <name>Protools Back Office</name>
     <description>Protools Back Office: Survey Orchestrator and Management Tool - Built with Flowable Engine</description>
     <properties>
         <java.version>17</java.version>
-        <springdoc.version>2.3.0</springdoc.version>
+        <springdoc.version>2.5.0</springdoc.version>
+        <properties-logger.version>1.0.0</properties-logger.version>
         <flowable.version>7.0.1-insee</flowable.version>
-        <pitest.version>1.11.7</pitest.version>
+        <pitest.version>1.16.1</pitest.version>
         <pitest.junit.version>1.2.1</pitest.junit.version>
         <passay.version>1.6.4</passay.version>
-        <groovy-version>4.0.20</groovy-version>
+        <groovy-version>4.0.21</groovy-version>
     </properties>
 
 
@@ -40,6 +41,13 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-process-rest</artifactId>
             <version>${flowable.version}</version>
+        </dependency>
+
+        <!-- INSEE properties logging lib -->
+        <dependency>
+            <groupId>fr.insee</groupId>
+            <artifactId>boot-properties-logger-starter</artifactId>
+            <version>${properties-logger.version}</version>
         </dependency>
 
         <!-- for password generation (used to init passwords in sugoi)-->
@@ -135,6 +143,19 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
+        <!-- To validate the JSons against json-schema -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
+        <!-- to create Instant from json -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
 
     </dependencies>
 
@@ -163,12 +184,24 @@
                 <version>${pitest.version}</version>
                 <configuration>
                     <targetTests>
-                        <param>fr.insee.protools.backend.service.*</param>
-                        <param>fr.insee.protools.backend.controller.StarterController</param>
+                        <param>fr.insee.protools.backend.*</param>
                     </targetTests>
                     <mutators>
                         <mutator>STRONGER</mutator>
                     </mutators>
+                    <avoidCallsTo>
+                        <avoidCallsTo>java.util.logging</avoidCallsTo>
+                        <avoidCallsTo>org.apache.log4j</avoidCallsTo>
+                        <avoidCallsTo>org.slf4j</avoidCallsTo>
+                        <avoidCallsTo>org.apache.commons.logging</avoidCallsTo>
+                        <avoidCallsTo>fr.insee.protools.backend.logging</avoidCallsTo>
+                        <avoidCallsTo>fr.insee.protools.backend.logging.LoggingHelper</avoidCallsTo>
+                    </avoidCallsTo>
+                    <excludedClasses>
+                        <excludedClass>fr.insee.protools.backend.logging.*</excludedClass>
+                        <excludedClass>fr.insee.protools.backend.dto.*</excludedClass>
+                        <excludedClass>*xxBPMNError</excludedClass>
+                    </excludedClasses>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -182,7 +215,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -205,8 +238,53 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <excludes>
+                        <exclude>fr/insee/protools/backend/deprecated/**/*.java</exclude>
+                    </excludes>
+                    <testExcludes>
+                        <testExclude>**/deprecated/**/*.java</testExclude>
+                    </testExcludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.jsonschema2pojo</groupId>
+                <artifactId>jsonschema2pojo-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <dateTimeType>java.time.Instant</dateTimeType>
+                    <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
+                    <targetPackage>fr.insee.protools.backend.dto</targetPackage>
+                    <inclusionLevel>ALWAYS</inclusionLevel>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/jsonschema2pojo</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
         </plugins>
     </build>
 

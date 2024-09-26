@@ -11,9 +11,6 @@ import java.util.List;
 @Service
 public class PasswordServiceImpl implements PasswordService {
 
-  @Value("${fr.insee.protools.password.create.length:12}")
-  private int pCreateSize;
-
   @Value("${fr.insee.protools.password.create.withDigits:true}")
   private boolean pCreateWithDigits;
 
@@ -27,7 +24,7 @@ public class PasswordServiceImpl implements PasswordService {
   private boolean pCreateWithSpecial;
 
   @Override
-  public String generatePassword() {
+  public String generatePassword(int pCreateSize) {
 
     PasswordGenerator passwordGenerator = new PasswordGenerator();
     return passwordGenerator.generatePassword(

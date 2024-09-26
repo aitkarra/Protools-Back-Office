@@ -4,8 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SpecVersion;
+import com.networknt.schema.ValidationMessage;
+import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.context.exception.BadContextDateTimeParseBPMNError;
+import fr.insee.protools.backend.service.context.exception.BadContexMissingBPMNError;
 import fr.insee.protools.backend.service.context.exception.BadContextIOException;
 import fr.insee.protools.backend.service.context.exception.BadContextIncorrectBPMNError;
 import fr.insee.protools.backend.service.context.exception.BadContextNotJSONBPMNError;
@@ -14,7 +20,6 @@ import fr.insee.protools.backend.service.exception.TaskNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
@@ -33,33 +38,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static fr.insee.protools.backend.service.FlowableVariableNameConstants.*;
-import static fr.insee.protools.backend.service.context.ContextConstants.*;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_CONTEXT;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ContextServiceImpl implements ContextService {
+public class ContextServiceImpl implements IContextService {
 
+    private static final ObjectReader defaultReader = new ObjectMapper().registerModule(new JavaTimeModule()).reader(); // maybe with configs
+    //Key : processInstanceID
+    //Value: Pair <raw json of Context as String; Dto representing this json Context>
+    private static final Map<String, ContextPair> contextCache = new ConcurrentHashMap<>();
+    //TODO: Peut être que ca va sortir dans une dépendance externe
+    private static final String SCHEMA_VALIDATION_FILE = "/schema/contexte-processus.json";
     private final RuntimeService runtimeService;
     private final TaskService taskService;
     private final RepositoryService repositoryService;
     private final ApplicationContext springApplicationContext;
-
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private static final ObjectReader defaultReader = mapper.reader(); // maybe with configs
-
-    private static final Map<String, JsonNode> contextCache = new ConcurrentHashMap<>();
+    private static final JsonSchema contextJsonSchema = JsonSchemaFactory
+            .getInstance(SpecVersion.VersionFlag.V202012)
+            .getSchema(ContextServiceImpl.class.getResourceAsStream(SCHEMA_VALIDATION_FILE));
 
     @Override
     public void processContextFileAndCompleteTask(MultipartFile file, String taskId) {
@@ -75,11 +77,14 @@ public class ContextServiceImpl implements ContextService {
         }
 
         //check context
-        Pair<Map<String, Object>, JsonNode> contextPair = processContextFile(file, task.getProcessDefinitionId());
+        ContextPair contextPair = processContextFile(file, task.getProcessDefinitionId());
         //Store context in cache
-        contextCache.put(task.getProcessInstanceId(), contextPair.getValue());
-        // Complete task and store context within process variables
-        taskService.complete(taskId, contextPair.getKey());
+        contextCache.put(task.getProcessInstanceId(), contextPair);
+
+        // Complete task and store context raw json as string within process variables
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(VARNAME_CONTEXT, contextPair.contextAsString);
+        taskService.complete(taskId, variables);
     }
 
     @Override
@@ -91,17 +96,21 @@ public class ContextServiceImpl implements ContextService {
 
         try {
             //check context
-            Pair<Map<String, Object>, JsonNode> contextPair = processContextFile(file, processDefinitionId);
+            ContextPair contextPair = processContextFile(file, processDefinitionId);
             //Create process instance
             ProcessInstance processInstance;
+            Map<String, Object> variables = new HashMap<>();
+            variables.put(VARNAME_CONTEXT, contextPair.contextAsString);
+
             if (StringUtils.isBlank(businessKey)) {
-                processInstance = runtimeService.startProcessInstanceByKey(processDefinitionId, contextPair.getKey());
+                processInstance = runtimeService.startProcessInstanceByKey(processDefinitionId, variables);
             } else {
-                processInstance = runtimeService.startProcessInstanceByKey(processDefinitionId, businessKey, contextPair.getKey());
+                processInstance = runtimeService.startProcessInstanceByKey(processDefinitionId, businessKey, variables);
             }
             log.info("Created new process instance with processDefinitionId={} - ProcessInstanceId={}", processDefinitionId, processInstance.getProcessInstanceId());
             //Store context in cache
-            contextCache.put(processInstance.getProcessInstanceId(), contextPair.getValue());
+            contextCache.put(processInstance.getProcessInstanceId(), contextPair);
+
             return processInstance.getProcessInstanceId();
         } catch (FlowableObjectNotFoundException e) {
             log.error("processDefinitionId={} is unknown", processDefinitionId);
@@ -109,32 +118,63 @@ public class ContextServiceImpl implements ContextService {
         }
     }
 
+    @Override
+    public JsonNode getContextJsonNodeByProcessInstance(String processInstanceId) {
+        try {
+            return defaultReader.readTree(getContextByProcessInstance(processInstanceId).contextAsString);
+        } catch (JsonProcessingException e) {
+            throw new BadContextIncorrectBPMNError(String.format("Context retrieved from engine cannot be parsed for processInstanceId=[%s] ", processInstanceId));
+        }
+    }
 
     @Override
-    public JsonNode getContextByProcessInstance(String processInstanceId) {
+    public ContexteProcessus getContextDtoByProcessInstance(String processInstanceId) {
+        return getContextByProcessInstance(processInstanceId).contextSchema();
+    }
+
+    private ContextPair getContextByProcessInstance(String processInstanceId) {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         if (processInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", ProcessInstance.class);
         }
-        JsonNode result = contextCache.get(processInstanceId);
+
+        ContextPair result = contextCache.get(processInstanceId);
         //If value does not exist in cache yet : Retrieve it and update cache
         if (result == null) {
             String contextStr = runtimeService.getVariable(processInstanceId, VARNAME_CONTEXT, String.class);
-            if(contextStr == null || contextStr.isBlank()){
-                throw new BadContextIncorrectBPMNError(String.format("Context retrieved from engine is null or empty processInstanceId=[%s] ", processInstanceId));
+            if (contextStr == null || contextStr.isBlank()) {
+                throw new BadContexMissingBPMNError(String.format("Context retrieved from engine is null or empty processInstanceId=[%s] ", processInstanceId));
             }
-
             try {
-                result = defaultReader.readTree(contextStr);
-            } catch (JsonProcessingException e) {
-                throw new BadContextIncorrectBPMNError(String.format("Context retrieved from engine could not be parsed for processInstanceId=[%s] - Exception : %s", processInstanceId, e.getMessage()));
+                ContexteProcessus schema = defaultReader.readValue(contextStr, ContexteProcessus.class);
+                result = new ContextPair(contextStr, schema);
+                contextCache.put(processInstanceId, result);
+            } catch (IOException e) {
+                throw new BadContextIncorrectBPMNError(String.format("Context cannot be parsed for processInstanceId=[%s] ", processInstanceId));
             }
-            contextCache.put(processInstanceId, result);
         }
         return result;
     }
 
-    private Pair<Map<String, Object>, JsonNode> processContextFile(MultipartFile file, String processDefinitionKey) {
+    protected ContexteProcessus jsonReadAndSchemaValidation(JsonNode rootContext) {
+        //Validate that the Json is valid regarding the json-schema
+        Set<ValidationMessage> jsonValidationErrors = contextJsonSchema.validate(rootContext);
+        if (!jsonValidationErrors.isEmpty()) {
+            String message = String.format("Uploaded context is not correct according to the json-schema. Errors: %s",
+                    jsonValidationErrors);
+            log.warn(message);
+            throw new BadContextNotJSONBPMNError(message);
+        } else {
+            try {
+                return defaultReader.treeToValue(rootContext, ContexteProcessus.class);
+            } catch (IllegalArgumentException | JsonProcessingException e) {
+                log.warn("Uploaded context cannot be parsed correctly {}", e.getMessage());
+                throw new BadContextNotJSONBPMNError("Uploaded context cannot be parsed correctly");
+            }
+        }
+    }
+
+    protected ContextPair processContextFile(MultipartFile file, String processDefinitionKey) {
         //Validate file name (JSON)
         var fileExtension = getFileExtension(file.getOriginalFilename());
         if (fileExtension.isEmpty()) {
@@ -148,72 +188,17 @@ public class ContextServiceImpl implements ContextService {
             log.debug("Context File content : " + content);
 
             JsonNode rootContext = defaultReader.readTree(content);
-            Set<String> contextErrors = isContextOKForBPMN(processDefinitionKey, rootContext);
+            ContexteProcessus contexte = jsonReadAndSchemaValidation(rootContext);
+
+            Set<String> contextErrors = isContextOKForBPMN(processDefinitionKey, contexte);
             if (!contextErrors.isEmpty()) {
                 throw new BadContextIncorrectBPMNError(contextErrors.toString());
             }
+            log.info("idCampaign={}", contexte.getId());
 
-            String mode = rootContext.path(CTX_MODE).asText();
-            if(!mode.equalsIgnoreCase("api") && mode.equalsIgnoreCase("queue")){
-                throw new BadContextIncorrectBPMNError("The mode must be defined with values api or queue");
-            }
-
-            String parallele = rootContext.path("parallele").asText();
-            Boolean paralleleB;
-            if(parallele.equalsIgnoreCase("true") ){
-                paralleleB=Boolean.TRUE;
-            }
-            else{
-                paralleleB=Boolean.FALSE;
-            }
-
-            log.info("idCampaign="+rootContext.path(CTX_CAMPAGNE_ID).textValue()+" - parallele="+paralleleB);
-
-            //Variables to store for this process
-            Map<String, Object> variables = new HashMap<>();
-            //Store the raw json as string
-            variables.put(VARNAME_CONTEXT, content);
-            //Store the mode
-            variables.put(VARNAME_MODE, mode);
-            variables.put("parallele", paralleleB);
-
-
-
-            // Extraction of campaign TIMER START/END dates
-            //        Do extraction of important BPMN Variables in separates functions
-            JsonNode partitions = rootContext.path(CTX_PARTITIONS);
-            if (partitions.isMissingNode()) {
-                String msg = String.format("Missing %s in context", CTX_PARTITIONS);
-                log.error(msg);
-                throw new BadContextIncorrectBPMNError(msg);
-            }
-
-            List<Long> partitionIds = new ArrayList<>();
-            HashMap<Long,HashMap<String, Serializable>> variablesByPartition= new HashMap<>();
-
-            for (JsonNode partition : partitions) {
-                Pair<Instant, Instant> startEndDT = getCollectionStartAndEndFromPartition(partition);
-                Long partitionId = partition.path(CTX_PARTITION_ID).asLong();
-                partitionIds.add(partitionId);
-
-                HashMap<String,Serializable> partitionVariables = new HashMap<>();
-                partitionVariables.put(CTX_PARTITION_DATE_DEBUT_COLLECTE,startEndDT.getKey() );
-                partitionVariables.put(CTX_PARTITION_DATE_FIN_COLLECTE,startEndDT.getValue() );
-
-                variablesByPartition.put(partitionId,partitionVariables);
-
-                //The context defines only one partition
-                if(partitions.size()==1){
-                    variables.put(VARNAME_CURRENT_PARTITION_ID, partitionId);
-                }
-            }
-
-            variables.put(VARNAME_CONTEXT_PARTITION_ID_LIST, partitionIds);
-            variables.put(VARNAME_CONTEXT_PARTITION_VARIABLES_BY_ID, variablesByPartition);
-
-            return Pair.of(variables, rootContext);
-        } catch (IOException e) {
-            throw new BadContextIOException("Error while reading context content", e);
+            return new ContextPair(content, contexte);
+        } catch (IOException | IllegalArgumentException e) {
+            throw new BadContextIOException("Error while reading context content: " + e.getMessage(), e);
         }
     }
 
@@ -223,96 +208,68 @@ public class ContextServiceImpl implements ContextService {
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 
-    //TODO : soit les json schema permettent de valider les dates, soit il faudra valider toutes les dates comme ça
-    public static Pair<Instant, Instant> getCollectionStartAndEndFromPartition(JsonNode partitionNode) {
-        String start = partitionNode.get(CTX_PARTITION_DATE_DEBUT_COLLECTE).asText();
-        String end = partitionNode.get(CTX_PARTITION_DATE_DEBUT_COLLECTE).asText();
-
-        if(start==null || end==null){
-            throw new BadContextIncorrectBPMNError(String.format("%s and %s must be defined on every partition", CTX_PARTITION_DATE_DEBUT_COLLECTE, CTX_PARTITION_DATE_FIN_COLLECTE));
-        }
-
-        try {
-            LocalDateTime collectionStart = LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME);
-            LocalDateTime collectionEnd = LocalDateTime.parse(end, DateTimeFormatter.ISO_DATE_TIME);
-            log.info("partition_id={} - CollectionStartDate={} - CollectionEndDate={}", partitionNode.path(CTX_PARTITION_ID), collectionStart, collectionEnd);
-            return Pair.of(collectionStart.atZone(ZoneId.systemDefault()).toInstant(),
-                    collectionEnd.atZone(ZoneId.systemDefault()).toInstant());
-
-        } catch (DateTimeParseException e) {
-            throw new BadContextIncorrectBPMNError(String.format("%s or %s cannot be casted to DateTime : %s", CTX_PARTITION_DATE_DEBUT_COLLECTE, CTX_PARTITION_DATE_FIN_COLLECTE, e.getMessage()));
-        }
-    }
-
-    public static Instant getInstantFromPartition(JsonNode partitionNode, String subnode) throws BadContextDateTimeParseBPMNError {
-        JsonNode instantNode = partitionNode.get(subnode);
-        if (instantNode == null) {
-            throw new BadContextDateTimeParseBPMNError(String.format("node %s of partition %s does not exists", subnode, partitionNode.path(CTX_PARTITION_ID).asText()));
-        }
-        String valueTxt = partitionNode.path(subnode).asText();
-        if (valueTxt.isBlank()) {
-            throw new BadContextDateTimeParseBPMNError(String.format("node %s of partition %s is blank", subnode, partitionNode.path(CTX_PARTITION_ID).asText()));
-        }
-
-        try {
-            return Instant.parse(valueTxt);
-        } catch (DateTimeParseException e) {
-            throw new BadContextDateTimeParseBPMNError(String.format("node %s of partition %s having value [%s] cannot be parsed : %s", subnode, partitionNode.path(CTX_PARTITION_ID).asText(), valueTxt, e.getMessage()));
-        }
-    }
-
     /**
      * Check if protoolsContextRootNode allows every Task implementing {@link  fr.insee.protools.backend.service.DelegateContextVerifier#getContextErrors  DelegateContextVerifier}  interface to run correctly
-     * @param processDefinitionKey The process (BPMN) identifier
-     * @param protoolsContextRootNode The context to check
+     *
+     * @param processDefinitionKey    The process (BPMN) identifier
+     * @param contexteProcessus The context to check
      * @return A list of the problems found
      * @throws FlowableObjectNotFoundException if no process definition (BPMN) matches processDefinitionKey
      */
-    public Set<String> isContextOKForBPMN(String processDefinitionKey, JsonNode protoolsContextRootNode) {
+    public Set<String> isContextOKForBPMN(String processDefinitionKey, ContexteProcessus contexteProcessus) {
         //At least, the campaign ID should be defined so we can write it on process variables to be used un groovy scripts
-        Set<String> errors=DelegateContextVerifier.computeMissingChildrenMessages(Set.of(CTX_CAMPAGNE_ID),protoolsContextRootNode,getClass());
+        Set<String> errors = new HashSet<>();
+        if(contexteProcessus.getId()==null){
+            errors.add("id is missing");
+        }
+        if(contexteProcessus.getMetadonnees()==null){
+            errors.add("metadonnees is missing");
+        }
 
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
         processDefinitionQuery.processDefinitionKey(processDefinitionKey);
         processDefinitionQuery.latestVersion();
         ProcessDefinition definition = processDefinitionQuery.singleResult();
-        if(definition==null){
+        if (definition == null) {
             throw new FlowableObjectNotFoundException("Cannot find process definition with key " + processDefinitionKey, ProcessDefinition.class);
         }
         BpmnModel model = repositoryService.getBpmnModel(definition.getId());
-        if(model==null){
+        if (model == null) {
             throw new FlowableObjectNotFoundException("Cannot find process BPMN model definition with key " + processDefinitionKey, ProcessDefinition.class);
         }
 
         org.flowable.bpmn.model.Process processModel = model.getProcessById(processDefinitionKey);
-        if(processModel==null){
+        if (processModel == null) {
             throw new FlowableObjectNotFoundException("Cannot find process Model with key " + processDefinitionKey, ProcessDefinition.class);
         }
 
         processModel.getFlowElements().stream()
                 .filter(flowElement -> (flowElement instanceof ServiceTask || flowElement instanceof SubProcess))
-                .forEach(flowElement -> errors.addAll(analyseProcess(flowElement,protoolsContextRootNode)));
+                .forEach(flowElement -> errors.addAll(analyseProcess(flowElement, contexteProcessus)));
         return errors;
     }
 
-    private Set<String> analyseProcess(FlowElement flowElement, JsonNode protoolsContextRootNode){
+    private Set<String> analyseProcess(FlowElement flowElement, ContexteProcessus contexteProcessus) {
         if (flowElement instanceof ServiceTask serviceTask) {
             if (serviceTask.getImplementationType().equals("delegateExpression")) {
                 String delegateExpression = serviceTask.getImplementation().replace("${", "").replace("}", "");
                 try {
                     Object bean = springApplicationContext.getBean(delegateExpression);
                     if (bean instanceof DelegateContextVerifier beanDelegateCtxVerifier) {
-                        return beanDelegateCtxVerifier.getContextErrors(protoolsContextRootNode);
+                        return beanDelegateCtxVerifier.getContextErrors(contexteProcessus);
                     }
+                } catch (NoSuchBeanDefinitionException e) {
                 }
-                catch (NoSuchBeanDefinitionException e){}
             }
         } else if (flowElement instanceof SubProcess subProcessFlowElement) {
             Set<String> errors = new HashSet<>();
-            subProcessFlowElement.getFlowElements().stream()
-                    .forEach(subFlowElement -> errors.addAll(analyseProcess(subFlowElement,protoolsContextRootNode)));
+            subProcessFlowElement.getFlowElements()
+                    .forEach(subFlowElement -> errors.addAll(analyseProcess(subFlowElement, contexteProcessus)));
             return errors;
         }
         return Set.of();
+    }
+
+    protected record ContextPair(String contextAsString, ContexteProcessus contextSchema) {
     }
 }
