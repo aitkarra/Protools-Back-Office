@@ -410,10 +410,12 @@ public class QuestionnaireHelper {
         String questionnaireId = currentPartitionNode.path(CTX_PARTITION_QUESTIONNAIRE_MODEL).asText();
         log.info("parallele="+parallele+"- Boolean.FALSE.equals(parallele)="+Boolean.FALSE.equals(parallele));
 
+        String processDefinitionId = execution.getProcessDefinitionId();
         String processInstanceId = execution.getProcessInstanceId();
+        String currentActivityId = execution.getCurrentActivityId();
         String campaignId = contextRootNode.path(CTX_CAMPAGNE_ID).asText();
 
-        iUniteEnquetee.addManyUniteEnquetee(listeUe, processInstanceId, campaignId, questionnaireId);
+        iUniteEnquetee.addManyUniteEnquetee(listeUe, processDefinitionId, processInstanceId, currentActivityId, campaignId, questionnaireId);
 //        iUniteEnquetee.addManyUniteEnqueteeDeleteColonneClass(listeUe);
     }
 

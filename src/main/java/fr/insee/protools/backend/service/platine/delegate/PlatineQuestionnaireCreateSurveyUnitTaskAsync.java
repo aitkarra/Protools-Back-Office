@@ -12,10 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static fr.insee.protools.backend.service.context.ContextConstants.CTX_CAMPAGNE_CONTEXTE;
 
@@ -32,6 +36,7 @@ public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelega
 
     @Override
     public void execute(DelegateExecution execution) {
+        Boolean start = Boolean.FALSE;
         JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
         //TODO: delete this log if necessary
         log.debug("ProcessInstanceId={}  - campagne={} - begin"
@@ -39,21 +44,30 @@ public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelega
 
         checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
         QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,iUniteEnquetee,platineQuestionnaireService);
+
+//        TODO gestion des timeouts
+        while (!start) {
+            log.info("start : "+ start);
+            try {
+                long nbInterogation = iUniteEnquetee.getCommandesByProcessInstanceIdAndCurrentActivityId(execution.getProcessInstanceId(), execution.getCurrentActivityId());
+                start = taskService.isTerminated(execution.getProcessInstanceId(), execution.getCurrentActivityId(), nbInterogation);
+                log.info("Tâche planifiée en cours pour le processInstanceId : " + execution.getProcessInstanceId() + ", le currentActivityId " + execution.getCurrentActivityId() + ",et le nbInterogation totale " + nbInterogation);
+                Thread.sleep(5000);
+                if (start) {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         log.debug("ProcessInstanceId={}  - campagne={} - end",
                 execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
-    }
-
-    @Scheduled(fixedDelay = 5000)
-    public void scheduledTask() throws InterruptedException {
-        // Logique de la tâche planifiée
-        log.info("Tâche planifiée exécutée...");
-        System.out.println("Tâche planifiée exécutée...");
-        taskService.isTerminated();
     }
 
     @Override
     public Set<String> getContextErrors(JsonNode contextRootNode) {
         return QuestionnaireHelper.getCreateSUContextErrorsPlatine(contextRootNode);
     }
+
 
 }

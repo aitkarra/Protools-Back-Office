@@ -23,6 +23,8 @@ import java.util.UUID;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.collect;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository
 @Slf4j
@@ -32,8 +34,14 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 	private MongoTemplate mongoTemplate;
 
 	@Setter
+	@Getter
+	private String processDefinitionId;
+	@Setter
     @Getter
     private String processInstanceId;
+	@Setter
+	@Getter
+	private String currentActivityId;
 	@Setter
     @Getter
     private String idCampaign;
@@ -60,7 +68,9 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
         keyValuePairs.put("correlationID", correlationID);
 		keyValuePairs.put("inProgress", false);
 		keyValuePairs.put("done", false);
+		keyValuePairs.put("processDefinitionID", getProcessDefinitionId());
 		keyValuePairs.put("processInstanceID", getProcessInstanceId());
+		keyValuePairs.put("currentActivityID", getCurrentActivityId());
 		keyValuePairs.put("CampaignID", getIdCampaign());
 		keyValuePairs.put("questionnaireID", getQuestionnaireId());
 		dbObject.putAll(keyValuePairs);
@@ -90,8 +100,10 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 	}
 
 	@Override
-	public void addManyUniteEnquetee(List<JsonNode> listeUe, String processInstanceId, String campaignId, String questionnaireId) {
+	public void addManyUniteEnquetee(List<JsonNode> listeUe, String processDefinitionId, String processInstanceId, String currentActivityId, String campaignId, String questionnaireId) {
+		this.setProcessDefinitionId(processDefinitionId);
 		this.setProcessInstanceId(processInstanceId);
+		this.setCurrentActivityId(currentActivityId);
 		this.setIdCampaign(campaignId);
 		this.setQuestionnaireId(questionnaireId);
 		List<BasicDBObject> bo = listeUe.parallelStream()
@@ -106,12 +118,28 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 	}
 
 	@Override
-	public boolean isTerminated() {
-		log.info("UniteEnqueteeImpl.isTerminated.");
+	public boolean isTerminated(String processInstanceId, String currentActivityId, long numberCommandes) {
+		log.debug("UniteEnqueteeImpl.isTerminated.");
 		boolean result=false;
 		Query query = new Query();
-		query.addCriteria(Criteria.where("inProgress").is(true).and("done").is(true));
-		mongoTemplate.find(query, String.class, "commandes");
+		query.addCriteria(Criteria.where("processInstanceID").is(processInstanceId));
+		query.addCriteria(Criteria.where("currentActivityID").is(currentActivityId));
+		query.addCriteria(where("inProgress").is(true).and("done").is(true));
+		List<String> listeCommandes = mongoTemplate.find(query, String.class, "commandes");
+		if(!listeCommandes.isEmpty() && listeCommandes.size()==numberCommandes){
+			result=true;
+		}
+		return result;
+	}
+
+	@Override
+	public long getCommandesByProcessInstanceIdAndCurrentActivityId(String processInstanceId, String currentActivityId) {
+		log.debug("getCommandesByProcessInstanceIdAndCurrentActivityId : " + processInstanceId + "|" + currentActivityId);
+		long result=0;
+		Query query = new Query();
+		query.addCriteria(Criteria.where("processInstanceID").is(processInstanceId));
+		query.addCriteria(Criteria.where("currentActivityID").is(currentActivityId));
+		result = mongoTemplate.count(query, String.class, "commandes");
 		return result;
 	}
 

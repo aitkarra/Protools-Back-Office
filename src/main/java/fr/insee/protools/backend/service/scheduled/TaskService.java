@@ -14,9 +14,10 @@ public class TaskService {
     this.iUniteEnquetee = iUniteEnquetee;
   }
 
-  public void isTerminated() throws InterruptedException {
+  public boolean isTerminated(String processInstanceId, String currentActivityId, long nbInterogation) throws InterruptedException {
     log.info("IUniteEnquetee.isTerminated");
-    iUniteEnquetee.isTerminated();
+//    TODO : iUniteEnquetee.getCommandesBygetProcessInstanceIdAndIdTask(1,2)
+    return iUniteEnquetee.isTerminated(processInstanceId, currentActivityId, nbInterogation);
   }
 
 
