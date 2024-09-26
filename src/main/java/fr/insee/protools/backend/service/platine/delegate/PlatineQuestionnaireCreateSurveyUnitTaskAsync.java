@@ -1,12 +1,13 @@
 package fr.insee.protools.backend.service.platine.delegate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import fr.insee.protools.backend.dto.ContexteProcessus;
 import fr.insee.protools.backend.repository.IUniteEnquetee;
 import fr.insee.protools.backend.service.DelegateContextVerifier;
-import fr.insee.protools.backend.service.common.platine_sabiane.QuestionnaireHelper;
-import fr.insee.protools.backend.service.context.ContextService;
-import fr.insee.protools.backend.service.platine.questionnaire.PlatineQuestionnaireService;
+import fr.insee.protools.backend.service.context.IContextService;
+import fr.insee.protools.backend.service.platine.service.IPlatineQuestionnaireService;
 import fr.insee.protools.backend.service.scheduled.TaskService;
+import fr.insee.protools.backend.service.utils.FlowableVariableUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -14,22 +15,18 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static fr.insee.protools.backend.service.context.ContextConstants.CTX_CAMPAGNE_CONTEXTE;
+import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VARNAME_REM_INTERRO_LIST;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelegate, DelegateContextVerifier {
 
-    private final ContextService protoolsContext;
-    private final PlatineQuestionnaireService platineQuestionnaireService;
+    private final IContextService protoolsContext;
+    private final IPlatineQuestionnaireService platineQuestionnaireService;
     private final IUniteEnquetee iUniteEnquetee;
     @Autowired
     TaskService taskService;
@@ -37,13 +34,21 @@ public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelega
     @Override
     public void execute(DelegateExecution execution) {
         Boolean start = Boolean.FALSE;
-        JsonNode contextRootNode = protoolsContext.getContextByProcessInstance(execution.getProcessInstanceId());
+        ContexteProcessus context = protoolsContext.getContextDtoByProcessInstance(execution.getProcessInstanceId());
         //TODO: delete this log if necessary
         log.debug("ProcessInstanceId={}  - campagne={} - begin"
-                ,execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
+                ,execution.getProcessInstanceId(),context.getId());
 
-        checkContextOrThrow(log,execution.getProcessInstanceId(), contextRootNode);
-        QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,iUniteEnquetee,platineQuestionnaireService);
+        checkContextOrThrow(log,execution.getProcessInstanceId(), context);
+
+//        QuestionnaireHelper.createSUTaskPlatineAsync(execution,protoolsContext,iUniteEnquetee,platineQuestionnaireService);
+
+        List<JsonNode> listeUe =   FlowableVariableUtils.getVariableOrThrow(execution, VARNAME_REM_INTERRO_LIST, List.class);
+        String processInstanceId = execution.getProcessInstanceId();
+        String currentActivityId = execution.getCurrentActivityId();
+        iUniteEnquetee.addManyUniteEnquetee(listeUe, processInstanceId, currentActivityId);
+
+//        iUniteEnquetee.addManyUniteEnqueteeDeleteColonneClass(listeUe);
 
 //        TODO gestion des timeouts
         while (!start) {
@@ -61,13 +66,6 @@ public class PlatineQuestionnaireCreateSurveyUnitTaskAsync implements JavaDelega
             }
         }
         log.debug("ProcessInstanceId={}  - campagne={} - end",
-                execution.getProcessInstanceId(),contextRootNode.path(CTX_CAMPAGNE_CONTEXTE).asText());
+                execution.getProcessInstanceId(),context.getId());
     }
-
-    @Override
-    public Set<String> getContextErrors(JsonNode contextRootNode) {
-        return QuestionnaireHelper.getCreateSUContextErrorsPlatine(contextRootNode);
-    }
-
-
 }

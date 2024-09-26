@@ -10,7 +10,7 @@ public interface IUniteEnquetee {
 	@Transactional
 	void addManyUniteEnquetee(List<JsonNode> listeUe);
 
-	void addManyUniteEnquetee(List<JsonNode> listeUe, String processDefinitionId, String processInstanceId, String currentActivityId, String campaignId, String questionnaireId);
+	void addManyUniteEnquetee(List<JsonNode> listeUe, String processInstanceId, String currentActivityId);
 
 	void addManyUniteEnqueteeDeleteColonneClass(List<JsonNode> listeUe);
 

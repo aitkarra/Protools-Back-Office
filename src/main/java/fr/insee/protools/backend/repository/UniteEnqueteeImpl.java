@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,28 +27,19 @@ import static org.codehaus.groovy.runtime.DefaultGroovyMethods.collect;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+@RequiredArgsConstructor
 @Repository
 @Slf4j
 public class UniteEnqueteeImpl implements IUniteEnquetee {
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
+	private final MongoTemplate mongoTemplate;
 
-	@Setter
-	@Getter
-	private String processDefinitionId;
 	@Setter
     @Getter
     private String processInstanceId;
 	@Setter
 	@Getter
 	private String currentActivityId;
-	@Setter
-    @Getter
-    private String idCampaign;
-	@Setter
-    @Getter
-    private String questionnaireId;
 
 	private static final ObjectMapper objectMapper =
 			new ObjectMapper()
@@ -68,11 +60,8 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
         keyValuePairs.put("correlationID", correlationID);
 		keyValuePairs.put("inProgress", false);
 		keyValuePairs.put("done", false);
-		keyValuePairs.put("processDefinitionID", getProcessDefinitionId());
 		keyValuePairs.put("processInstanceID", getProcessInstanceId());
 		keyValuePairs.put("currentActivityID", getCurrentActivityId());
-		keyValuePairs.put("CampaignID", getIdCampaign());
-		keyValuePairs.put("questionnaireID", getQuestionnaireId());
 		dbObject.putAll(keyValuePairs);
 		return dbObject;
 	}
@@ -100,21 +89,18 @@ public class UniteEnqueteeImpl implements IUniteEnquetee {
 	}
 
 	@Override
-	public void addManyUniteEnquetee(List<JsonNode> listeUe, String processDefinitionId, String processInstanceId, String currentActivityId, String campaignId, String questionnaireId) {
-		this.setProcessDefinitionId(processDefinitionId);
+	public void addManyUniteEnquetee(List<JsonNode> listeUe, String processInstanceId, String currentActivityId) {
 		this.setProcessInstanceId(processInstanceId);
 		this.setCurrentActivityId(currentActivityId);
-		this.setIdCampaign(campaignId);
-		this.setQuestionnaireId(questionnaireId);
-		List<BasicDBObject> bo = listeUe.parallelStream()
-				.map(this::getUEUpdate)
-				.toList();
+//		List<BasicDBObject> bo = listeUe.parallelStream()
+//				.map(this::getUEUpdate)
+//				.toList();
 		//remove _class
 		MappingMongoConverter converter =
 				new MappingMongoConverter(mongoTemplate.getMongoDatabaseFactory(), new MongoMappingContext());
 		converter.setTypeMapper(new DefaultMongoTypeMapper(null));
 		MongoTemplate mongoTemplate2 = new MongoTemplate(mongoTemplate.getMongoDatabaseFactory(), converter);
-		mongoTemplate2.insert(bo, "commandes");
+		mongoTemplate2.insert(listeUe, "commandes");
 	}
 
 	@Override
