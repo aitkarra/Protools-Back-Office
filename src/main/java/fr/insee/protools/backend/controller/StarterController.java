@@ -21,8 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StarterController {
 
-        @Autowired(required = false)
-        private Optional<BuildProperties> buildProperties;
+        private final Optional<BuildProperties> buildProperties;
 
         private final  RestClientHelper restClientHelper;
 

@@ -34,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //@ExtendWith(PluggableFlowableExtension.class)
 @ExtendWith(FlowableSpringExtension.class)
 @ExtendWith(MockitoExtension.class)
-public class GetREMProcessTest extends AbstractFlowableTestCase {
+class GetREMProcessTest extends AbstractFlowableTestCase {
 
-    final static String END_EVENT_ID ="endTask";
+    static final String END_EVENT_ID ="endTask";
 
     private List<String> autoCleanedUpDeploymentIds = new ArrayList<>();
 

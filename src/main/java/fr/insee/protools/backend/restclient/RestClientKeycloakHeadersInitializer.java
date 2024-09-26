@@ -15,22 +15,22 @@ import org.springframework.http.client.ClientHttpRequestInitializer;
  */
 class RestClientKeycloakHeadersInitializer implements ClientHttpRequestInitializer {
 
-        KeycloakService keycloakService;
-        //Configuration of the connexion to the auth server
-        private APIProperties.AuthProperties authProperties;
+    final KeycloakService keycloakService;
+    //Configuration of the connexion to the auth server
+    private final APIProperties.AuthProperties authProperties;
 
     public RestClientKeycloakHeadersInitializer(KeycloakService keycloakService, APIProperties.AuthProperties authProperties) {
         this.keycloakService = keycloakService;
         this.authProperties = authProperties;
     }
 
-        @Override
+    @Override
     public void initialize(ClientHttpRequest request) {
         try {
             request.getHeaders().setBearerAuth(keycloakService.getToken(authProperties));
         } catch (KeycloakTokenConfigBPMNError e) {
             throw new KeycloakTokenConfigUncheckedBPMNError(e);
         }
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
     }
 }

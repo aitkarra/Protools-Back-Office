@@ -19,7 +19,7 @@ import static fr.insee.protools.backend.service.FlowableVariableNameConstants.VA
 @RequiredArgsConstructor
 public class RemPostResmiseEnCollecteTaskREST implements JavaDelegate, DelegateContextVerifier {
 
-    IRemService remService;
+    private final IRemService remService;
 
     @Override
     public void execute(DelegateExecution execution) {

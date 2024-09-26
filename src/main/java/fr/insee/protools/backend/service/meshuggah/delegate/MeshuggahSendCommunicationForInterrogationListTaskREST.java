@@ -35,7 +35,7 @@ public class MeshuggahSendCommunicationForInterrogationListTaskREST implements J
 
         meshuggahService.postCommunicationRequest(String.valueOf(context.getId()), currentCommunicationId, interroList);
 
-        log.info("ProcessInstanceId={} - currentCommunicationId - end",
+        log.info("ProcessInstanceId={} - currentCommunicationId={} - end",
                 execution.getProcessInstanceId(), currentCommunicationId);
     }
 }

@@ -54,11 +54,11 @@ public class KeycloakService {
         logToken(token);
 
         //We refresh any expired token or that will expire within TOKEN_REFRESH_LIMIT_MILISECONDS
-        if(token==null || Instant.now().toEpochMilli() >= (token.endValidityTimeMillis- TOKEN_REFRESH_LIMIT_MILLISECONDS)){
+        if(token==null || Instant.now().toEpochMilli() >= (token.endValidityTimeMillis()- TOKEN_REFRESH_LIMIT_MILLISECONDS)){
             log.trace("Refresh the token");
             refreshToken(authProperties);
         }
-        return tokenByAuthRealm.get(authProperties).value;
+        return tokenByAuthRealm.get(authProperties).value();
     }
 
     private void refreshToken(APIProperties.AuthProperties authProperties) throws KeycloakTokenConfigBPMNError {
@@ -125,7 +125,7 @@ public class KeycloakService {
             var currentDt = Instant.now().toEpochMilli();
             if(token!=null) {
                 log.trace("token.endValidityTimeMillis = {} - currentTimeMillis={} - diff={}",
-                        token.endValidityTimeMillis,currentDt, token.endValidityTimeMillis-currentDt);
+                        token.endValidityTimeMillis(),currentDt, token.endValidityTimeMillis()-currentDt);
             }
             else
                 log.trace("token=null - currentTimeMillis={}",currentDt);

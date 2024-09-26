@@ -1,7 +1,6 @@
 package fr.insee.protools.backend.integration;
 
 
-import fr.insee.protools.backend.integration.delegate_and_services_stub.TestDelegate;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -11,7 +10,6 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
@@ -24,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 })
 @TestPropertySource(locations = "/application-test.properties")
 @ExtendWith(FlowableSpringExtension.class)
-public class SimpleProcessTest {
+class SimpleProcessTest {
 
     //private ProcessEngine processEngine;
     private RuntimeService runtimeService;

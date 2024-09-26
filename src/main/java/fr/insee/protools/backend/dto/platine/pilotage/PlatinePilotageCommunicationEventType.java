@@ -8,7 +8,7 @@ public enum PlatinePilotageCommunicationEventType {
 
     public final String label;
 
-    private PlatinePilotageCommunicationEventType(String label) {
+    PlatinePilotageCommunicationEventType(String label) {
         this.label = label;
     }
 }

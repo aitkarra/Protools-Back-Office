@@ -60,7 +60,7 @@ public class SugoiREMCreateMissingAccountListTask implements JavaDelegate, Deleg
             sugoiService.postInitPassword(createdUser.getUsername(), userPassword);
             userByInterroId.put(interrogationId,createdUser.getUsername());
             pwdByInterroId.put(interrogationId,userPassword);
-            log.debug("ProcessInstanceId={} - username={} ", createdUser.getUsername());
+            log.debug("ProcessInstanceId={} - username={} ", execution.getProcessInstanceId(),createdUser.getUsername());
         }
 
         remService.patchInterrogationsSetAccounts(userByInterroId);

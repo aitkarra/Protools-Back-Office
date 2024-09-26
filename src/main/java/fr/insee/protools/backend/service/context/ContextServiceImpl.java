@@ -263,7 +263,7 @@ public class ContextServiceImpl implements IContextService {
             }
         } else if (flowElement instanceof SubProcess subProcessFlowElement) {
             Set<String> errors = new HashSet<>();
-            subProcessFlowElement.getFlowElements().stream()
+            subProcessFlowElement.getFlowElements()
                     .forEach(subFlowElement -> errors.addAll(analyseProcess(subFlowElement, contexteProcessus)));
             return errors;
         }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,10 @@ import java.util.Optional;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class SpringDocConfiguration {
 
-  @Autowired
   private InseeSpringdocProperties springdocProperties;
-
-  @Autowired(required = false)
   private Optional<BuildProperties> buildProperties;
 
 

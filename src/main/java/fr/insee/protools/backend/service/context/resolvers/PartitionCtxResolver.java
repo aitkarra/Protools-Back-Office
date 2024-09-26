@@ -147,8 +147,7 @@ public class PartitionCtxResolver {
             execution.getRootProcessInstance().setVariableLocal(VARNAME_ALREADY_SCHEDULED_COMMUNICATION_ID_SET,sentCommunicationIds);
         }
 
-        //TODO: remove
-        System.out.println("part="+partitionId+" - nextCom="+TimeLogUtils.format(nextCommEcheance));
+        log.info("part="+partitionId+" - nextCom="+TimeLogUtils.format(nextCommEcheance));
         return nextCommEcheance;
     }
 
